@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package.json and install dependencies
+COPY packages/qr-service/package.json ./
+RUN npm install
+
+# Create uploads directory
+RUN mkdir -p uploads
+
+# Copy the rest of the application
+COPY packages/qr-service ./src
+
+EXPOSE 3003
+
+CMD ["node", "src/index.js"]

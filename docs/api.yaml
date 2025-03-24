@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: Conversion Microservices API
+  description: API for the Conversion Microservices platform
+  version: 1.0.0
+  contact:
+    email: support@example.com
+  license:
+    name: ISC
+servers:
+  - url: 'http://localhost:3000'
+    description: Local development server
+tags:
+  - name: PDF
+    description: PDF conversion operations
+  - name: Image
+    description: Image processing operations
+  - name: QR
+    description: QR code generation operations
+paths:
+  /api/pdf/status:
+    get:
+      summary: Get PDF service status
+      tags:
+        - PDF
+      responses:
+        '200':
+          description: Service status information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceStatus'
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/pdf/convert:
+    post:
+      summary: Convert text to PDF
+      tags:
+        - PDF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  description: Text content to convert to PDF
+      responses:
+        '200':
+          description: PDF created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: URL to download the PDF
+                  fileName:
+                    type: string
+                    description: Name of the generated file
+                  message:
+                    type: string
+                    description: Success message
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/image/status:
+    get:
+      summary: Get Image service status
+      tags:
+        - Image
+      responses:
+        '200':
+          description: Service status information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceStatus'
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/image/convert:
+    post:
+      summary: Convert and resize images
+      tags:
+        - Image
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to convert
+                width:
+                  type: integer
+                  description: Target width in pixels
+                height:
+                  type: integer
+                  description: Target height in pixels (optional)
+                format:
+                  type: string
+                  enum: [jpeg, png, webp, avif]
+                  description: Target format
+      responses:
+        '200':
+          description: Image processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: URL to download the processed image
+                  fileName:
+                    type: string
+                    description: Name of the generated file
+                  width:
+                    type: integer
+                    description: Width of the processed image
+                  format:
+                    type: string
+                    description: Format of the processed image
+                  message:
+                    type: string
+                    description: Success message
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/qr/status:
+    get:
+      summary: Get QR service status
+      tags:
+        - QR
+      responses:
+        '200':
+          description: Service status information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceStatus'
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/qr/generate:
+    post:
+      summary: Generate QR code
+      tags:
+        - QR
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  description: Text or URL to encode in the QR code
+                size:
+                  type: integer
+                  description: Size of the QR code in pixels
+                dark:
+                  type: string
+                  description: Color of the dark modules (hex color)
+                light:
+                  type: string
+                  description: Color of the light modules (hex color)
+      responses:
+        '200':
+          description: QR code generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: URL to download the QR code image
+                  qr:
+                    type: string
+                    description: Base64 data URL of the QR code
+                  fileName:
+                    type: string
+                    description: Name of the generated file
+                  message:
+                    type: string
+                    description: Success message
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    ServiceStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [online, offline]
+          description: Status of the service
+        service:
+          type: string
+          description: Name of the service
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
