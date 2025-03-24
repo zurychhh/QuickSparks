@@ -27,7 +27,8 @@ Thumbs.db
 
 # Editor directories and files
 .idea/
-.vscode/
+# Include .vscode settings for team consistency
+!.vscode/
 *.suo
 *.ntvs*
 *.njsproj

@@ -1,0 +1,40 @@
+# Build artifacts
+dist/
+build/
+coverage/
+.cache/
+.next/
+storybook-static/
+
+# Generated files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Generated documentation
+docs/api/
+
+# Test results
+test-results/
+junit.xml
+
+# Environment files
+.env*
+!.env.example
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
