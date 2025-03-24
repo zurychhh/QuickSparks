@@ -49,6 +49,48 @@ npm run generate-test-docx
 
 ## Usage
 
+### Command Line Interface (CLI)
+
+The project provides a command-line interface for easy document conversion:
+
+```bash
+# Convert a PDF file to DOCX
+npm run convert sample.pdf --to docx
+
+# Convert a DOCX file to PDF with a specific converter
+npm run convert example.docx --to pdf --converter mammoth
+
+# Compare different converters for a file
+npm run compare sample.pdf
+
+# Batch convert multiple files
+npm run batch-convert "documents/*.pdf"
+```
+
+Alternatively, you can use the CLI directly:
+
+```bash
+node src/cli.js convert sample.pdf --to docx
+```
+
+The CLI provides the following commands:
+
+- **convert**: Convert a single file
+  - Options:
+    - `--to, -t`: Target format (pdf or docx) [required]
+    - `--converter, -c`: Converter to use (pdf-lib, pdf2json, pdfjs, mammoth)
+    - `--output-dir, -o`: Output directory
+    - `--quality, -q`: Assess conversion quality
+
+- **compare**: Compare different converters for a single file
+  - Options:
+    - `--output-dir, -o`: Output directory
+
+- **batch-convert**: Convert multiple files
+  - Options:
+    - `--converter, -c`: Converter to use
+    - `--output-dir, -o`: Output directory
+
 ### Starting the Test Server
 
 ```bash
@@ -145,14 +187,18 @@ pdf-service-test/
 │   │   ├── pdfjs-converter.js
 │   │   └── mammoth-converter.js
 │   ├── benchmark.js         # Performance benchmarking
+│   ├── cli.js               # Command-line interface
+│   ├── conversion-pipeline.js # End-to-end conversion pipeline
 │   ├── generate-test-docx.js # Test DOCX generator
 │   ├── generate-test-pdf.js  # Test PDF generator
 │   ├── index.js             # API server
+│   ├── quality-metrics.js   # Quality measurement functions
 │   ├── quality-test.js      # Quality assessment
 │   └── test-api.js          # API testing script
 ├── test-files/              # Test documents
 ├── outputs/                 # Conversion outputs
-└── results/                 # Test results
+├── results/                 # Test results
+└── temp/                    # Temporary files during conversion
 ```
 
 ### Adding a New Converter

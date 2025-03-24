@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Testing environment for PDF conversion libraries",
   "main": "src/index.js",
+  "bin": {
+    "pdf-converter": "src/cli.js"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
@@ -13,7 +16,11 @@
     "create-samples": "node src/create-sample-pdf.js",
     "generate-test-docx": "node src/generate-test-docx.js",
     "generate-test-pdf": "node src/generate-test-pdf.js",
-    "test-api": "node src/test-api.js"
+    "test-api": "node src/test-api.js",
+    "test-cli": "node src/cli.test.js",
+    "convert": "node src/cli.js convert",
+    "compare": "node src/cli.js compare",
+    "batch-convert": "node src/cli.js batch-convert"
   },
   "keywords": [
     "pdf",
@@ -28,13 +35,15 @@
     "docx-pdf": "0.0.1",
     "express": "^4.18.3",
     "form-data": "^4.0.2",
+    "glob": "^10.3.10",
     "mammoth": "^1.6.0",
     "multer": "^1.4.5-lts.1",
     "officegen": "^0.6.5",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
     "pdf2json": "^3.0.5",
-    "pdfjs-dist": "^3.10.111"
+    "pdfjs-dist": "^3.10.111",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "jest": "^29.7.0",

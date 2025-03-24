@@ -10,13 +10,12 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 
-// Import converter modules
-const pdfLibConverter = require('./converters/pdf-lib-converter');
-const pdf2jsonConverter = require('./converters/pdf2json-converter');
-const pdfjsConverter = require('./converters/pdfjs-converter');
-const mammothConverter = require('./converters/mammoth-converter');
-
-// Import quality metrics
+// Import conversion pipeline and quality metrics
+const { 
+  convertPdfToDocx,
+  convertDocxToPdf,
+  compareConverters
+} = require('./conversion-pipeline');
 const qualityMetrics = require('./quality-metrics');
 
 // Setup storage for uploaded files
@@ -87,65 +86,42 @@ app.post('/convert/pdf-to-docx', upload.single('file'), async (req, res) => {
     }
 
     const filePath = req.file.path;
-    const libraryName = req.body.library || 'pdf-lib'; // Default library
-
-    // Start measuring performance
+    const converter = req.body.library || 'default'; // Default or specific converter
+    
+    // Start measuring the total API response time (includes file reading/writing)
     const startTime = process.hrtime();
     const startMemory = process.memoryUsage().heapUsed;
 
-    let result;
-    switch(libraryName) {
-      case 'pdf-lib':
-        result = await pdfLibConverter.pdfToDocx(filePath);
-        break;
-      case 'pdf2json':
-        result = await pdf2jsonConverter.pdfToDocx(filePath);
-        break;
-      case 'pdfjs':
-        result = await pdfjsConverter.pdfToDocx(filePath);
-        break;
-      default:
-        return res.status(400).json({ error: `Library ${libraryName} not supported` });
-    }
+    // Use the conversion pipeline
+    const result = await convertPdfToDocx(filePath, {
+      outputDir: outputsDir,
+      converter: converter,
+      assessQuality: req.body.evaluateQuality === 'true'
+    });
 
-    // End measuring performance
+    // End measuring total API performance
     const hrtime = process.hrtime(startTime);
     const executionTime = hrtime[0] * 1000 + hrtime[1] / 1000000; // ms
     const memoryUsed = (process.memoryUsage().heapUsed - startMemory) / 1024 / 1024; // MB
 
     // Get file stats
-    const outputFilePath = path.join(outputsDir, result.fileName);
-    const stats = fs.statSync(outputFilePath);
+    const stats = fs.statSync(result.outputPath);
     const fileSizeInBytes = stats.size;
     const fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-
-    // Evaluate quality if requested
-    let quality = null;
-    if (req.body.evaluateQuality === 'true') {
-      try {
-        quality = await qualityMetrics.evaluatePdfToDocxQuality(
-          filePath, 
-          outputFilePath
-        );
-      } catch (error) {
-        console.error('Error evaluating quality:', error);
-        // Continue even if quality evaluation fails
-      }
-    }
 
     res.json({
       success: true,
       inputFile: req.file.originalname,
-      outputFile: result.fileName,
-      outputUrl: `/outputs/${result.fileName}`,
+      outputFile: path.basename(result.outputPath),
+      outputUrl: `/outputs/${path.basename(result.outputPath)}`,
       conversionTime: result.conversionTime,
       performance: {
         executionTime,
         memoryUsed,
         fileSizeInMB
       },
-      quality,
-      library: libraryName
+      quality: result.quality,
+      library: result.converter
     });
   } catch (error) {
     console.error('Error converting PDF to DOCX:', error);
@@ -160,59 +136,42 @@ app.post('/convert/docx-to-pdf', upload.single('file'), async (req, res) => {
     }
 
     const filePath = req.file.path;
-    const libraryName = req.body.library || 'mammoth'; // Default library
-
-    // Start measuring performance
+    const converter = req.body.library || 'default'; // Default or specific converter
+    
+    // Start measuring the total API response time
     const startTime = process.hrtime();
     const startMemory = process.memoryUsage().heapUsed;
 
-    let result;
-    switch(libraryName) {
-      case 'mammoth':
-        result = await mammothConverter.docxToPdf(filePath);
-        break;
-      default:
-        return res.status(400).json({ error: `Library ${libraryName} not supported` });
-    }
+    // Use the conversion pipeline
+    const result = await convertDocxToPdf(filePath, {
+      outputDir: outputsDir,
+      converter: converter,
+      assessQuality: req.body.evaluateQuality === 'true'
+    });
 
-    // End measuring performance
+    // End measuring total API performance
     const hrtime = process.hrtime(startTime);
     const executionTime = hrtime[0] * 1000 + hrtime[1] / 1000000; // ms
     const memoryUsed = (process.memoryUsage().heapUsed - startMemory) / 1024 / 1024; // MB
 
     // Get file stats
-    const outputFilePath = path.join(outputsDir, result.fileName);
-    const stats = fs.statSync(outputFilePath);
+    const stats = fs.statSync(result.outputPath);
     const fileSizeInBytes = stats.size;
     const fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-
-    // Evaluate quality if requested
-    let quality = null;
-    if (req.body.evaluateQuality === 'true') {
-      try {
-        quality = await qualityMetrics.evaluateDocxToPdfQuality(
-          filePath, 
-          outputFilePath
-        );
-      } catch (error) {
-        console.error('Error evaluating quality:', error);
-        // Continue even if quality evaluation fails
-      }
-    }
 
     res.json({
       success: true,
       inputFile: req.file.originalname,
-      outputFile: result.fileName,
-      outputUrl: `/outputs/${result.fileName}`,
+      outputFile: path.basename(result.outputPath),
+      outputUrl: `/outputs/${path.basename(result.outputPath)}`,
       conversionTime: result.conversionTime,
       performance: {
         executionTime,
         memoryUsed,
         fileSizeInMB
       },
-      quality,
-      library: libraryName
+      quality: result.quality,
+      library: result.converter
     });
   } catch (error) {
     console.error('Error converting DOCX to PDF:', error);
@@ -228,176 +187,75 @@ app.post('/compare', upload.single('file'), async (req, res) => {
     }
 
     const filePath = req.file.path;
-    const fileExt = path.extname(req.file.originalname).toLowerCase();
     
-    let results = [];
+    // Start measuring total API performance
+    const startTime = process.hrtime();
     
-    if (fileExt === '.pdf') {
-      // Test all PDF to DOCX converters
-      const libraries = ['pdf-lib', 'pdf2json', 'pdfjs'];
-      
-      for (const lib of libraries) {
-        try {
-          // Start measuring performance
-          const startTime = process.hrtime();
-          const startMemory = process.memoryUsage().heapUsed;
-          
-          let result;
-          switch(lib) {
-            case 'pdf-lib':
-              result = await pdfLibConverter.pdfToDocx(filePath);
-              break;
-            case 'pdf2json':
-              result = await pdf2jsonConverter.pdfToDocx(filePath);
-              break;
-            case 'pdfjs':
-              result = await pdfjsConverter.pdfToDocx(filePath);
-              break;
-          }
-          
-          // End measuring performance
-          const hrtime = process.hrtime(startTime);
-          const executionTime = hrtime[0] * 1000 + hrtime[1] / 1000000; // ms
-          const memoryUsed = (process.memoryUsage().heapUsed - startMemory) / 1024 / 1024; // MB
-          
-          // Get file stats
-          const outputFilePath = path.join(outputsDir, result.fileName);
-          const stats = fs.statSync(outputFilePath);
-          const fileSizeInBytes = stats.size;
-          const fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-          
-          // Evaluate quality
-          let quality = null;
-          try {
-            quality = await qualityMetrics.evaluatePdfToDocxQuality(
-              filePath, 
-              outputFilePath
-            );
-          } catch (error) {
-            console.error(`Error evaluating quality for ${lib}:`, error);
-            // Continue even if quality evaluation fails
-          }
-          
-          results.push({
-            library: lib,
-            success: true,
-            outputFile: result.fileName,
-            outputUrl: `/outputs/${result.fileName}`,
-            conversionTime: result.conversionTime,
-            performance: {
-              executionTime,
-              memoryUsed,
-              fileSizeInMB
-            },
-            quality
-          });
-        } catch (error) {
-          results.push({
-            library: lib,
-            success: false,
-            error: error.message
-          });
-        }
-      }
-      
-      // Generate visual comparison report if requested
-      if (req.body.generateVisualReport === 'true' && results.some(r => r.success)) {
-        try {
-          const successfulResult = results.find(r => r.success);
-          const outputFilePath = path.join(outputsDir, successfulResult.outputFile);
-          
-          const reportPath = await qualityMetrics.generateVisualComparison(
-            filePath,
-            outputFilePath,
-            'pdf-to-docx'
-          );
-          
-          const reportUrl = `/reports/${path.basename(reportPath)}`;
-          
-          // Add report URL to response
-          results = results.map(r => ({
-            ...r,
-            reportUrl: r.success ? reportUrl : null
-          }));
-        } catch (error) {
-          console.error('Error generating visual comparison:', error);
-        }
-      }
-      
-    } else if (fileExt === '.docx') {
-      // Test DOCX to PDF converter
-      try {
-        // Start measuring performance
-        const startTime = process.hrtime();
-        const startMemory = process.memoryUsage().heapUsed;
-        
-        const result = await mammothConverter.docxToPdf(filePath);
-        
-        // End measuring performance
-        const hrtime = process.hrtime(startTime);
-        const executionTime = hrtime[0] * 1000 + hrtime[1] / 1000000; // ms
-        const memoryUsed = (process.memoryUsage().heapUsed - startMemory) / 1024 / 1024; // MB
-        
-        // Get file stats
-        const outputFilePath = path.join(outputsDir, result.fileName);
-        const stats = fs.statSync(outputFilePath);
-        const fileSizeInBytes = stats.size;
-        const fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-        
-        // Evaluate quality
-        let quality = null;
-        try {
-          quality = await qualityMetrics.evaluateDocxToPdfQuality(
-            filePath, 
-            outputFilePath
-          );
-        } catch (error) {
-          console.error('Error evaluating quality for mammoth:', error);
-          // Continue even if quality evaluation fails
-        }
-        
-        // Generate visual comparison report if requested
-        let reportUrl = null;
-        if (req.body.generateVisualReport === 'true') {
-          try {
-            const reportPath = await qualityMetrics.generateVisualComparison(
-              filePath,
-              outputFilePath,
-              'docx-to-pdf'
-            );
-            
-            reportUrl = `/reports/${path.basename(reportPath)}`;
-          } catch (error) {
-            console.error('Error generating visual comparison:', error);
-          }
-        }
-        
-        results.push({
-          library: 'mammoth',
-          success: true,
-          outputFile: result.fileName,
-          outputUrl: `/outputs/${result.fileName}`,
-          conversionTime: result.conversionTime,
-          performance: {
-            executionTime,
-            memoryUsed,
-            fileSizeInMB
-          },
-          quality,
-          reportUrl
-        });
-      } catch (error) {
-        results.push({
-          library: 'mammoth',
+    // Use the conversion pipeline's compare function
+    const comparisonResult = await compareConverters(filePath, {
+      outputDir: outputsDir
+    });
+    
+    // End measuring total API performance
+    const hrtime = process.hrtime(startTime);
+    const executionTime = hrtime[0] * 1000 + hrtime[1] / 1000000; // ms
+    
+    // Format the results for the API response
+    const formattedResults = comparisonResult.results.map(result => {
+      if (!result.success) {
+        return {
+          library: result.converter,
           success: false,
-          error: error.message
-        });
+          error: result.error
+        };
+      }
+      
+      return {
+        library: result.converter,
+        success: true,
+        outputFile: path.basename(result.outputPath),
+        outputUrl: `/outputs/${path.basename(result.outputPath)}`,
+        conversionTime: result.conversionTime,
+        quality: result.quality,
+        performance: {
+          conversionTime: result.conversionTime,
+          // Add other performance metrics if available
+        }
+      };
+    });
+    
+    // Generate visual comparison report if requested
+    if (req.body.generateVisualReport === 'true' && formattedResults.some(r => r.success)) {
+      try {
+        const successfulResult = formattedResults.find(r => r.success);
+        const outputFilePath = path.join(outputsDir, successfulResult.outputFile);
+        
+        const conversionType = comparisonResult.inputType === 'pdf' ? 'pdf-to-docx' : 'docx-to-pdf';
+        
+        const reportPath = await qualityMetrics.generateVisualComparison(
+          filePath,
+          outputFilePath,
+          conversionType
+        );
+        
+        const reportUrl = `/reports/${path.basename(reportPath)}`;
+        
+        // Add report URL to response
+        formattedResults = formattedResults.map(r => ({
+          ...r,
+          reportUrl: r.success ? reportUrl : null
+        }));
+      } catch (error) {
+        console.error('Error generating visual comparison:', error);
       }
     }
     
     res.json({
       inputFile: req.file.originalname,
-      results
+      inputType: comparisonResult.inputType,
+      outputType: comparisonResult.outputType,
+      totalExecutionTime: executionTime,
+      results: formattedResults
     });
     
   } catch (error) {
