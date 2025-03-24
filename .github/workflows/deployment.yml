@@ -1,0 +1,95 @@
+name: Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      service:
+        description: 'Service to deploy'
+        required: true
+        type: choice
+        options:
+          - all
+          - gateway
+          - pdf-service
+          - image-service
+          - qr-service
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Set environment variables
+        run: |
+          echo "DEPLOYMENT_TIMESTAMP=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+          
+          if [[ "${{ github.event.inputs.environment }}" == "production" ]]; then
+            echo "DEPLOYMENT_ENV=prod" >> $GITHUB_ENV
+          else
+            echo "DEPLOYMENT_ENV=staging" >> $GITHUB_ENV
+          fi
+      
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            cd /var/www/conversion-services
+            
+            # Pull the latest images
+            if [[ "${{ github.event.inputs.service }}" == "all" || "${{ github.event.inputs.service }}" == "gateway" ]]; then
+              docker pull quicksparks/conversion-gateway:${{ github.ref_name }}
+            fi
+            
+            if [[ "${{ github.event.inputs.service }}" == "all" || "${{ github.event.inputs.service }}" == "pdf-service" ]]; then
+              docker pull quicksparks/pdf-service:${{ github.ref_name }}
+            fi
+            
+            if [[ "${{ github.event.inputs.service }}" == "all" || "${{ github.event.inputs.service }}" == "image-service" ]]; then
+              docker pull quicksparks/image-service:${{ github.ref_name }}
+            fi
+            
+            if [[ "${{ github.event.inputs.service }}" == "all" || "${{ github.event.inputs.service }}" == "qr-service" ]]; then
+              docker pull quicksparks/qr-service:${{ github.ref_name }}
+            fi
+            
+            # Update docker-compose.yml with new image versions if needed
+            
+            # Restart the services
+            if [[ "${{ github.event.inputs.service }}" == "all" ]]; then
+              docker-compose down && docker-compose up -d
+            else
+              docker-compose up -d ${{ github.event.inputs.service }}
+            fi
+            
+            # Verify deployment
+            docker ps
+      
+      - name: Notify deployment status
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_TITLE: "Deployment to ${{ github.event.inputs.environment }}"
+          SLACK_MESSAGE: "${{ github.event.inputs.service }} services deployed to ${{ github.event.inputs.environment }} by ${{ github.actor }}"
+          SLACK_COLOR: ${{ job.status }}

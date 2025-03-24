@@ -1,0 +1,57 @@
+# Branch Protection Rules
+# This file describes the branch protection rules that should be applied
+# to the repository. These rules can be set up manually in the repository
+# settings or automated using GitHub CLI or API.
+
+branches:
+  - name: main
+    protection:
+      required_status_checks:
+        strict: true
+        contexts:
+          - lint
+          - test
+          - build
+          - code-quality
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: true
+      enforce_admins: false
+      restrictions: null
+      
+  - name: develop
+    protection:
+      required_status_checks:
+        strict: true
+        contexts:
+          - lint
+          - test
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: false
+      enforce_admins: false
+      restrictions: null
+
+# Instructions for setting up branch protection via GitHub CLI:
+#
+# 1. Install GitHub CLI: https://cli.github.com/
+# 2. Authenticate: gh auth login
+# 3. Set branch protection for main:
+#    gh api -X PUT repos/:owner/:repo/branches/main/protection \
+#      -f required_status_checks[strict]=true \
+#      -f required_status_checks[contexts][]=lint \
+#      -f required_status_checks[contexts][]=test \
+#      -f required_status_checks[contexts][]=build \
+#      -f required_pull_request_reviews[required_approving_review_count]=1 \
+#      -f required_pull_request_reviews[dismiss_stale_reviews]=true \
+#      -f required_pull_request_reviews[require_code_owner_reviews]=true
+#
+# 4. Set branch protection for develop:
+#    gh api -X PUT repos/:owner/:repo/branches/develop/protection \
+#      -f required_status_checks[strict]=true \
+#      -f required_status_checks[contexts][]=lint \
+#      -f required_status_checks[contexts][]=test \
+#      -f required_pull_request_reviews[required_approving_review_count]=1 \
+#      -f required_pull_request_reviews[dismiss_stale_reviews]=true

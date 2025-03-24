@@ -1,0 +1,33 @@
+# This file defines the code owners for different parts of the repository
+# Code owners are automatically requested for review when someone opens a pull request
+
+# Default owners for everything
+* @project-lead
+
+# Gateway service
+/gateway/ @api-team
+
+# PDF conversion service
+/services/pdf-service/ @conversion-team
+/packages/pdf-service-test/ @conversion-team
+
+# Image conversion service
+/services/image-service/ @conversion-team
+
+# QR code service
+/services/qr-service/ @conversion-team
+
+# Shared packages
+/packages/shared/ @core-team
+/packages/ui-components/ @frontend-team
+
+# CI/CD configuration
+/.github/ @devops-team
+/docker-compose.yml @devops-team
+/Dockerfile @devops-team
+
+# Documentation
+/docs/ @documentation-team
+
+# Tests
+/tests/ @quality-team
