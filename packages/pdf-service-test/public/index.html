@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickSparks PDF Conversion</title>
+  <style>
+    :root {
+      --primary-color: #4a6bef;
+      --primary-dark: #3a5bd0;
+      --secondary-color: #f5f7ff;
+      --text-color: #333;
+      --light-gray: #e9ecef;
+      --border-radius: 8px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .conversion-card {
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 30px;
+      margin-bottom: 30px;
+      transition: var(--transition);
+    }
+
+    .conversion-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--secondary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+    }
+
+    .card-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--primary-color);
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .upload-area {
+      border: 2px dashed var(--light-gray);
+      border-radius: var(--border-radius);
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--primary-color);
+      background-color: var(--secondary-color);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+
+    .upload-text {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .upload-subtext {
+      font-size: 14px;
+      color: #888;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .options {
+      margin-bottom: 20px;
+    }
+
+    .options-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .radio-item {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .radio-label {
+      display: block;
+      padding: 12px 15px;
+      background-color: var(--light-gray);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .radio-label:hover {
+      background-color: var(--secondary-color);
+    }
+
+    input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    input[type="radio"]:checked + .radio-label {
+      background-color: var(--secondary-color);
+      border: 1px solid var(--primary-color);
+    }
+
+    .convert-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .convert-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .convert-btn:disabled {
+      background-color: var(--light-gray);
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    .progress-container {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background-color: var(--light-gray);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--primary-color);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .result-container {
+      margin-top: 30px;
+      display: none;
+    }
+
+    .result-header {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .result-file {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background-color: var(--secondary-color);
+      border-radius: var(--border-radius);
+      margin-bottom: 15px;
+    }
+
+    .result-icon {
+      margin-right: 15px;
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+
+    .result-info {
+      flex: 1;
+    }
+
+    .result-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .result-meta {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .download-btn {
+      padding: 8px 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .download-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .quality-metrics {
+      margin-top: 20px;
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .metrics-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .metric-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .metric-name {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .metric-bar {
+      flex: 2;
+      height: 8px;
+      background-color: var(--light-gray);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0 15px;
+    }
+
+    .metric-fill {
+      height: 100%;
+      background-color: var(--primary-color);
+    }
+
+    .metric-value {
+      width: 40px;
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .compare-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 20px;
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .compare-btn:hover {
+      background-color: var(--secondary-color);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid var(--light-gray);
+      color: #888;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .conversion-card {
+        padding: 20px;
+      }
+      
+      .radio-group {
+        flex-direction: column;
+      }
+      
+      .radio-item {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">QuickSparks</div>
+      <h1>PDF Conversion Service</h1>
+      <p class="subtitle">Convert your documents with high quality and precision</p>
+    </header>
+
+    <div class="conversion-card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M19 3H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-2-7H7v-2h10v2zm-4 4H7v-2h6v2z"/>
+          </svg>
+        </div>
+        <h2 class="card-title">Convert PDF to DOCX</h2>
+      </div>
+      
+      <form id="pdf-to-docx-form">
+        <div class="upload-area" id="pdf-upload-area">
+          <div class="upload-icon">📄</div>
+          <p class="upload-text">Drag & Drop your PDF here</p>
+          <p class="upload-subtext">or click to browse files</p>
+          <input type="file" class="file-input" id="pdf-file-input" accept=".pdf">
+        </div>
+        
+        <div class="options">
+          <h3 class="options-title">Conversion Library</h3>
+          <div class="radio-group">
+            <div class="radio-item">
+              <input type="radio" id="pdf-lib" name="library" value="pdf-lib" checked>
+              <label for="pdf-lib" class="radio-label">
+                pdf-lib (Fast)
+              </label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="pdf2json" name="library" value="pdf2json">
+              <label for="pdf2json" class="radio-label">
+                pdf2json (Balanced)
+              </label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="pdfjs" name="library" value="pdfjs">
+              <label for="pdfjs" class="radio-label">
+                pdfjs (High Quality)
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <button type="submit" class="convert-btn" id="pdf-convert-btn" disabled>Convert to DOCX</button>
+        
+        <div class="progress-container" id="pdf-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="pdf-progress-fill"></div>
+          </div>
+          <div class="progress-text" id="pdf-progress-text">Processing...</div>
+        </div>
+        
+        <div class="result-container" id="pdf-result">
+          <h3 class="result-header">Conversion Complete</h3>
+          <div class="result-file">
+            <div class="result-icon">📝</div>
+            <div class="result-info">
+              <div class="result-name" id="pdf-result-name">document.docx</div>
+              <div class="result-meta" id="pdf-result-meta">DOCX Document • 256 KB</div>
+            </div>
+            <a href="#" class="download-btn" id="pdf-download-btn">Download</a>
+          </div>
+          
+          <div class="quality-metrics">
+            <h3 class="metrics-title">Quality Assessment</h3>
+            <div class="metric-item">
+              <span class="metric-name">Text Accuracy</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 92%;"></div>
+              </div>
+              <span class="metric-value">92%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-name">Structure</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 85%;"></div>
+              </div>
+              <span class="metric-value">85%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-name">Formatting</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 78%;"></div>
+              </div>
+              <span class="metric-value">78%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-name">Tables</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 88%;"></div>
+              </div>
+              <span class="metric-value">88%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-name">Overall</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 86%;"></div>
+              </div>
+              <span class="metric-value">86%</span>
+            </div>
+          </div>
+          
+          <button class="compare-btn" id="pdf-compare-btn">Compare Original & Converted</button>
+        </div>
+      </form>
+    </div>
+    
+    <div class="conversion-card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+          </svg>
+        </div>
+        <h2 class="card-title">Convert DOCX to PDF</h2>
+      </div>
+      
+      <form id="docx-to-pdf-form">
+        <div class="upload-area" id="docx-upload-area">
+          <div class="upload-icon">📝</div>
+          <p class="upload-text">Drag & Drop your DOCX here</p>
+          <p class="upload-subtext">or click to browse files</p>
+          <input type="file" class="file-input" id="docx-file-input" accept=".docx">
+        </div>
+        
+        <div class="options">
+          <h3 class="options-title">Conversion Library</h3>
+          <div class="radio-group">
+            <div class="radio-item">
+              <input type="radio" id="mammoth" name="library" value="mammoth" checked>
+              <label for="mammoth" class="radio-label">
+                Mammoth (High Quality)
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <button type="submit" class="convert-btn" id="docx-convert-btn" disabled>Convert to PDF</button>
+        
+        <div class="progress-container" id="docx-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="docx-progress-fill"></div>
+          </div>
+          <div class="progress-text" id="docx-progress-text">Processing...</div>
+        </div>
+        
+        <div class="result-container" id="docx-result">
+          <h3 class="result-header">Conversion Complete</h3>
+          <div class="result-file">
+            <div class="result-icon">📄</div>
+            <div class="result-info">
+              <div class="result-name" id="docx-result-name">document.pdf</div>
+              <div class="result-meta" id="docx-result-meta">PDF Document • 128 KB</div>
+            </div>
+            <a href="#" class="download-btn" id="docx-download-btn">Download</a>
+          </div>
+          
+          <div class="quality-metrics">
+            <h3 class="metrics-title">Quality Assessment</h3>
+            <div class="metric-item">
+              <span class="metric-name">Text Accuracy</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 95%;"></div>
+              </div>
+              <span class="metric-value">95%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-name">Structure</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 90%;"></div>
+              </div>
+              <span class="metric-value">90%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-name">Formatting</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 85%;"></div>
+              </div>
+              <span class="metric-value">85%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-name">Tables</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 82%;"></div>
+              </div>
+              <span class="metric-value">82%</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-name">Overall</span>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 90%;"></div>
+              </div>
+              <span class="metric-value">90%</span>
+            </div>
+          </div>
+          
+          <button class="compare-btn" id="docx-compare-btn">Compare Original & Converted</button>
+        </div>
+      </form>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 QuickSparks PDF Conversion Service • All Rights Reserved</p>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const pdfUploadArea = document.getElementById('pdf-upload-area');
+      const pdfFileInput = document.getElementById('pdf-file-input');
+      const pdfConvertBtn = document.getElementById('pdf-convert-btn');
+      const pdfProgress = document.getElementById('pdf-progress');
+      const pdfProgressFill = document.getElementById('pdf-progress-fill');
+      const pdfProgressText = document.getElementById('pdf-progress-text');
+      const pdfResult = document.getElementById('pdf-result');
+      const pdfResultName = document.getElementById('pdf-result-name');
+      const pdfResultMeta = document.getElementById('pdf-result-meta');
+      const pdfDownloadBtn = document.getElementById('pdf-download-btn');
+      const pdfCompareBtn = document.getElementById('pdf-compare-btn');
+      
+      const docxUploadArea = document.getElementById('docx-upload-area');
+      const docxFileInput = document.getElementById('docx-file-input');
+      const docxConvertBtn = document.getElementById('docx-convert-btn');
+      const docxProgress = document.getElementById('docx-progress');
+      const docxProgressFill = document.getElementById('docx-progress-fill');
+      const docxProgressText = document.getElementById('docx-progress-text');
+      const docxResult = document.getElementById('docx-result');
+      const docxResultName = document.getElementById('docx-result-name');
+      const docxResultMeta = document.getElementById('docx-result-meta');
+      const docxDownloadBtn = document.getElementById('docx-download-btn');
+      const docxCompareBtn = document.getElementById('docx-compare-btn');
+      
+      // Handle file upload for PDF to DOCX
+      setupFileUpload(pdfUploadArea, pdfFileInput, pdfConvertBtn);
+      
+      // Handle file upload for DOCX to PDF
+      setupFileUpload(docxUploadArea, docxFileInput, docxConvertBtn);
+      
+      // Handle PDF to DOCX conversion
+      document.getElementById('pdf-to-docx-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get selected library
+        const library = document.querySelector('input[name="library"]:checked').value;
+        
+        // Show progress
+        pdfProgress.style.display = 'block';
+        pdfConvertBtn.disabled = true;
+        
+        // Simulate conversion progress
+        simulateProgress(pdfProgressFill, pdfProgressText, function() {
+          // Show result
+          pdfProgress.style.display = 'none';
+          pdfResult.style.display = 'block';
+          
+          // Set result details
+          const file = pdfFileInput.files[0];
+          pdfResultName = file.name.replace('.pdf', '.docx');
+          pdfResultMeta.textContent = 'DOCX Document • ' + formatFileSize(file.size * 0.8);
+          
+          // Set download link
+          pdfDownloadBtn.href = '#'; // Would be actual file URL in production
+        });
+      });
+      
+      // Handle DOCX to PDF conversion
+      document.getElementById('docx-to-pdf-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Show progress
+        docxProgress.style.display = 'block';
+        docxConvertBtn.disabled = true;
+        
+        // Simulate conversion progress
+        simulateProgress(docxProgressFill, docxProgressText, function() {
+          // Show result
+          docxProgress.style.display = 'none';
+          docxResult.style.display = 'block';
+          
+          // Set result details
+          const file = docxFileInput.files[0];
+          docxResultName.textContent = file.name.replace('.docx', '.pdf');
+          docxResultMeta.textContent = 'PDF Document • ' + formatFileSize(file.size * 1.2);
+          
+          // Set download link
+          docxDownloadBtn.href = '#'; // Would be actual file URL in production
+        });
+      });
+      
+      // Setup file upload functionality
+      function setupFileUpload(uploadArea, fileInput, convertBtn) {
+        // Click on upload area to trigger file input
+        uploadArea.addEventListener('click', function() {
+          fileInput.click();
+        });
+        
+        // Handle file selection
+        fileInput.addEventListener('change', function() {
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            uploadArea.querySelector('.upload-text').textContent = file.name;
+            uploadArea.querySelector('.upload-subtext').textContent = formatFileSize(file.size);
+            convertBtn.disabled = false;
+          }
+        });
+        
+        // Handle drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function() {
+          uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+          e.preventDefault();
+          uploadArea.classList.remove('dragover');
+          
+          if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            const file = fileInput.files[0];
+            uploadArea.querySelector('.upload-text').textContent = file.name;
+            uploadArea.querySelector('.upload-subtext').textContent = formatFileSize(file.size);
+            convertBtn.disabled = false;
+          }
+        });
+      }
+      
+      // Simulate conversion progress
+      function simulateProgress(progressFill, progressText, callback) {
+        let progress = 0;
+        const interval = setInterval(function() {
+          progress += Math.random() * 10;
+          if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            progressFill.style.width = '100%';
+            progressText.textContent = 'Conversion complete!';
+            setTimeout(callback, 500);
+          } else {
+            progressFill.style.width = progress + '%';
+            progressText.textContent = 'Processing... ' + Math.round(progress) + '%';
+          }
+        }, 300);
+      }
+      
+      // Format file size
+      function formatFileSize(bytes) {
+        if (bytes < 1024) {
+          return bytes + ' B';
+        } else if (bytes < 1024 * 1024) {
+          return (bytes / 1024).toFixed(1) + ' KB';
+        } else {
+          return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

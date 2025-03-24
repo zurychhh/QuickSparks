@@ -1,0 +1,56 @@
+{
+  "pdfToDocx": [
+    {
+      "converter": "pdf-lib",
+      "file": "test-document.pdf",
+      "success": true,
+      "iterations": 3,
+      "avgTimeMs": 12.467264,
+      "minTimeMs": 6.3755,
+      "maxTimeMs": 24.499042,
+      "stdDevMs": 8.507977370154357,
+      "avgMemoryBytes": -506261.3333333333
+    },
+    {
+      "converter": "pdf2json",
+      "file": "test-document.pdf",
+      "success": true,
+      "iterations": 3,
+      "avgTimeMs": 9.638958666666666,
+      "minTimeMs": 6.953792,
+      "maxTimeMs": 14.694334,
+      "stdDevMs": 3.5770019528554293,
+      "avgMemoryBytes": 518098.6666666667
+    },
+    {
+      "converter": "pdfjs",
+      "file": "test-document.pdf",
+      "success": true,
+      "iterations": 3,
+      "avgTimeMs": 32.664611,
+      "minTimeMs": 8.265875,
+      "maxTimeMs": 80.228291,
+      "stdDevMs": 33.636372198674216,
+      "avgMemoryBytes": 2824058.6666666665
+    }
+  ],
+  "docxToPdf": [
+    {
+      "converter": "mammoth",
+      "file": "test-document.docx",
+      "success": true,
+      "iterations": 3,
+      "avgTimeMs": 33.51991666666667,
+      "minTimeMs": 13.74375,
+      "maxTimeMs": 68.005292,
+      "stdDevMs": 24.47242461430276,
+      "avgMemoryBytes": 4762077.333333333
+    }
+  ],
+  "timestamp": "2025-03-24T14:57:41.512Z",
+  "system": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeVersion": "v22.13.1"
+  }
+}

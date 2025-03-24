@@ -1,0 +1,39 @@
+{
+  "pdfToDocx": [
+    {
+      "converter": "pdf-lib",
+      "file": "test-document.pdf",
+      "success": false,
+      "error": "All iterations failed"
+    },
+    {
+      "converter": "pdf2json",
+      "file": "test-document.pdf",
+      "success": true,
+      "iterations": 3,
+      "avgTimeMs": 14.736194333333332,
+      "minTimeMs": 7.05375,
+      "maxTimeMs": 28.894375,
+      "stdDevMs": 10.023459013460917,
+      "avgMemoryBytes": 1962360
+    },
+    {
+      "converter": "pdfjs",
+      "file": "test-document.pdf",
+      "success": true,
+      "iterations": 3,
+      "avgTimeMs": 31.124070000000003,
+      "minTimeMs": 6.287959,
+      "maxTimeMs": 80.094959,
+      "stdDevMs": 34.62883137966554,
+      "avgMemoryBytes": 4301978.666666667
+    }
+  ],
+  "docxToPdf": [],
+  "timestamp": "2025-03-24T14:52:50.284Z",
+  "system": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "nodeVersion": "v22.13.1"
+  }
+}

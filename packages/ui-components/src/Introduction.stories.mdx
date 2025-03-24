@@ -1,0 +1,64 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Introduction" />
+
+# QuickSparks UI Component Library
+
+This is the component library for the QuickSparks conversion microservices platform. 
+It provides a set of reusable React components that follow a consistent design language.
+
+## Installation
+
+```bash
+# Using npm
+npm install @conversion-microservices/ui-components
+
+# Using yarn
+yarn add @conversion-microservices/ui-components
+
+# Using pnpm
+pnpm add @conversion-microservices/ui-components
+```
+
+## Usage
+
+```jsx
+import { Button, Card, Input } from '@conversion-microservices/ui-components';
+
+function App() {
+  return (
+    <Card title="Contact Form">
+      <Input 
+        label="Email" 
+        placeholder="Enter your email" 
+        fullWidth 
+      />
+      <Button variant="primary">Submit</Button>
+    </Card>
+  );
+}
+```
+
+## Components
+
+The library includes the following components:
+
+- **Button** - For user interactions
+- **Card** - Container for grouping content
+- **Input** - For collecting user input
+
+## Contributing
+
+To run Storybook locally:
+
+```bash
+cd packages/ui-components
+pnpm run storybook
+```
+
+To build the library:
+
+```bash
+cd packages/ui-components
+pnpm run build
+```

@@ -1,0 +1,50 @@
+{
+  "pdfToDocx": [
+    {
+      "converter": "pdf-lib",
+      "file": "test-document.pdf",
+      "success": false,
+      "error": "Invalid PDF structure"
+    },
+    {
+      "converter": "pdf2json",
+      "file": "test-document.pdf",
+      "success": false,
+      "error": "Invalid PDF structure"
+    },
+    {
+      "converter": "pdfjs",
+      "file": "test-document.pdf",
+      "conversionTime": 91,
+      "scores": {
+        "textAccuracy": 79.57325746799431,
+        "structurePreservation": 81.82981020494856,
+        "stylePreservation": 77.80259163191636,
+        "imagePreservation": 80.87341968234026,
+        "tableQuality": 96.59748571653782,
+        "overall": 81.50287389445852
+      },
+      "textSample": {
+        "original": "\n\nTesting PDF Conversion\nThis is a simple text file that we'll use to create a test PDF document.\nIt includes:\n• Some plain text\n• A bulleted list\n• Different formatting (bold and italic would be here...",
+        "converted": "test-document\n\nTesting PDF Conversion\n\n \n\n This is a simple text file that we'll use to create a test PDF document.\n\n \n\n It includes:\n\n \n\n \n\n • Some plain text\n\n \n\n • A bulleted list\n\n \n\n • Different ..."
+      }
+    }
+  ],
+  "docxToPdf": [
+    {
+      "converter": "mammoth",
+      "file": "test-document.docx",
+      "success": false,
+      "error": "Invalid PDF structure"
+    }
+  ],
+  "timestamp": "2025-03-24T14:57:50.946Z",
+  "metrics": [
+    "textAccuracy",
+    "structurePreservation",
+    "stylePreservation",
+    "imagePreservation",
+    "tableQuality",
+    "overall"
+  ]
+}

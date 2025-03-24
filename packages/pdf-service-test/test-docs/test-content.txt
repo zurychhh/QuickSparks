@@ -1,0 +1,12 @@
+Testing PDF Conversion
+
+This is a simple text file that we'll use to create a test PDF document.
+
+It includes:
+- Some plain text
+- A bulleted list
+- Different formatting (bold and italic would be here)
+
+Tables would also be included in a real document.
+
+The goal is to test the conversion of these elements to DOCX format using different libraries.

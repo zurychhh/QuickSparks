@@ -9,7 +9,13 @@
     "build": "pnpm -r build",
     "start": "pnpm -r --parallel start",
     "generate-schemas": "pnpm --filter @conversion-microservices/shared generate-interfaces",
-    "validate-schemas": "pnpm --filter @conversion-microservices/shared test"
+    "validate-schemas": "pnpm --filter @conversion-microservices/shared test",
+    "storybook": "pnpm --filter @conversion-microservices/ui-components storybook",
+    "build-storybook": "pnpm --filter @conversion-microservices/ui-components build-storybook",
+    "pdf-test:dev": "pnpm --filter @conversion-microservices/pdf-service-test dev",
+    "pdf-test:benchmark": "pnpm --filter @conversion-microservices/pdf-service-test benchmark",
+    "pdf-test:quality": "pnpm --filter @conversion-microservices/pdf-service-test quality-test",
+    "pdf-test:sample": "pnpm --filter @conversion-microservices/pdf-service-test node src/create-sample-pdf.js"
   },
   "keywords": [
     "microservices",
