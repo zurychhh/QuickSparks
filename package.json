@@ -21,7 +21,16 @@
     "pdf-test:dev": "pnpm --filter @conversion-microservices/pdf-service-test dev",
     "pdf-test:benchmark": "pnpm --filter @conversion-microservices/pdf-service-test benchmark",
     "pdf-test:quality": "pnpm --filter @conversion-microservices/pdf-service-test quality-test",
-    "pdf-test:sample": "pnpm --filter @conversion-microservices/pdf-service-test node src/create-sample-pdf.js"
+    "pdf-test:sample": "pnpm --filter @conversion-microservices/pdf-service-test node src/create-sample-pdf.js",
+    
+    "create:service": "node scripts/create-microservice.js",
+    "create:component": "node scripts/create-component.js",
+    "create:feature": "scripts/create-feature.sh",
+    "setup": "scripts/setup-environment.sh",
+    "db:setup": "node scripts/db-setup.js --action setup",
+    "db:migrate": "node scripts/db-setup.js --action migrate",
+    "db:seed": "node scripts/db-setup.js --action seed",
+    "release": "scripts/release.sh"
   },
   "keywords": [
     "microservices",
