@@ -10,7 +10,6 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:promise/recommended',
-    'plugin:security/recommended',
     'prettier', // Make sure this is always the last element in the array
   ],
   parserOptions: {
@@ -20,7 +19,6 @@ module.exports = {
   plugins: [
     'import',
     'promise',
-    'security',
     'jest',
   ],
   rules: {
@@ -50,9 +48,6 @@ module.exports = {
     'max-params': ['warn', 4],
     'complexity': ['warn', 10],
     
-    // Security
-    'security/detect-object-injection': 'off', // Too many false positives
-
     // Promises
     'promise/always-return': 'warn',
     'promise/catch-or-return': 'error',

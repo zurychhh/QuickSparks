@@ -271,12 +271,12 @@ Zadania Product Managera:
 Określenie wymagań dla procesu CI/CD
 Ustalenie polityki dla broken builds
 Zatwierdzenie workflow CI/CD
-8.2. Przygotuj środowisko na Render/Vercel
+8.2. Przygotuj środowisko na Vercel
 Cel biznesowy: Zapewnienie stabilnego i łatwego w zarządzaniu środowiska produkcyjnego.
 Wartość dla projektu: Niezawodne hostowanie aplikacji z minimalnymi kosztami utrzymania.
 Wskazówki dla Claude Code: Skonfiguruj automatyczne deploymenty z GitHub.
 Zadania Product Managera:
-Utworzenie konta i projektu na Render/Vercel
+Utworzenie konta i projektu na Vercel
 Konfiguracja projektu i ustawień billingowych
 Określenie strategii dla zmiennych środowiskowych
 Ustalenie polityki dostępu do środowiska produkcyjnego
@@ -916,7 +916,7 @@ Konfiguracja i Kredencjały:
 
 
 Zakup i dostarczenie domeny
-Utworzenie i konfiguracja kont na platformach (MongoDB Atlas, Render/Vercel, Stripe/PayU, Google Analytics, Sentry)
+Utworzenie i konfiguracja kont na platformach (MongoDB Atlas, Vercel, Stripe/PayU, Google Analytics, Sentry)
 Dostarczenie wszystkich niezbędnych kredencjałów i kluczy API
 Materiały Marketingowe i Teksty:
 
