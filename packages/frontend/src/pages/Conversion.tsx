@@ -1,11 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { captureException } from '@utils/sentry';
-import { uploadFile, createCancelToken, UploadProgress as UploadProgressType } from '@services/api';
+import { 
+  uploadFile, 
+  createCancelToken, 
+  getConversionStatus,
+  getDownloadToken,
+  UploadProgress as UploadProgressType 
+} from '@services/api';
 import Card from '@components/ui/Card';
 import Button from '@components/ui/Button';
 import FileUpload from '@components/ui/FileUpload';
 import FilePreview from '@components/ui/FilePreview';
+import FileViewer from '@components/ui/FileViewer';
 import UploadProgress from '@components/ui/UploadProgress';
+import PaymentRequiredDownload from '@components/ui/PaymentRequiredDownload';
+import { usePaymentStore } from '../store/subscriptionStore';
 
 type ConversionType = 'pdf-to-docx' | 'docx-to-pdf';
 
@@ -16,6 +26,7 @@ interface ConversionOptions {
 }
 
 const ConversionPage: React.FC = (): React.ReactElement => {
+  const { conversionId } = useParams<{ conversionId?: string }>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [conversionType, setConversionType] = useState<ConversionType>('pdf-to-docx');
   const [conversionOptions, setConversionOptions] = useState<ConversionOptions>({
@@ -28,7 +39,9 @@ const ConversionPage: React.FC = (): React.ReactElement => {
   const [convertedFileUrl, setConvertedFileUrl] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<UploadProgressType | null>(null);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing' | 'success' | 'error'>('idle');
+  const [currentConversionId, setCurrentConversionId] = useState<string | null>(conversionId || null);
   const cancelTokenRef = useRef(createCancelToken());
+  const { fetchPaymentStatus } = usePaymentStore();
   
   // Reset cancel token on unmount
   useEffect(() => {
@@ -36,6 +49,90 @@ const ConversionPage: React.FC = (): React.ReactElement => {
       cancelTokenRef.current.cancel('Component unmounted');
     };
   }, []);
+  
+  // Load existing conversion if ID is provided in URL
+  useEffect(() => {
+    if (conversionId) {
+      // Fetch conversion status
+      const fetchConversion = async () => {
+        try {
+          setIsConverting(true);
+          setUploadStatus('processing');
+          
+          const statusResponse = await getConversionStatus(conversionId);
+          const status = statusResponse.data.status;
+          
+          if (status === 'completed') {
+            // Get download token (this will be protected by payment verification on backend)
+            try {
+              const tokenResponse = await getDownloadToken(statusResponse.data.resultFile.id);
+              const downloadUrl = tokenResponse.data.downloadUrl;
+              setConvertedFileUrl(downloadUrl);
+              setUploadStatus('success');
+            } catch (err) {
+              // If we get a 402 Payment Required error, we don't show it as an error
+              // The payment component will handle this case
+              if (err.response && err.response.status === 402) {
+                setUploadStatus('success');
+              } else {
+                throw err;
+              }
+            }
+          } else if (status === 'failed') {
+            setError(`Conversion failed: ${statusResponse.data.error || 'Unknown error'}`);
+            setUploadStatus('error');
+          } else {
+            // It's still processing, set up polling
+            // Similar to handleConvert logic
+            const pollInterval = setInterval(async () => {
+              try {
+                const updatedResponse = await getConversionStatus(conversionId);
+                const updatedStatus = updatedResponse.data.status;
+                
+                if (updatedStatus === 'completed') {
+                  clearInterval(pollInterval);
+                  setUploadStatus('success');
+                  
+                  // Get download token (may require payment)
+                  try {
+                    const tokenResponse = await getDownloadToken(updatedResponse.data.resultFile.id);
+                    const downloadUrl = tokenResponse.data.downloadUrl;
+                    setConvertedFileUrl(downloadUrl);
+                  } catch (e) {
+                    // If payment required, we don't show an error
+                    if (e.response && e.response.status !== 402) {
+                      throw e;
+                    }
+                  }
+                } else if (updatedStatus === 'failed') {
+                  clearInterval(pollInterval);
+                  setError(`Conversion failed: ${updatedResponse.data.error || 'Unknown error'}`);
+                  setUploadStatus('error');
+                }
+              } catch (err) {
+                console.error('Status check error:', err);
+                clearInterval(pollInterval);
+                setError('Failed to check conversion status. Please try again.');
+                setUploadStatus('error');
+              }
+            }, 2000);
+            
+            // Cleanup interval on component unmount
+            return () => clearInterval(pollInterval);
+          }
+        } catch (err) {
+          console.error('Error fetching conversion:', err);
+          captureException(err);
+          setError('Failed to load conversion. Please try again.');
+          setUploadStatus('error');
+        } finally {
+          setIsConverting(false);
+        }
+      };
+      
+      fetchConversion();
+    }
+  }, [conversionId]);
 
   // Determine accepted file types based on conversion type
   const getAcceptedFileTypes = (): string[] => {
@@ -110,21 +207,73 @@ const ConversionPage: React.FC = (): React.ReactElement => {
         onProgress: (progress) => {
           setUploadProgress(progress);
           
-          // Simulate processing after upload is complete
+          // Mark as processing after upload is complete
           if (progress.percentage === 100) {
             setUploadStatus('processing');
           }
         },
         onSuccess: async (response) => {
-          // Simulate processing delay
-          await new Promise(resolve => setTimeout(resolve, 1500));
+          // Get conversion ID from response
+          const conversionId = response.data?.data?.conversionId;
           
-          // In a real implementation, you would get the converted file URL from the response
-          // For demo, create a blob URL from the original file
-          const fakeUrl = URL.createObjectURL(new Blob([selectedFile], { type: selectedFile.type }));
-          setConvertedFileUrl(fakeUrl);
-          setUploadStatus('success');
-          setIsConverting(false);
+          if (conversionId) {
+            // Save the conversion ID for later use
+            setCurrentConversionId(conversionId);
+            
+            // Start polling for conversion status
+            const pollInterval = setInterval(async () => {
+              try {
+                const statusResponse = await getConversionStatus(conversionId);
+                const status = statusResponse.data.status;
+                
+                if (status === 'completed') {
+                  clearInterval(pollInterval);
+                  
+                  // Get download token - this may fail with 402 if payment is required
+                  try {
+                    const tokenResponse = await getDownloadToken(statusResponse.data.resultFile.id);
+                    const downloadUrl = tokenResponse.data.downloadUrl;
+                    
+                    setConvertedFileUrl(downloadUrl);
+                    setUploadStatus('success');
+                    setIsConverting(false);
+                  } catch (err) {
+                    // Handle payment required case
+                    if (err.response && err.response.status === 402) {
+                      setUploadStatus('success');
+                      setIsConverting(false);
+                    } else {
+                      throw err;
+                    }
+                  }
+                } else if (status === 'failed') {
+                  clearInterval(pollInterval);
+                  setError(`Conversion failed: ${statusResponse.data.error || 'Unknown error'}`);
+                  setUploadStatus('error');
+                  setIsConverting(false);
+                }
+                // Keep polling if status is 'pending' or 'processing'
+              } catch (err) {
+                console.error('Status check error:', err);
+                clearInterval(pollInterval);
+                setError('Failed to check conversion status. Please try again.');
+                setUploadStatus('error');
+                setIsConverting(false);
+              }
+            }, 2000); // Poll every 2 seconds
+            
+            // Store interval ID in ref for cleanup
+            const currentIntervalId = pollInterval;
+            useEffect(() => {
+              return () => {
+                if (currentIntervalId) clearInterval(currentIntervalId);
+              };
+            }, []);
+          } else {
+            setError('Invalid server response. Please try again.');
+            setUploadStatus('error');
+            setIsConverting(false);
+          }
         },
         onError: (err) => {
           console.error('Conversion error:', err);
@@ -147,13 +296,14 @@ const ConversionPage: React.FC = (): React.ReactElement => {
   const handleDownload = (): void => {
     if (!convertedFileUrl) return;
     
-    // Create a download link and click it
-    const link = document.createElement('a');
-    link.href = convertedFileUrl;
-    link.download = `converted_${selectedFile?.name || 'file'}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // For API URLs with tokens, navigate to the URL
+    // This will trigger the browser download dialog
+    window.open(convertedFileUrl, '_blank');
+  };
+  
+  // Check if payment is required and download is ready
+  const isDownloadReady = (): boolean => {
+    return uploadStatus === 'success' && !isConverting;
   };
 
   return (
@@ -279,24 +429,60 @@ const ConversionPage: React.FC = (): React.ReactElement => {
               )}
               
               {convertedFileUrl && (
-                <div className="mb-6 rounded-md bg-green-50 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
+                <div className="mb-6">
+                  <div className="rounded-md bg-green-50 p-4 mb-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3 flex-1">
+                        <p className="text-sm text-green-700">Conversion completed successfully!</p>
+                      </div>
+                      {currentConversionId ? (
+                        <PaymentRequiredDownload
+                          conversionId={currentConversionId}
+                          onDownload={handleDownload}
+                          disableButton={!convertedFileUrl}
+                        />
+                      ) : (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={handleDownload}
+                          disabled={!convertedFileUrl}
+                        >
+                          Download
+                        </Button>
+                      )}
                     </div>
-                    <div className="ml-3 flex-1">
-                      <p className="text-sm text-green-700">Conversion completed successfully!</p>
-                    </div>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={handleDownload}
-                    >
-                      Download
-                    </Button>
                   </div>
+                  
+                  <FileViewer
+                    fileUrl={convertedFileUrl}
+                    fileType={conversionOptions.conversionType === 'pdf-to-docx' ? 
+                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 
+                      'application/pdf'
+                    }
+                    onDownload={handleDownload}
+                    allowFullScreen={true}
+                    className="mb-4"
+                  />
+                  
+                  {/* Show payment button if currentConversionId exists and we don't have the downloadUrl yet */}
+                  {currentConversionId && !convertedFileUrl && isDownloadReady() && (
+                    <div className="mt-4 p-4 border rounded-lg bg-gray-50">
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">Ready to Download</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Your conversion is complete and ready for download after payment.
+                      </p>
+                      <PaymentRequiredDownload
+                        conversionId={currentConversionId}
+                        onDownload={handleDownload}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
               
