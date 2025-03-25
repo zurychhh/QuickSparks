@@ -105,7 +105,7 @@ EOF
 
 # Step 4: Deploy to Vercel
 echo "🚀 Deploying to Vercel..."
-cd "$PROJECT_ROOT" && vercel deploy --prod --force
+cd "$PROJECT_ROOT" && vercel deploy --prod --force --yes
 
 # Step 5: Verification
 echo "✅ Deployment process complete!"
