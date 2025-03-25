@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:vercel": "node vercel-build.mjs && vite build",
+    "build:vercel": "node fix-build.mjs && vite build",
+    "direct-deploy": "node direct-deploy.mjs",
+    "vercel-deploy": "./direct-deploy.sh",
     "build:test": "node build-test.mjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
