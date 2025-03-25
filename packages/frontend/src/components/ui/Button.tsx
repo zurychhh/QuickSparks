@@ -8,6 +8,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
   fullWidth?: boolean
+  animate?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -20,6 +21,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       leftIcon,
       rightIcon,
       fullWidth = false,
+      animate = true,
       children,
       disabled,
       ...props
@@ -27,7 +29,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     // Base classes for all button variants
-    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-colors duration-200';
+    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-all duration-200';
     
     // Size variations
     const sizeClasses = {
@@ -38,14 +40,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       xl: 'px-6 py-3 text-lg',
     };
     
-    // Variant variations
+    // Animation classes
+    const animationClasses = animate && !disabled && !isLoading
+      ? 'transform hover:scale-105 active:scale-95 hover:shadow-md active:shadow-inner'
+      : '';
+    
+    // Variant variations with improved hover/active states
     const variantClasses = {
-      primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow',
-      secondary: 'bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 shadow',
-      outline: 'bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
-      ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
-      link: 'bg-transparent text-primary-600 hover:text-primary-700 hover:underline focus:ring-0 shadow-none',
-      danger: 'bg-error-600 text-white hover:bg-error-700 focus:ring-2 focus:ring-offset-2 focus:ring-error-500 shadow',
+      primary: 'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow',
+      secondary: 'bg-secondary-600 text-white hover:bg-secondary-700 active:bg-secondary-800 focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 shadow',
+      outline: 'bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
+      ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
+      link: 'bg-transparent text-primary-600 hover:text-primary-700 active:text-primary-800 hover:underline focus:ring-0 shadow-none',
+      danger: 'bg-error-600 text-white hover:bg-error-700 active:bg-error-800 focus:ring-2 focus:ring-offset-2 focus:ring-error-500 shadow',
     };
     
     // Disabled & Loading states
@@ -65,6 +72,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           variantClasses[variant],
           stateClasses,
           widthClass,
+          animationClasses,
           className,
         )}
         disabled={disabled || isLoading}
