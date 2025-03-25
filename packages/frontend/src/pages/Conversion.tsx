@@ -1,101 +1,159 @@
-import React, { useState, useRef, ChangeEvent } from 'react';
-import Button from '@components/ui/Button';
+import React, { useState, useRef, useEffect } from 'react';
+import { captureException } from '@utils/sentry';
+import { uploadFile, createCancelToken, UploadProgress as UploadProgressType } from '@services/api';
 import Card from '@components/ui/Card';
+import Button from '@components/ui/Button';
+import FileUpload from '@components/ui/FileUpload';
+import FilePreview from '@components/ui/FilePreview';
+import UploadProgress from '@components/ui/UploadProgress';
 
 type ConversionType = 'pdf-to-docx' | 'docx-to-pdf';
+
+interface ConversionOptions {
+  conversionType: ConversionType;
+  quality?: 'standard' | 'high';
+  preserveFormatting?: boolean;
+}
 
 const ConversionPage: React.FC = (): React.ReactElement => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [conversionType, setConversionType] = useState<ConversionType>('pdf-to-docx');
-  const [isDragging, setIsDragging] = useState(false);
+  const [conversionOptions, setConversionOptions] = useState<ConversionOptions>({
+    conversionType: 'pdf-to-docx',
+    quality: 'high',
+    preserveFormatting: true,
+  });
   const [isConverting, setIsConverting] = useState(false);
-  const [error, setError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [convertedFileUrl, setConvertedFileUrl] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgressType | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing' | 'success' | 'error'>('idle');
+  const cancelTokenRef = useRef(createCancelToken());
+  
+  // Reset cancel token on unmount
+  useEffect(() => {
+    return () => {
+      cancelTokenRef.current.cancel('Component unmounted');
+    };
+  }, []);
 
-  const validateAndSetFile = (file: File): void => {
-    setError('');
-    
-    // Validate file type based on conversion type
-    if (conversionType === 'pdf-to-docx' && file.type !== 'application/pdf') {
-      setError('Please select a PDF file for PDF to DOCX conversion.');
-      return;
+  // Determine accepted file types based on conversion type
+  const getAcceptedFileTypes = (): string[] => {
+    if (conversionType === 'pdf-to-docx') {
+      return ['application/pdf'];
+    } else {
+      return ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
     }
-    
-    if (conversionType === 'docx-to-pdf' && 
-        !['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'].includes(file.type)) {
-      setError('Please select a DOCX or DOC file for DOCX to PDF conversion.');
-      return;
-    }
+  };
 
-    // Validate file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      setError('File size exceeds 10MB limit. Please select a smaller file.');
-      return;
-    }
-
+  // Handle file selection
+  const handleFileAccepted = (file: File): void => {
     setSelectedFile(file);
+    setError(null);
+    setConvertedFileUrl(null);
   };
 
-  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>): void => {
-    if (e.target.files && e.target.files.length > 0) {
-      validateAndSetFile(e.target.files[0]);
-    }
+  // Handle file rejection
+  const handleFileRejected = (errors: Array<{ code: string; message: string }>): void => {
+    console.error('File rejected:', errors);
+    setError(errors[0]?.message || 'File upload error');
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      validateAndSetFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (): void => {
-    setIsDragging(false);
-  };
-
-  const handleBrowseClick = (): void => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
+  // Handle conversion type change
   const handleConversionTypeChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    setConversionType(e.target.value as ConversionType);
+    const newType = e.target.value as ConversionType;
+    setConversionType(newType);
+    setConversionOptions(prev => ({ ...prev, conversionType: newType }));
     setSelectedFile(null);
-    setError('');
+    setError(null);
+    setConvertedFileUrl(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault();
-    
-    if (!selectedFile) {
-      setError('Please select a file to convert.');
-      return;
-    }
-    
+  // Handle option changes
+  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, type, checked, value } = e.target;
+    setConversionOptions(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  // Handle file removal
+  const handleRemoveFile = (): void => {
+    setSelectedFile(null);
+    setError(null);
+    setConvertedFileUrl(null);
+  };
+
+  // Handle conversion
+  const handleConvert = async (): Promise<void> => {
+    if (!selectedFile) return;
+
     setIsConverting(true);
+    setError(null);
+    setUploadStatus('uploading');
+    setUploadProgress(null);
     
-    // In a real implementation, you would upload the file to your API here
-    // This is a mockup for demonstration purposes
+    // Reset cancel token
+    cancelTokenRef.current = createCancelToken();
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Successfully converted
-      alert('File converted successfully! In a real implementation, you would be redirected to a download page.');
+      // Upload the file with progress tracking
+      uploadFile({
+        file: selectedFile,
+        additionalData: {
+          conversionType: conversionOptions.conversionType,
+          quality: conversionOptions.quality || 'high',
+          preserveFormatting: String(conversionOptions.preserveFormatting),
+        },
+        cancelToken: cancelTokenRef.current,
+        onProgress: (progress) => {
+          setUploadProgress(progress);
+          
+          // Simulate processing after upload is complete
+          if (progress.percentage === 100) {
+            setUploadStatus('processing');
+          }
+        },
+        onSuccess: async (response) => {
+          // Simulate processing delay
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // In a real implementation, you would get the converted file URL from the response
+          // For demo, create a blob URL from the original file
+          const fakeUrl = URL.createObjectURL(new Blob([selectedFile], { type: selectedFile.type }));
+          setConvertedFileUrl(fakeUrl);
+          setUploadStatus('success');
+          setIsConverting(false);
+        },
+        onError: (err) => {
+          console.error('Conversion error:', err);
+          captureException(err);
+          setError('An error occurred during conversion. Please try again.');
+          setUploadStatus('error');
+          setIsConverting(false);
+        }
+      });
     } catch (err) {
+      console.error('Conversion error:', err);
+      captureException(err);
       setError('An error occurred during conversion. Please try again.');
-      console.error(err);
-    } finally {
+      setUploadStatus('error');
       setIsConverting(false);
     }
+  };
+
+  // Handle download
+  const handleDownload = (): void => {
+    if (!convertedFileUrl) return;
+    
+    // Create a download link and click it
+    const link = document.createElement('a');
+    link.href = convertedFileUrl;
+    link.download = `converted_${selectedFile?.name || 'file'}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -110,7 +168,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
           </div>
           
           <Card className="overflow-hidden">
-            <form onSubmit={handleSubmit} className="p-6">
+            <div className="p-6">
               <div className="mb-6">
                 <label htmlFor="conversion-type" className="block text-sm font-medium text-gray-700 mb-2">
                   Conversion Type
@@ -120,6 +178,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                   value={conversionType}
                   onChange={handleConversionTypeChange}
                   className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+                  disabled={isConverting}
                 >
                   <option value="pdf-to-docx">PDF to DOCX</option>
                   <option value="docx-to-pdf">DOCX to PDF</option>
@@ -131,54 +190,78 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                 </p>
               </div>
               
-              <div 
-                className={`mb-6 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                  isDragging ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-primary-400'
-                } ${selectedFile ? 'bg-primary-50 border-primary-300' : ''}`}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onClick={handleBrowseClick}
-              >
-                <input 
-                  type="file" 
-                  ref={fileInputRef}
-                  onChange={handleFileSelect}
-                  className="hidden" 
-                  accept={conversionType === 'pdf-to-docx' ? '.pdf' : '.docx,.doc'}
+              {!selectedFile ? (
+                <FileUpload
+                  onFileAccepted={handleFileAccepted}
+                  onFileRejected={handleFileRejected}
+                  acceptedFileTypes={getAcceptedFileTypes()}
+                  maxSize={10 * 1024 * 1024} // 10MB
+                  label="Upload your file"
+                  dropzoneText="Drag & drop your file here, or click to browse"
+                  className="mb-6"
                 />
-                
-                <div className="space-y-2">
-                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                    <path 
-                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4h-12m4-12v8m0 0v4m0-23v4m0 0h-4m4 0h4m-11 18h4" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                    />
-                  </svg>
+              ) : (
+                <div className="mb-6">
+                  <FilePreview
+                    file={selectedFile}
+                    onRemove={handleRemoveFile}
+                    onConvert={handleConvert}
+                    isConverting={isConverting}
+                    className="mb-4"
+                  />
                   
-                  {selectedFile ? (
-                    <div>
-                      <span className="block text-sm font-medium text-gray-900">{selectedFile.name}</span>
-                      <span className="block text-xs text-gray-500 mt-1">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </span>
+                  <div className="mt-6 border rounded-lg p-4 bg-gray-50">
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">Conversion Options</h3>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <input
+                          id="quality-high"
+                          name="quality"
+                          type="radio"
+                          value="high"
+                          checked={conversionOptions.quality === 'high'}
+                          onChange={handleOptionChange}
+                          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                          disabled={isConverting}
+                        />
+                        <label htmlFor="quality-high" className="ml-3 text-sm text-gray-700">
+                          High Quality (Recommended)
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          id="quality-standard"
+                          name="quality"
+                          type="radio"
+                          value="standard"
+                          checked={conversionOptions.quality === 'standard'}
+                          onChange={handleOptionChange}
+                          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                          disabled={isConverting}
+                        />
+                        <label htmlFor="quality-standard" className="ml-3 text-sm text-gray-700">
+                          Standard Quality (Faster)
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          id="preserve-formatting"
+                          name="preserveFormatting"
+                          type="checkbox"
+                          checked={conversionOptions.preserveFormatting}
+                          onChange={handleOptionChange}
+                          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                          disabled={isConverting}
+                        />
+                        <label htmlFor="preserve-formatting" className="ml-3 text-sm text-gray-700">
+                          Preserve formatting (fonts, layout, styles)
+                        </label>
+                      </div>
                     </div>
-                  ) : (
-                    <div>
-                      <span className="block text-sm font-medium text-gray-900">
-                        Drag and drop your file here, or click to browse
-                      </span>
-                      <span className="block text-xs text-gray-500 mt-1">
-                        {conversionType === 'pdf-to-docx' 
-                          ? 'PDF files up to 10MB' 
-                          : 'DOCX or DOC files up to 10MB'}
-                      </span>
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
               
               {error && (
                 <div className="mb-6 rounded-md bg-error-50 p-4">
@@ -195,23 +278,76 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                 </div>
               )}
               
-              <div className="flex justify-center">
-                <Button 
-                  type="submit" 
-                  variant="primary" 
-                  size="lg" 
-                  isLoading={isConverting}
-                  disabled={!selectedFile || isConverting}
-                  fullWidth
-                >
-                  {isConverting ? 'Converting...' : 'Convert Now'}
-                </Button>
-              </div>
+              {convertedFileUrl && (
+                <div className="mb-6 rounded-md bg-green-50 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <p className="text-sm text-green-700">Conversion completed successfully!</p>
+                    </div>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleDownload}
+                    >
+                      Download
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {uploadProgress && isConverting && (
+                <div className="mb-6">
+                  <UploadProgress 
+                    progress={uploadProgress.percentage} 
+                    fileName={selectedFile?.name}
+                    fileSize={selectedFile?.size}
+                    status={uploadStatus}
+                    error={error || undefined}
+                  />
+                </div>
+              )}
+              
+              {selectedFile && !convertedFileUrl && (
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={handleConvert}
+                    variant="primary" 
+                    size="lg" 
+                    isLoading={isConverting}
+                    disabled={!selectedFile || isConverting}
+                    fullWidth
+                  >
+                    {isConverting ? (
+                      uploadStatus === 'processing' ? 'Processing...' : 'Uploading...'
+                    ) : 'Convert Now'}
+                  </Button>
+                  
+                  {isConverting && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="ml-2"
+                      onClick={() => {
+                        cancelTokenRef.current.cancel('Cancelled by user');
+                        setIsConverting(false);
+                        setUploadStatus('idle');
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                </div>
+              )}
               
               <div className="mt-4 text-center text-xs text-gray-500">
                 By using our service you agree to our Terms of Service and Privacy Policy.
               </div>
-            </form>
+            </div>
           </Card>
           
           <div className="mt-12">
