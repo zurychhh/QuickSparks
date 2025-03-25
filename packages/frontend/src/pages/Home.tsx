@@ -31,10 +31,10 @@ const HomePage = (): React.ReactElement => {
                     Convert Now
                   </a>
                   <a
-                    href="/pricing"
+                    href="/product"
                     className="ml-4 inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                   >
-                    View Pricing
+                    Learn More
                   </a>
                 </div>
               </div>
@@ -216,12 +216,20 @@ const HomePage = (): React.ReactElement => {
                 <p className="mt-4 text-lg leading-6 text-gray-500">
                   Start converting your documents for free. No credit card required to get started.
                 </p>
-                <a
-                  href="/convert"
-                  className="mt-8 bg-primary-600 border border-transparent rounded-md shadow px-5 py-3 inline-flex items-center text-base font-medium text-white hover:bg-primary-700"
-                >
-                  Convert Your First Document
-                </a>
+                <div className="mt-8 flex flex-wrap space-y-4 sm:space-y-0 sm:space-x-4">
+                  <a
+                    href="/convert"
+                    className="bg-primary-600 border border-transparent rounded-md shadow px-5 py-3 inline-flex items-center text-base font-medium text-white hover:bg-primary-700"
+                  >
+                    Convert Your First Document
+                  </a>
+                  <a
+                    href="/product"
+                    className="bg-white border border-gray-300 rounded-md shadow px-5 py-3 inline-flex items-center text-base font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    View Product Details
+                  </a>
+                </div>
               </div>
             </div>
             <div className="-mt-6 aspect-w-5 aspect-h-3 md:aspect-w-2 md:aspect-h-1">
