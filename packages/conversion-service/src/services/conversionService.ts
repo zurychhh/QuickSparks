@@ -1,11 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import { ConversionJob, ConversionType, ConversionQuality, UserTier } from '../types/conversion';
-import { conversionQueue } from '../config/queue';
+import queueService from '../config/queue';
 import Conversion from '../models/conversion.model';
 import File from '../models/file.model';
 import fileStorage from '../utils/fileStorage';
 import logger from '../utils/logger';
+import notificationService from '../services/notificationService';
 
 /**
  * Start a new conversion job
@@ -24,7 +25,7 @@ export async function startConversion({
   quality?: ConversionQuality;
   preserveFormatting?: boolean;
   userTier?: UserTier;
-}): Promise<{ conversionId: string; jobId: string }> {
+}): Promise<{ conversionId: string; jobId: string; estimatedTime: number }> {
   try {
     // Find source file
     const sourceFile = await File.findById(sourceFileId);
@@ -75,29 +76,66 @@ export async function startConversion({
       userTier
     };
     
-    // Add job to queue
-    const job = await conversionQueue.add('conversion', jobData, {
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 5000
-      }
-    });
+    // Add job to queue with priority based on user tier
+    const job = await queueService.addConversionJob(jobData);
     
     // Update conversion with job ID
     await Conversion.findByIdAndUpdate(conversion._id, {
       jobId: job.id
     });
     
+    // Get queue statistics to estimate wait time
+    const queueStats = await queueService.getQueueStats();
+    
+    // Get queue statistics
+    const waitingJobs = queueStats.waiting || 0;
+    
+    // Get file type for estimation
+    const fileType = conversionType === 'pdf-to-docx' ? 'pdf' : 'docx';
+    
+    // Account for user tier in queue position calculation
+    // Higher tier users essentially "skip the line" in our estimation
+    const effectiveQueuePosition = waitingJobs * {
+      'enterprise': 0.2, // Enterprise users effectively see only 20% of the actual queue
+      'premium': 0.5,
+      'basic': 0.8,
+      'free': 1.0
+    }[userTier] || 1.0;
+    
+    // Estimate conversion time using our more sophisticated algorithm
+    const estimatedTime = estimateConversionTime({
+      fileType, 
+      fileSize: sourceFile.size,
+      quality,
+      queuePosition: Math.round(effectiveQueuePosition)
+    });
+    
     logger.info(`Conversion job queued`, {
       jobId: job.id,
       conversionId: conversion._id,
-      conversionType
+      conversionType,
+      userTier,
+      estimatedTime,
+      queuePosition: waitingJobs,
+      fileSize
     });
+    
+    // Send notification that job is queued
+    notificationService.sendConversionStatusNotification(
+      userId,
+      conversion._id.toString(),
+      'pending',
+      {
+        jobId: job.id,
+        estimatedTime,
+        queuePosition: waitingJobs
+      }
+    );
     
     return {
       conversionId: conversion._id.toString(),
-      jobId: job.id
+      jobId: job.id,
+      estimatedTime
     };
   } catch (error) {
     logger.error('Failed to start conversion', error);
@@ -249,7 +287,7 @@ export async function cancelConversion(conversionId: string, userId: string): Pr
   
   // If job ID exists, remove it from the queue
   if (conversion.jobId) {
-    await conversionQueue.remove(conversion.jobId);
+    await queueService.removeJob(conversion.jobId);
   }
   
   // Update conversion status to failed with cancellation message
@@ -267,9 +305,64 @@ export async function cancelConversion(conversionId: string, userId: string): Pr
   return true;
 }
 
+/**
+ * Estimate conversion time based on file type, size, quality, and queue position
+ * @param params Parameters for the estimation
+ * @returns Estimated time in milliseconds
+ */
+export function estimateConversionTime({
+  fileType,
+  fileSize,
+  quality,
+  queuePosition
+}: {
+  fileType: 'pdf' | 'docx';
+  fileSize: number;
+  quality: ConversionQuality;
+  queuePosition: number;
+}): number {
+  // Base time based on file size (bytes to MB)
+  const fileSizeMB = Math.max(0.1, fileSize / (1024 * 1024));
+  
+  // Base processing rates (ms per MB) - these are approximations and can be tuned
+  const processingRates = {
+    pdf: {
+      high: 2500,    // PDF to DOCX with high quality is more intensive
+      standard: 1200  // PDF to DOCX with standard quality is faster
+    },
+    docx: {
+      high: 2000,    // DOCX to PDF with high quality
+      standard: 1000  // DOCX to PDF with standard quality
+    }
+  };
+  
+  // Select appropriate rate
+  const ratePerMB = processingRates[fileType][quality];
+  
+  // Calculate base processing time
+  const baseProcessingTime = fileSizeMB * ratePerMB;
+  
+  // Apply log scale to prevent unreasonable times for very large files
+  // This accounts for the fact that processing time doesn't scale linearly with file size
+  const scaledProcessingTime = baseProcessingTime * (1 + 0.1 * Math.log10(Math.max(1, fileSizeMB)));
+  
+  // Queue delay - each position in queue adds delay
+  // Diminishing returns with deep queue positions (first few positions matter more)
+  const queueDelay = queuePosition === 0 ? 0 : 15000 * Math.min(queuePosition, 5) + 5000 * Math.max(0, queuePosition - 5);
+  
+  // Minimum time threshold to ensure we don't show unrealistically fast times
+  const minimumTime = 3000; // 3 seconds minimum
+  
+  // Total estimated time
+  const totalEstimatedTime = Math.max(minimumTime, scaledProcessingTime + queueDelay);
+  
+  return Math.round(totalEstimatedTime);
+}
+
 export default {
   startConversion,
   getConversionStatus,
   getUserConversions,
-  cancelConversion
+  cancelConversion,
+  estimateConversionTime
 };

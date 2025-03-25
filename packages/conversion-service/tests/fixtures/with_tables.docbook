@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article lang="en">
+  <title>Document with Tables</title>
+  
+  <para>This document contains various tables to test the conversion service's ability to handle tabular data when converting between DOCX and PDF formats.</para>
+  
+  <section>
+    <title>Simple Table</title>
+    <para>A basic table with header row and regular data:</para>
+    <table frame="all">
+      <title>People Information</title>
+      <tgroup cols="4">
+        <thead>
+          <row>
+            <entry>Name</entry>
+            <entry>Age</entry>
+            <entry>Occupation</entry>
+            <entry>Location</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>John Smith</entry>
+            <entry>32</entry>
+            <entry>Software Engineer</entry>
+            <entry>New York</entry>
+          </row>
+          <row>
+            <entry>Jane Doe</entry>
+            <entry>28</entry>
+            <entry>Data Scientist</entry>
+            <entry>San Francisco</entry>
+          </row>
+          <row>
+            <entry>Robert Johnson</entry>
+            <entry>45</entry>
+            <entry>Project Manager</entry>
+            <entry>Chicago</entry>
+          </row>
+          <row>
+            <entry>Emily Williams</entry>
+            <entry>31</entry>
+            <entry>UX Designer</entry>
+            <entry>Seattle</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+  
+  <section>
+    <title>Data Table with Formatting</title>
+    <para>This table contains various data types and formatting:</para>
+    <table frame="all">
+      <title>Product Information</title>
+      <tgroup cols="5">
+        <thead>
+          <row>
+            <entry>Product</entry>
+            <entry>Price ($)</entry>
+            <entry>In Stock</entry>
+            <entry>Rating</entry>
+            <entry>Description</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry><emphasis role="bold">Laptop Pro</emphasis></entry>
+            <entry>1,299.99</entry>
+            <entry>Yes</entry>
+            <entry>★★★★★</entry>
+            <entry>High-performance laptop with 16GB RAM and SSD</entry>
+          </row>
+          <row>
+            <entry><emphasis role="bold">Smartphone X</emphasis></entry>
+            <entry>899.50</entry>
+            <entry>Limited</entry>
+            <entry>★★★★☆</entry>
+            <entry>Latest smartphone with advanced camera system</entry>
+          </row>
+          <row>
+            <entry><emphasis role="bold">Wireless Headphones</emphasis></entry>
+            <entry>199.99</entry>
+            <entry>Yes</entry>
+            <entry>★★★★☆</entry>
+            <entry>Noise-cancelling wireless headphones with long battery life</entry>
+          </row>
+          <row>
+            <entry><emphasis role="bold">Tablet Mini</emphasis></entry>
+            <entry>499.00</entry>
+            <entry>No</entry>
+            <entry>★★★☆☆</entry>
+            <entry>Compact tablet with 10-inch display</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+  
+  <section>
+    <title>Quarterly Sales Report</title>
+    <para>A more complex table with numerical data:</para>
+    <table frame="all">
+      <title>Quarterly Sales by Region</title>
+      <tgroup cols="6">
+        <thead>
+          <row>
+            <entry>Region</entry>
+            <entry>Q1</entry>
+            <entry>Q2</entry>
+            <entry>Q3</entry>
+            <entry>Q4</entry>
+            <entry>Total</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>North America</entry>
+            <entry>$245,000</entry>
+            <entry>$312,000</entry>
+            <entry>$298,000</entry>
+            <entry>$359,000</entry>
+            <entry>$1,214,000</entry>
+          </row>
+          <row>
+            <entry>Europe</entry>
+            <entry>$190,000</entry>
+            <entry>$214,000</entry>
+            <entry>$248,000</entry>
+            <entry>$289,000</entry>
+            <entry>$941,000</entry>
+          </row>
+          <row>
+            <entry>Asia</entry>
+            <entry>$182,000</entry>
+            <entry>$196,000</entry>
+            <entry>$227,000</entry>
+            <entry>$251,000</entry>
+            <entry>$856,000</entry>
+          </row>
+          <row>
+            <entry>Australia</entry>
+            <entry>$112,000</entry>
+            <entry>$127,000</entry>
+            <entry>$118,000</entry>
+            <entry>$142,000</entry>
+            <entry>$499,000</entry>
+          </row>
+          <row>
+            <entry><emphasis role="bold">Total</emphasis></entry>
+            <entry><emphasis role="bold">$729,000</emphasis></entry>
+            <entry><emphasis role="bold">$849,000</emphasis></entry>
+            <entry><emphasis role="bold">$891,000</emphasis></entry>
+            <entry><emphasis role="bold">$1,041,000</emphasis></entry>
+            <entry><emphasis role="bold">$3,510,000</emphasis></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+  
+  <section>
+    <title>Schedule Table</title>
+    <para>A table representing a weekly schedule:</para>
+    <table frame="all">
+      <title>Weekly Schedule</title>
+      <tgroup cols="6">
+        <thead>
+          <row>
+            <entry>Time</entry>
+            <entry>Monday</entry>
+            <entry>Tuesday</entry>
+            <entry>Wednesday</entry>
+            <entry>Thursday</entry>
+            <entry>Friday</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>9:00 - 10:30</entry>
+            <entry>Team Meeting</entry>
+            <entry>Client Call</entry>
+            <entry>Development</entry>
+            <entry>Planning</entry>
+            <entry>Development</entry>
+          </row>
+          <row>
+            <entry>10:45 - 12:15</entry>
+            <entry>Development</entry>
+            <entry>Development</entry>
+            <entry>Design Review</entry>
+            <entry>Development</entry>
+            <entry>Team Meeting</entry>
+          </row>
+          <row>
+            <entry>13:00 - 14:30</entry>
+            <entry>Design Meeting</entry>
+            <entry>Development</entry>
+            <entry>Client Demo</entry>
+            <entry>Development</entry>
+            <entry>Project Review</entry>
+          </row>
+          <row>
+            <entry>14:45 - 16:15</entry>
+            <entry>Development</entry>
+            <entry>Testing</entry>
+            <entry>Development</entry>
+            <entry>Client Call</entry>
+            <entry>Retrospective</entry>
+          </row>
+          <row>
+            <entry>16:30 - 17:30</entry>
+            <entry>Testing</entry>
+            <entry>Documentation</entry>
+            <entry>Testing</entry>
+            <entry>Documentation</entry>
+            <entry>Planning</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+  
+  <para>This document tests the ability of the conversion service to handle various types of tables with different complexity levels.</para>
+</article>

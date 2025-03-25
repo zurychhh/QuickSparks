@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Document with Images</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      line-height: 1.5;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .image-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .image-container img {
+      max-width: 80%;
+      height: auto;
+      border: 1px solid #ddd;
+      padding: 5px;
+    }
+    .caption {
+      font-style: italic;
+      color: #666;
+      margin-top: 8px;
+    }
+    .image-float-right {
+      float: right;
+      margin: 0 0 15px 15px;
+      max-width: 200px;
+    }
+    .image-float-left {
+      float: left;
+      margin: 0 15px 15px 0;
+      max-width: 200px;
+    }
+    .clearfix::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+  </style>
+</head>
+<body>
+  <h1>Document with Images</h1>
+  <p>This document contains various images to test the conversion service's ability to handle embedded images when converting between PDF and DOCX formats.</p>
+  
+  <h2>Centered Image</h2>
+  <p>Below is a centered image with a caption:</p>
+  <div class="image-container">
+    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMzQ5OGRiIi8+CiAgICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxNTAiIHI9IjgwIiBmaWxsPSIjZWNmMGYxIi8+CiAgICA8dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMmMzZTUwIj5UZXN0IEltYWdlPC90ZXh0Pgo8L3N2Zz4=" alt="Center aligned test image">
+    <div class="caption">Figure 1: A simple test image with blue background and a circle</div>
+  </div>
+  
+  <h2>Images with Text Wrapping</h2>
+  <p>The following paragraphs demonstrate text wrapping around images:</p>
+  
+  <div class="clearfix">
+    <img class="image-float-right" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZTc0YzNjIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjEwMCw1MCA1MCwxNTAgMTUwLDE1MCIgZmlsbD0iI2ZmZiIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxODAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiI+UmlnaHQgQWxpZ25lZDwvdGV4dD4KPC9zdmc+" alt="Right aligned test image">
+    <p>This paragraph has an image aligned to the right. The text should wrap around the image when converted to PDF and DOCX formats. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget sapien vel arcu finibus facilisis. Fusce ultrices erat ac ligula rhoncus, eget faucibus arcu hendrerit. Integer egestas nulla vel justo venenatis, vel fermentum mi tincidunt.</p>
+    <p>Vivamus vestibulum justo ut ipsum vestibulum, nec malesuada nisl hendrerit. Proin et est at nunc cursus pellentesque. Mauris vitae mi eu neque faucibus hendrerit. Nam semper tempus neque, eget aliquet felis imperdiet sed. Nulla facilisi. Praesent sollicitudin purus quis urna lacinia faucibus. Morbi luctus nisi et velit imperdiet, in scelerisque nisl rhoncus.</p>
+  </div>
+  
+  <div class="clearfix">
+    <img class="image-float-left" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMjdhZTYwIi8+CiAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjUwIiBmaWxsPSIjZWNmMGYxIi8+CiAgICA8Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSIxMCIgZmlsbD0iIzJjM2U1MCIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iODAiIHI9IjEwIiBmaWxsPSIjMmMzZTUwIi8+CiAgICA8cGF0aCBkPSJNNzAsMTEwIHE1MCw0MCA2MCwwIiBzdHJva2U9IiMyYzNlNTAiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxODAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiI+TGVmdCBBbGlnbmVkPC90ZXh0Pgo8L3N2Zz4=" alt="Left aligned test image">
+    <p>This paragraph has an image aligned to the left. The text should wrap around the image when converted to PDF and DOCX formats. Sed vitae enim blandit, pretium sapien eu, dictum justo. Duis vel turpis a orci congue molestie. Cras in felis vel magna vulputate vehicula. Vivamus fringilla nulla vel lacus fringilla, sed finibus ligula fermentum.</p>
+    <p>Cras viverra enim vel lorem eleifend, vel blandit quam vestibulum. Fusce interdum libero vel velit elementum, vel aliquam neque molestie. Sed commodo convallis sapien, vel dictum mi aliquam nec. Quisque finibus dictum enim, vitae laoreet magna eleifend eget. Nulla facilisi. Integer eu tempor mauris, eget facilisis augue.</p>
+  </div>
+  
+  <h2>Multiple Images in Sequence</h2>
+  <p>Below are multiple images arranged in sequence:</p>
+  
+  <div class="image-container">
+    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjM5YzEyIi8+CiAgICA8cmVjdCB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZmZmIi8+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjE4MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIj5JbWFnZSAxPC90ZXh0Pgo8L3N2Zz4=" alt="Test image 1">
+    <div class="caption">Figure 2: A square image</div>
+  </div>
+  
+  <div class="image-container">
+    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjOWI1OWI2Ii8+CiAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjcwIiBmaWxsPSIjZWNmMGYxIiBzdHJva2U9IiMyYzNlNTAiIHN0cm9rZS13aWR0aD0iNCIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMDUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzJjM2U1MCI+SW1hZ2UgMjwvdGV4dD4KPC9zdmc+" alt="Test image 2">
+    <div class="caption">Figure 3: A circle image</div>
+  </div>
+  
+  <div class="image-container">
+    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMmVjYzcxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjEwMCw0MCA0MCwxODAgMTYwLDE4MCIgZmlsbD0iI2VjZjBmMSIgc3Ryb2tlPSIjMmMzZTUwIiBzdHJva2Utd2lkdGg9IjQiLz4KICAgIDx0ZXh0IHg9IjEwMCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyYzNlNTAiPkltYWdlIDM8L3RleHQ+Cjwvc3ZnPg==" alt="Test image 3">
+    <div class="caption">Figure 4: A triangle image</div>
+  </div>
+  
+  <h2>Conclusion</h2>
+  <p>This document tests the ability of the conversion service to handle images with various positioning and sizes. The conversion should maintain image placement and text wrapping as accurately as possible when converting between PDF and DOCX formats.</p>
+</body>
+</html>

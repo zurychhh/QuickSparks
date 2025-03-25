@@ -8,25 +8,21 @@ import fileStorage from '../utils/fileStorage';
 import logger from '../utils/logger';
 import env from '../config/env';
 
+// Import payment service
+import paymentService from '../services/paymentService';
+
 /**
  * Verify payment status for a conversion
  */
 async function verifyPayment(conversionId: string, userId: string): Promise<boolean> {
+  // If payment is not required, return true
+  if (!env.PAYMENT_REQUIRED) {
+    return true;
+  }
+  
   try {
-    // Call payment service to verify payment
-    const response = await axios.get(
-      `${env.PAYMENT_SERVICE_URL}/payments/status/${conversionId}`,
-      {
-        headers: {
-          // Include user ID in request for authentication
-          'User-Id': userId,
-          'Authorization': `Bearer ${env.INTERNAL_API_KEY}`
-        }
-      }
-    );
-    
-    // Return true if payment is completed
-    return response.data.success && response.data.data.isPaid;
+    // Use payment service to verify payment
+    return await paymentService.verifyPayment(conversionId, userId);
   } catch (error) {
     logger.error(`Payment verification error for conversion ${conversionId}`, error);
     return false;

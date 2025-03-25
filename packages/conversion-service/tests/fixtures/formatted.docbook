@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article lang="en">
+  <title>Formatted Document Test</title>
+  
+  <section>
+    <title>Introduction to Formatting</title>
+    <para>This document contains <emphasis role="bold">various</emphasis> types of <emphasis>formatting</emphasis> to test the conversion service's ability to preserve formatting when converting between DOCX and PDF.</para>
+  </section>
+  
+  <section>
+    <title>Text Styling</title>
+    <para>Here are some examples of text styling:</para>
+    <itemizedlist>
+      <listitem><para><emphasis role="bold">Bold text</emphasis> should be preserved</para></listitem>
+      <listitem><para><emphasis>Italic text</emphasis> should be preserved</para></listitem>
+      <listitem><para><emphasis role="underline">Underlined text</emphasis> should be preserved</para></listitem>
+      <listitem><para>Colored text should be preserved if possible</para></listitem>
+      <listitem><para>Text with highlighting should be preserved if possible</para></listitem>
+    </itemizedlist>
+  </section>
+  
+  <section>
+    <title>List Formatting</title>
+    
+    <section>
+      <title>Unordered List</title>
+      <itemizedlist>
+        <listitem><para>First item</para></listitem>
+        <listitem>
+          <para>Second item</para>
+          <itemizedlist>
+            <listitem><para>Nested item 1</para></listitem>
+            <listitem><para>Nested item 2</para></listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem><para>Third item</para></listitem>
+      </itemizedlist>
+    </section>
+    
+    <section>
+      <title>Ordered List</title>
+      <orderedlist>
+        <listitem><para>First step</para></listitem>
+        <listitem>
+          <para>Second step</para>
+          <orderedlist>
+            <listitem><para>Substep a</para></listitem>
+            <listitem><para>Substep b</para></listitem>
+          </orderedlist>
+        </listitem>
+        <listitem><para>Third step</para></listitem>
+      </orderedlist>
+    </section>
+  </section>
+  
+  <section>
+    <title>Block Elements</title>
+    
+    <section>
+      <title>Blockquote</title>
+      <blockquote>
+        <para>This is a blockquote that should be preserved with the proper formatting during conversion. The indentation and styling should be maintained as much as possible.</para>
+      </blockquote>
+    </section>
+    
+    <section>
+      <title>Code Block</title>
+      <programlisting>
+function testFunction() {
+  console.log("Hello, world!");
+  return true;
+}
+      </programlisting>
+    </section>
+    
+    <section>
+      <title>Highlight Block</title>
+      <note>
+        <para>This is a highlighted block of text that should maintain its background color and border styling during conversion if possible.</para>
+      </note>
+    </section>
+  </section>
+  
+  <section>
+    <title>Conclusion</title>
+    <para>This document tests the <emphasis role="bold">formatting preservation capabilities</emphasis> of the conversion service. The goal is to maintain as much of the original formatting as possible when converting between DOCX and PDF formats.</para>
+  </section>
+</article>

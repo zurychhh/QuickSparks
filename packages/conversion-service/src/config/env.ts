@@ -7,6 +7,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 interface Environment {
   NODE_ENV: 'development' | 'production' | 'test';
   PORT: number;
+  BASE_URL: string;
   MONGODB_URI: string;
   UPLOADS_DIR: string;
   OUTPUTS_DIR: string;
@@ -27,12 +28,18 @@ interface Environment {
   PAYMENT_SERVICE_URL: string;
   INTERNAL_API_KEY: string;
   PAYMENT_REQUIRED: boolean;
+  PAYMENT_SECRET_KEY: string;
+  PAYMENT_SHOP_ID: string;
+  DEFAULT_PAYMENT_CURRENCY: string;
+  PDF_TO_DOCX_PRICE: number;
+  DOCX_TO_PDF_PRICE: number;
 }
 
 // Default values for environment variables
 const env: Environment = {
   NODE_ENV: (process.env.NODE_ENV as Environment['NODE_ENV']) || 'development',
   PORT: parseInt(process.env.PORT || '5001', 10),
+  BASE_URL: process.env.BASE_URL || 'http://localhost:5001',
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/conversion-service',
   UPLOADS_DIR: process.env.UPLOADS_DIR || 'uploads',
   OUTPUTS_DIR: process.env.OUTPUTS_DIR || 'outputs',
@@ -53,6 +60,11 @@ const env: Environment = {
   PAYMENT_SERVICE_URL: process.env.PAYMENT_SERVICE_URL || 'http://localhost:5004',
   INTERNAL_API_KEY: process.env.INTERNAL_API_KEY || 'development-internal-api-key',
   PAYMENT_REQUIRED: process.env.PAYMENT_REQUIRED === 'true' || true,
+  PAYMENT_SECRET_KEY: process.env.PAYMENT_SECRET_KEY || 'development-payment-secret',
+  PAYMENT_SHOP_ID: process.env.PAYMENT_SHOP_ID || 'dev-shop',
+  DEFAULT_PAYMENT_CURRENCY: process.env.DEFAULT_PAYMENT_CURRENCY || 'PLN',
+  PDF_TO_DOCX_PRICE: parseFloat(process.env.PDF_TO_DOCX_PRICE || '4.99'),
+  DOCX_TO_PDF_PRICE: parseFloat(process.env.DOCX_TO_PDF_PRICE || '4.99'),
 };
 
 // Validation for required environment variables in production
@@ -63,7 +75,10 @@ if (env.NODE_ENV === 'production') {
     'FILE_ENCRYPTION_SECRET', 
     'SECURE_TOKEN_SECRET',
     'PAYMENT_SERVICE_URL',
-    'INTERNAL_API_KEY'
+    'INTERNAL_API_KEY',
+    'PAYMENT_SECRET_KEY',
+    'PAYMENT_SHOP_ID',
+    'BASE_URL'
   ];
   for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
@@ -79,6 +94,11 @@ if (env.NODE_ENV === 'production') {
   // Ensure SECURE_TOKEN_SECRET is strong enough in production
   if (env.SECURE_TOKEN_SECRET.length < 32) {
     throw new Error('SECURE_TOKEN_SECRET must be at least 32 characters long in production mode');
+  }
+  
+  // Ensure PAYMENT_SECRET_KEY is strong enough in production
+  if (env.PAYMENT_SECRET_KEY.length < 32) {
+    throw new Error('PAYMENT_SECRET_KEY must be at least 32 characters long in production mode');
   }
 }
 

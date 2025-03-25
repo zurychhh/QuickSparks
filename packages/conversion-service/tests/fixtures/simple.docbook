@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article lang="en">
+  <title>Simple Test Document</title>
+  <section>
+    <title>Introduction</title>
+    <para>This is a simple document to test DOCX to PDF conversion.</para>
+    <para>It contains basic text with minimal formatting.</para>
+    <para>The conversion service should be able to handle this file without any issues.</para>
+  </section>
+</article>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Document with Tables</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      line-height: 1.5;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+      text-align: left;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .complex-table th, .complex-table td {
+      text-align: center;
+    }
+    .merged-cell {
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Document with Tables</h1>
+  <p>This document contains various tables to test the conversion service's ability to handle tabular data when converting between PDF and DOCX formats.</p>
+  
+  <h2>Simple Table</h2>
+  <p>A basic table with header row and regular data:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Occupation</th>
+        <th>Location</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>John Smith</td>
+        <td>32</td>
+        <td>Software Engineer</td>
+        <td>New York</td>
+      </tr>
+      <tr>
+        <td>Jane Doe</td>
+        <td>28</td>
+        <td>Data Scientist</td>
+        <td>San Francisco</td>
+      </tr>
+      <tr>
+        <td>Robert Johnson</td>
+        <td>45</td>
+        <td>Project Manager</td>
+        <td>Chicago</td>
+      </tr>
+      <tr>
+        <td>Emily Williams</td>
+        <td>31</td>
+        <td>UX Designer</td>
+        <td>Seattle</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h2>Data Table with Formatting</h2>
+  <p>This table contains various data types and formatting:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Price ($)</th>
+        <th>In Stock</th>
+        <th>Rating</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Laptop Pro</strong></td>
+        <td>1,299.99</td>
+        <td>Yes</td>
+        <td>★★★★★</td>
+        <td>High-performance laptop with 16GB RAM and SSD</td>
+      </tr>
+      <tr>
+        <td><strong>Smartphone X</strong></td>
+        <td>899.50</td>
+        <td>Limited</td>
+        <td>★★★★☆</td>
+        <td>Latest smartphone with advanced camera system</td>
+      </tr>
+      <tr>
+        <td><strong>Wireless Headphones</strong></td>
+        <td>199.99</td>
+        <td>Yes</td>
+        <td>★★★★☆</td>
+        <td>Noise-cancelling wireless headphones with long battery life</td>
+      </tr>
+      <tr>
+        <td><strong>Tablet Mini</strong></td>
+        <td>499.00</td>
+        <td>No</td>
+        <td>★★★☆☆</td>
+        <td>Compact tablet with 10-inch display</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h2>Quarterly Sales Report</h2>
+  <p>A more complex table with numerical data:</p>
+  <table class="complex-table">
+    <thead>
+      <tr>
+        <th>Region</th>
+        <th>Q1</th>
+        <th>Q2</th>
+        <th>Q3</th>
+        <th>Q4</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>North America</td>
+        <td>$245,000</td>
+        <td>$312,000</td>
+        <td>$298,000</td>
+        <td>$359,000</td>
+        <td>$1,214,000</td>
+      </tr>
+      <tr>
+        <td>Europe</td>
+        <td>$190,000</td>
+        <td>$214,000</td>
+        <td>$248,000</td>
+        <td>$289,000</td>
+        <td>$941,000</td>
+      </tr>
+      <tr>
+        <td>Asia</td>
+        <td>$182,000</td>
+        <td>$196,000</td>
+        <td>$227,000</td>
+        <td>$251,000</td>
+        <td>$856,000</td>
+      </tr>
+      <tr>
+        <td>Australia</td>
+        <td>$112,000</td>
+        <td>$127,000</td>
+        <td>$118,000</td>
+        <td>$142,000</td>
+        <td>$499,000</td>
+      </tr>
+      <tr>
+        <td><strong>Total</strong></td>
+        <td><strong>$729,000</strong></td>
+        <td><strong>$849,000</strong></td>
+        <td><strong>$891,000</strong></td>
+        <td><strong>$1,041,000</strong></td>
+        <td><strong>$3,510,000</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h2>Schedule Table</h2>
+  <p>A table representing a weekly schedule:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>9:00 - 10:30</td>
+        <td>Team Meeting</td>
+        <td>Client Call</td>
+        <td>Development</td>
+        <td>Planning</td>
+        <td>Development</td>
+      </tr>
+      <tr>
+        <td>10:45 - 12:15</td>
+        <td>Development</td>
+        <td>Development</td>
+        <td>Design Review</td>
+        <td>Development</td>
+        <td>Team Meeting</td>
+      </tr>
+      <tr>
+        <td>13:00 - 14:30</td>
+        <td>Design Meeting</td>
+        <td>Development</td>
+        <td>Client Demo</td>
+        <td>Development</td>
+        <td>Project Review</td>
+      </tr>
+      <tr>
+        <td>14:45 - 16:15</td>
+        <td>Development</td>
+        <td>Testing</td>
+        <td>Development</td>
+        <td>Client Call</td>
+        <td>Retrospective</td>
+      </tr>
+      <tr>
+        <td>16:30 - 17:30</td>
+        <td>Testing</td>
+        <td>Documentation</td>
+        <td>Testing</td>
+        <td>Documentation</td>
+        <td>Planning</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <p>This document tests the ability of the conversion service to handle various types of tables with different complexity levels.</p>
+</body>
+</html>

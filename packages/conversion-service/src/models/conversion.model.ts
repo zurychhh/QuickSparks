@@ -18,8 +18,12 @@ export interface IConversion extends Document {
   processingStartedAt?: Date;
   processingEndedAt?: Date;
   error?: string;
+  errorDetails?: Record<string, any>;
   pageCount?: number;
+  conversionTime?: number;
   jobId?: string;
+  paymentId?: mongoose.Types.ObjectId | string;
+  isPaid?: boolean;
 }
 
 /**
@@ -73,11 +77,26 @@ const conversionSchema = new Schema<IConversion>(
     error: {
       type: String,
     },
+    errorDetails: {
+      type: Schema.Types.Mixed, // Store any error details
+    },
     pageCount: {
       type: Number,
     },
+    conversionTime: {
+      type: Number, // Conversion time in milliseconds
+    },
     jobId: {
       type: String,
+    },
+    paymentId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Payment',
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
+      index: true,
     }
   },
   {

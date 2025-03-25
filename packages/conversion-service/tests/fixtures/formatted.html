@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Formatted Document</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      line-height: 1.5;
+    }
+    h1 {
+      color: #2c3e50;
+      font-size: 28px;
+      text-align: center;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #3498db;
+      font-size: 22px;
+      margin-top: 25px;
+    }
+    h3 {
+      color: #e74c3c;
+      font-size: 18px;
+    }
+    p {
+      margin-bottom: 15px;
+    }
+    .highlight {
+      background-color: #ffffcc;
+      padding: 5px;
+      border-left: 3px solid #f39c12;
+    }
+    .important {
+      font-weight: bold;
+      color: #e74c3c;
+    }
+    .code {
+      font-family: monospace;
+      background-color: #f7f7f7;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    ul, ol {
+      margin-left: 30px;
+    }
+    blockquote {
+      border-left: 4px solid #3498db;
+      padding-left: 15px;
+      color: #555;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>Formatted Document Test</h1>
+  
+  <h2>Introduction to Formatting</h2>
+  <p>This document contains <strong>various</strong> types of <em>formatting</em> to test the conversion service's ability to preserve formatting when converting between PDF and DOCX.</p>
+  
+  <h2>Text Styling</h2>
+  <p>Here are some examples of text styling:</p>
+  <ul>
+    <li><strong>Bold text</strong> should be preserved</li>
+    <li><em>Italic text</em> should be preserved</li>
+    <li><u>Underlined text</u> should be preserved</li>
+    <li><span style="color: #e74c3c;">Colored text</span> should be preserved if possible</li>
+    <li>Text with <span style="background-color: #ffffcc;">highlighting</span> should be preserved if possible</li>
+  </ul>
+  
+  <h2>List Formatting</h2>
+  
+  <h3>Unordered List</h3>
+  <ul>
+    <li>First item</li>
+    <li>Second item
+      <ul>
+        <li>Nested item 1</li>
+        <li>Nested item 2</li>
+      </ul>
+    </li>
+    <li>Third item</li>
+  </ul>
+  
+  <h3>Ordered List</h3>
+  <ol>
+    <li>First step</li>
+    <li>Second step
+      <ol type="a">
+        <li>Substep a</li>
+        <li>Substep b</li>
+      </ol>
+    </li>
+    <li>Third step</li>
+  </ol>
+  
+  <h2>Block Elements</h2>
+  
+  <h3>Blockquote</h3>
+  <blockquote>
+    <p>This is a blockquote that should be preserved with the proper formatting during conversion. The indentation and styling should be maintained as much as possible.</p>
+  </blockquote>
+  
+  <h3>Code Block</h3>
+  <div class="code">
+    function testFunction() {<br>
+    &nbsp;&nbsp;console.log("Hello, world!");<br>
+    &nbsp;&nbsp;return true;<br>
+    }
+  </div>
+  
+  <h3>Highlight Block</h3>
+  <div class="highlight">
+    <p>This is a highlighted block of text that should maintain its background color and border styling during conversion if possible.</p>
+  </div>
+  
+  <h2>Conclusion</h2>
+  <p>This document tests the <span class="important">formatting preservation capabilities</span> of the conversion service. The goal is to maintain as much of the original formatting as possible when converting between PDF and DOCX formats.</p>
+</body>
+</html>

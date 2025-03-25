@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article lang="en">
+  <title>Document with Images</title>
+  
+  <para>This document contains various images to test the conversion service's ability to handle embedded images when converting between DOCX and PDF formats.</para>
+  
+  <section>
+    <title>Centered Image</title>
+    <para>Below is a centered image with a caption:</para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMzQ5OGRiIi8+CiAgICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxNTAiIHI9IjgwIiBmaWxsPSIjZWNmMGYxIi8+CiAgICA8dGV4dCB4PSIyMDAiIHk9IjE1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMmMzZTUwIj5UZXN0IEltYWdlPC90ZXh0Pgo8L3N2Zz4=" format="SVG" align="center"/>
+      </imageobject>
+      <caption>
+        <para>Figure 1: A simple test image with blue background and a circle</para>
+      </caption>
+    </mediaobject>
+  </section>
+  
+  <section>
+    <title>Images with Text</title>
+    <para>The following paragraphs have images alongside text:</para>
+    
+    <para>This paragraph has an image that should appear inline or aligned right. The text should flow around the image when converted. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget sapien vel arcu finibus facilisis. Fusce ultrices erat ac ligula rhoncus, eget faucibus arcu hendrerit. Integer egestas nulla vel justo venenatis.</para>
+    
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZTc0YzNjIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjEwMCw1MCA1MCwxNTAgMTUwLDE1MCIgZmlsbD0iI2ZmZiIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxODAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiI+UmlnaHQgQWxpZ25lZDwvdGV4dD4KPC9zdmc+" format="SVG" align="right"/>
+      </imageobject>
+    </mediaobject>
+    
+    <para>This paragraph should have text that flows around the previous image. Vivamus vestibulum justo ut ipsum vestibulum, nec malesuada nisl hendrerit. Proin et est at nunc cursus pellentesque. Mauris vitae mi eu neque faucibus hendrerit. Nam semper tempus neque, eget aliquet felis imperdiet sed. Nulla facilisi. Praesent sollicitudin purus quis urna lacinia faucibus.</para>
+    
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMjdhZTYwIi8+CiAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjUwIiBmaWxsPSIjZWNmMGYxIi8+CiAgICA8Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSIxMCIgZmlsbD0iIzJjM2U1MCIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iODAiIHI9IjEwIiBmaWxsPSIjMmMzZTUwIi8+CiAgICA8cGF0aCBkPSJNNzAsMTEwIHE1MCw0MCA2MCwwIiBzdHJva2U9IiMyYzNlNTAiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxODAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiI+TGVmdCBBbGlnbmVkPC90ZXh0Pgo8L3N2Zz4=" format="SVG" align="left"/>
+      </imageobject>
+    </mediaobject>
+    
+    <para>This paragraph should have text that flows around the previous image. Sed vitae enim blandit, pretium sapien eu, dictum justo. Duis vel turpis a orci congue molestie. Cras in felis vel magna vulputate vehicula. Vivamus fringilla nulla vel lacus fringilla, sed finibus ligula fermentum. Cras viverra enim vel lorem eleifend, vel blandit quam vestibulum.</para>
+    
+    <para>Fusce interdum libero vel velit elementum, vel aliquam neque molestie. Sed commodo convallis sapien, vel dictum mi aliquam nec. Quisque finibus dictum enim, vitae laoreet magna eleifend eget. Nulla facilisi. Integer eu tempor mauris, eget facilisis augue.</para>
+  </section>
+  
+  <section>
+    <title>Multiple Images in Sequence</title>
+    <para>Below are multiple images arranged in sequence:</para>
+    
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjM5YzEyIi8+CiAgICA8cmVjdCB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZmZmIi8+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjE4MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIj5JbWFnZSAxPC90ZXh0Pgo8L3N2Zz4=" format="SVG" align="center"/>
+      </imageobject>
+      <caption>
+        <para>Figure 2: A square image</para>
+      </caption>
+    </mediaobject>
+    
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjOWI1OWI2Ii8+CiAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjcwIiBmaWxsPSIjZWNmMGYxIiBzdHJva2U9IiMyYzNlNTAiIHN0cm9rZS13aWR0aD0iNCIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMDUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzJjM2U1MCI+SW1hZ2UgMjwvdGV4dD4KPC9zdmc+" format="SVG" align="center"/>
+      </imageobject>
+      <caption>
+        <para>Figure 3: A circle image</para>
+      </caption>
+    </mediaobject>
+    
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMmVjYzcxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjEwMCw0MCA0MCwxODAgMTYwLDE4MCIgZmlsbD0iI2VjZjBmMSIgc3Ryb2tlPSIjMmMzZTUwIiBzdHJva2Utd2lkdGg9IjQiLz4KICAgIDx0ZXh0IHg9IjEwMCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyYzNlNTAiPkltYWdlIDM8L3RleHQ+Cjwvc3ZnPg==" format="SVG" align="center"/>
+      </imageobject>
+      <caption>
+        <para>Figure 4: A triangle image</para>
+      </caption>
+    </mediaobject>
+  </section>
+  
+  <section>
+    <title>Conclusion</title>
+    <para>This document tests the ability of the conversion service to handle images with various positioning and sizes. The conversion should maintain image placement and text flow as accurately as possible when converting between DOCX and PDF formats.</para>
+  </section>
+</article>
