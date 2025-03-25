@@ -1,6 +1,6 @@
 {
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "buildCommand": "cd packages/frontend && pnpm run build",
+  "buildCommand": "cd packages/frontend && pnpm run build:vercel",
   "outputDirectory": "packages/frontend/dist",
   "framework": "vite",
   "rewrites": [

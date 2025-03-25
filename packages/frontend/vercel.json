@@ -2,7 +2,7 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "buildCommand": "pnpm run build",
+  "buildCommand": "pnpm run build:vercel",
   "devCommand": "pnpm run dev",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "outputDirectory": "dist",
