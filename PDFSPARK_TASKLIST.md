@@ -109,7 +109,7 @@ Wartość dla projektu: Uproszczenie rozwoju i utrzymania na wczesnym etapie.
 Wskazówki dla Claude Code: Projektuj z myślą o przyszłej modularyzacji, ale bez nadmiernego komplikowania początkowej wersji.
 Zadania Product Managera:
 Weryfikacja czy architektura spełnia wymogi biznesowe
-Ocena kompromisów między szybkością wdrożenia a skalowalością
+Ocena kompromisów między szybkością wdrożenia a skalowalności
 Zatwierdzenie zaproponowanej architektury
 4.2. Opracuj model danych
 Cel biznesowy: Zapewnienie efektywnego przechowywania i zarządzania danymi transakcyjnymi.
@@ -179,8 +179,8 @@ Określenie workflow zarządzania zadaniami
 Ustalenie procesu raportowania postępów
 Faza 1: Implementacja Core MVP (4 tygodnie)
 Etap 3: Podstawowa Infrastruktura (1 tydzień)
-6. Frontend - Podstawy (3 dni)
-6.1. Skonfiguruj projekt React
+✅ 6. Frontend - Podstawy (3 dni)
+✅ 6.1. Skonfiguruj projekt React
 Cel biznesowy: Zapewnienie stabilnej i wydajnej podstawy dla interfejsu użytkownika.
 Wartość dla projektu: Fundament dla wszystkich funkcji frontend.
 Wskazówki dla Claude Code: Użyj Vite dla szybszego developmentu i lepszej wydajności.
@@ -188,7 +188,7 @@ Zadania Product Managera:
 Zatwierdzenie stosu technologicznego frontendowego
 Weryfikacja zgodności konfiguracji z wymaganiami biznesowymi
 Ustalenie standardów dostępności i kompatybilności przeglądarek
-6.2. Zaimplementuj podstawowy wygląd z Tailwind CSS
+✅ 6.2. Zaimplementuj podstawowy wygląd z Tailwind CSS
 Cel biznesowy: Stworzenie spójnego, profesjonalnego wyglądu aplikacji zgodnego z identyfikacją marki.
 Wartość dla projektu: Budowanie zaufania użytkowników poprzez profesjonalny wygląd.
 Wskazówki dla Claude Code: Wykorzystaj Tailwind dla szybkiego prototypowania UI z zachowaniem estetyki.
@@ -196,7 +196,7 @@ Zadania Product Managera:
 Przygotowanie wytycznych brandingowych (kolory, typografia, styl)
 Zatwierdzenie podstawowych elementów UI
 Weryfikacja zgodności z założeniami UX
-6.3. Utwórz podstawowe komponenty UI
+✅ 6.3. Utwórz podstawowe komponenty UI
 Cel biznesowy: Zapewnienie spójności interfejsu i przyspieszenie developmentu.
 Wartość dla projektu: Lepsza skalowalność frontendu i spójność doświadczenia użytkownika.
 Wskazówki dla Claude Code: Projektuj reużywalne komponenty z myślą o różnych kontekstach użycia.
@@ -204,7 +204,7 @@ Zadania Product Managera:
 Weryfikacja użyteczności i intuicyjności komponentów
 Zatwierdzenie projektów komponentów z perspektywy UX
 Ustalenie priorytetów dla rozwoju biblioteki komponentów
-6.4. Zaimplementuj routing i strukturę stron
+✅ 6.4. Zaimplementuj routing i strukturę stron
 Cel biznesowy: Zapewnienie intuicyjnej nawigacji w aplikacji.
 Wartość dla projektu: Poprawa doświadczenia użytkownika i SEO.
 Wskazówki dla Claude Code: Zaprojektuj przejrzystą strukturę URL-i i płynne przejścia między stronami.
@@ -212,7 +212,7 @@ Zadania Product Managera:
 Zatwierdzenie mapy strony i struktury nawigacji
 Weryfikacja zgodności z wymaganiami SEO
 Ustalenie strategii dla stron błędów i przypadków brzegowych
-6.5. Skonfiguruj zarządzanie stanem
+✅ 6.5. Skonfiguruj zarządzanie stanem
 Cel biznesowy: Zapewnienie spójności danych w interfejsie użytkownika.
 Wartość dla projektu: Lepsza responsywność UI i redukcja błędów związanych ze stanem aplikacji.
 Wskazówki dla Claude Code: Użyj Zustand dla prostszego zarządzania stanem niż Redux.
@@ -220,8 +220,8 @@ Zadania Product Managera:
 Weryfikacja czy zarządzanie stanem uwzględnia wszystkie przypadki użycia
 Określenie wymagań dotyczących persystencji stanu
 Zatwierdzenie architektury zarządzania stanem
-7. Backend - Podstawy (2 dni)
-7.1. Utwórz projekt Express.js
+✅ 7. Backend - Podstawy (2 dni)
+✅ 7.1. Utwórz projekt Express.js
 Cel biznesowy: Zapewnienie stabilnego i wydajnego backendu dla aplikacji.
 Wartość dla projektu: Fundament dla wszystkich funkcji backendowych.
 Wskazówki dla Claude Code: Użyj TypeScript dla lepszej jakości kodu i dokumentacji API.
@@ -229,7 +229,7 @@ Zadania Product Managera:
 Zatwierdzenie stosu technologicznego backendowego
 Weryfikacja zgodności z wymaganiami skalowalności
 Ustalenie standardów dokumentacji API
-7.2. Zaimplementuj podstawową strukturę API
+✅ 7.2. Zaimplementuj podstawową strukturę API
 Cel biznesowy: Zapewnienie spójnego i intuicyjnego interfejsu programistycznego.
 Wartość dla projektu: Fundament dla wszystkich funkcji produktu.
 Wskazówki dla Claude Code: Projektuj API zgodnie z zasadami REST i z myślą o przyszłej rozbudowie.
@@ -237,7 +237,7 @@ Zadania Product Managera:
 Weryfikacja zgodności struktury API z wymaganiami funkcjonalnymi
 Zatwierdzenie nazewnictwa i konwencji API
 Ustalenie strategii wersjonowania API
-7.3. Dodaj middleware bezpieczeństwa
+✅ 7.3. Dodaj middleware bezpieczeństwa
 Cel biznesowy: Zapewnienie bezpieczeństwa aplikacji i danych użytkowników.
 Wartość dla projektu: Ochrona przed popularnymi atakami i zgodność z regulacjami.
 Wskazówki dla Claude Code: Zaimplementuj zabezpieczenia przed OWASP Top 10.
@@ -245,7 +245,7 @@ Zadania Product Managera:
 Określenie wymagań bezpieczeństwa
 Ustalenie polityki CORS
 Zatwierdzenie strategii rate limitingu
-7.4. Skonfiguruj połączenie z MongoDB
+✅ 7.4. Skonfiguruj połączenie z MongoDB
 Cel biznesowy: Zapewnienie niezawodnego przechowywania danych aplikacji.
 Wartość dla projektu: Fundament dla wszystkich funkcji wymagających persystencji danych.
 Wskazówki dla Claude Code: Użyj Mongoose dla wygodniejszej pracy z MongoDB i walidacji danych.
@@ -254,7 +254,7 @@ Zakup i konfiguracja klastra MongoDB Atlas
 Dostarczenie kredencjałów dostępowych do bazy danych
 Ustalenie polityki backupów danych
 Określenie strategii indeksowania dla optymalizacji wydajności
-7.5. Przygotuj system walidacji danych
+✅ 7.5. Przygotuj system walidacji danych
 Cel biznesowy: Zapewnienie integralności i jakości danych w systemie.
 Wartość dla projektu: Redukcja błędów i poprawa jakości danych.
 Wskazówki dla Claude Code: Użyj Zod dla typowo-bezpiecznej walidacji danych.
@@ -262,8 +262,8 @@ Zadania Product Managera:
 Określenie reguł walidacji dla krytycznych danych
 Ustalenie strategii obsługi błędów walidacji
 Zatwierdzenie komunikatów błędów dla użytkowników
-8. CI/CD i Deployment (2 dni)
-8.1. Skonfiguruj GitHub Actions
+✅ 8. CI/CD i Deployment (2 dni)
+✅ 8.1. Skonfiguruj GitHub Actions
 Cel biznesowy: Automatyzacja procesu testowania i wdrażania, zwiększenie niezawodności.
 Wartość dla projektu: Szybsze i bezpieczniejsze wdrożenia, lepsza jakość kodu.
 Wskazówki dla Claude Code: Zaimplementuj pipeline CI dla testów, lintingu i budowania.
@@ -271,7 +271,7 @@ Zadania Product Managera:
 Określenie wymagań dla procesu CI/CD
 Ustalenie polityki dla broken builds
 Zatwierdzenie workflow CI/CD
-8.2. Przygotuj środowisko na Vercel
+✅ 8.2. Przygotuj środowisko na Vercel
 Cel biznesowy: Zapewnienie stabilnego i łatwego w zarządzaniu środowiska produkcyjnego.
 Wartość dla projektu: Niezawodne hostowanie aplikacji z minimalnymi kosztami utrzymania.
 Wskazówki dla Claude Code: Skonfiguruj automatyczne deploymenty z GitHub.
@@ -280,7 +280,7 @@ Utworzenie konta i projektu na Vercel
 Konfiguracja projektu i ustawień billingowych
 Określenie strategii dla zmiennych środowiskowych
 Ustalenie polityki dostępu do środowiska produkcyjnego
-8.3. Skonfiguruj automatyczny deployment z preview
+✅ 8.3. Skonfiguruj automatyczny deployment z preview
 Cel biznesowy: Zapewnienie możliwości weryfikacji zmian przed wdrożeniem produkcyjnym.
 Wartość dla projektu: Redukcja ryzyka błędów na produkcji i lepszy proces recenzji kodu.
 Wskazówki dla Claude Code: Skonfiguruj automatyczne tworzenie środowisk preview dla PR-ów.
@@ -288,7 +288,7 @@ Zadania Product Managera:
 Określenie procesu weryfikacji i zatwierdzania deploymentów
 Ustalenie polityki dla environments
 Zatwierdzenie workflow deploymentów
-8.4. Zaimplementuj monitoring błędów
+✅ 8.4. Zaimplementuj monitoring błędów
 Cel biznesowy: Zapewnienie szybkiej identyfikacji i rozwiązywania problemów.
 Wartość dla projektu: Lepsza jakość usługi i szybsza reakcja na problemy.
 Wskazówki dla Claude Code: Zintegruj Sentry dla śledzenia błędów w czasie rzeczywistym.
@@ -297,7 +297,7 @@ Utworzenie konta Sentry i konfiguracja projektu
 Dostarczenie kredencjałów do Sentry
 Ustalenie priorytetów dla różnych typów błędów
 Określenie procesu reagowania na błędy
-8.5. Utwórz system powiadomień o błędach
+✅ 8.5. Utwórz system powiadomień o błędach
 Cel biznesowy: Zapewnienie szybkiej reakcji na krytyczne problemy.
 Wartość dla projektu: Minimalizacja czasów przestoju i wpływu błędów na użytkowników.
 Wskazówki dla Claude Code: Skonfiguruj integrację Sentry z kanałami komunikacji zespołu.
@@ -912,39 +912,32 @@ Identyfikacja potencjalnych partnerów do integracji
 Analiza najczęściej żądanych integracji
 Przygotowanie planu rozwoju integracji
 Podsumowanie Zadań Wymagających Bezpośredniego Wkładu Product Managera
+
 Konfiguracja i Kredencjały:
+- Zakup i dostarczenie domeny
+- Utworzenie i konfiguracja kont na platformach (MongoDB Atlas, Vercel, Stripe/PayU, Google Analytics, Sentry)
+- Dostarczenie wszystkich niezbędnych kredencjałów i kluczy API
 
-
-Zakup i dostarczenie domeny
-Utworzenie i konfiguracja kont na platformach (MongoDB Atlas, Vercel, Stripe/PayU, Google Analytics, Sentry)
-Dostarczenie wszystkich niezbędnych kredencjałów i kluczy API
 Materiały Marketingowe i Teksty:
+- Przygotowanie wytycznych brandingowych (kolory, typografia, styl)
+- Opracowanie kluczowych punktów wartości (value proposition)
+- Przygotowanie tekstów marketingowych, FAQ, przykładów
+- Tworzenie treści dla potwierdzeń zakupu i komunikacji z klientem
 
-
-Przygotowanie wytycznych brandingowych (kolory, typografia, styl)
-Opracowanie kluczowych punktów wartości (value proposition)
-Przygotowanie tekstów marketingowych, FAQ, przykładów
-Tworzenie treści dla potwierdzeń zakupu i komunikacji z klientem
 Decyzje Biznesowe:
+- Ustalenie struktury cenowej i opcji produktowych
+- Określenie strategii dla kampanii marketingowych
+- Definiowanie metryk sukcesu i KPI
+- Priorytetyzacja funkcjonalności i backlogu
 
-
-Ustalenie struktury cenowej i opcji produktowych
-Określenie strategii dla kampanii marketingowych
-Definiowanie metryk sukcesu i KPI
-Priorytetyzacja funkcjonalności i backlogu
 Dokumenty Prawne i Procedury:
+- Opracowanie polityki prywatności i regulaminu
+- Przygotowanie procedur reagowania na incydenty
+- Określenie polityki przechowywania danych
+- Szablony komunikacji kryzysowej
 
-
-Opracowanie polityki prywatności i regulaminu
-Przygotowanie procedur reagowania na incydenty
-Określenie polityki przechowywania danych
-Szablony komunikacji kryzysowej
 Testy i Weryfikacja:
-
-
-Przygotowanie zestawu testowych dokumentów
-Weryfikacja jakości konwersji z perspektywy użytkownika
-Ocena interfejsu użytkownika i doświadczenia
-Zatwierdzanie kluczowych etapów projektu
-Ten szczegółowy plan zadań zapewnia klarowne zrozumienie celów każdego zadania zarówno z perspektywy biznesowej, jak i technicznej. Zadania Product Managera zostały wyraźnie oznaczone, ze szczególnym uwzględnieniem tych wymagających dostarczenia zasobów zewnętrznych, których Claude Code nie może samodzielnie wdrożyć (zaznaczone pogrubioną czcionką).
-
+- Przygotowanie zestawu testowych dokumentów
+- Weryfikacja jakości konwersji z perspektywy użytkownika
+- Ocena interfejsu użytkownika i doświadczenia
+- Zatwierdzanie kluczowych etapów projektu

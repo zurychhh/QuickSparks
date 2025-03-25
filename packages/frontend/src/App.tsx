@@ -4,6 +4,7 @@ import NotFoundPage from '@pages/NotFound';
 import ConversionPage from '@pages/Conversion';
 import PricingPage from '@pages/Pricing';
 import AboutPage from '@pages/About';
+import Health from '@pages/Health';
 import Layout from '@components/layout/Layout';
 
 function App(): React.ReactElement {
@@ -15,6 +16,7 @@ function App(): React.ReactElement {
           <Route path="convert" element={<ConversionPage />} />
           <Route path="pricing" element={<PricingPage />} />
           <Route path="about" element={<AboutPage />} />
+          <Route path="health" element={<Health />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

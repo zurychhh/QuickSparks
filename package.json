@@ -22,7 +22,6 @@
     "pdf-test:benchmark": "pnpm --filter @conversion-microservices/pdf-service-test benchmark",
     "pdf-test:quality": "pnpm --filter @conversion-microservices/pdf-service-test quality-test",
     "pdf-test:sample": "pnpm --filter @conversion-microservices/pdf-service-test node src/create-sample-pdf.js",
-    
     "create:service": "node scripts/create-microservice.js",
     "create:component": "node scripts/create-component.js",
     "create:feature": "scripts/create-feature.sh",
@@ -69,6 +68,8 @@
     "@nestjs/common": "^11.0.12",
     "@nestjs/core": "^11.0.12",
     "@nestjs/platform-express": "^11.0.12",
+    "@sentry/integrations": "^7.114.0",
+    "@sentry/node": "^9.9.0",
     "reflect-metadata": "^0.2.2"
   }
 }

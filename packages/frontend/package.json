@@ -15,13 +15,15 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@sentry/browser": "^9.9.0",
+    "@sentry/react": "^9.9.0",
+    "axios": "^1.6.7",
+    "clsx": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
-    "zustand": "^4.5.2",
-    "axios": "^1.6.7",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.2.1"
+    "tailwind-merge": "^2.2.1",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^7.6.17",

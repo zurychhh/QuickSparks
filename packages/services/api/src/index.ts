@@ -8,9 +8,16 @@ import compressionMiddleware from './middleware/compression';
 import { globalRateLimit } from './middleware/rateLimit';
 import { notFoundHandler, errorHandler } from './utils/errorHandler';
 import apiRoutes from './routes';
+import { initSentry, setupSentryRequestHandler, setupSentryErrorHandler } from './utils/sentry';
+
+// Initialize Sentry
+initSentry();
 
 // Initialize Express app
 const app = express();
+
+// Set up Sentry request handler (before all middleware)
+setupSentryRequestHandler(app);
 
 // Set up security middleware
 setupSecurityMiddleware(app);
@@ -32,6 +39,9 @@ app.use('/api', apiRoutes);
 
 // 404 handler for undefined routes
 app.use(notFoundHandler);
+
+// Set up Sentry error handler (after routes, before other error handlers)
+setupSentryErrorHandler(app);
 
 // Global error handler
 app.use(errorHandler);
@@ -56,6 +66,13 @@ const startServer = async (): Promise<void> => {
 process.on('unhandledRejection', (err: Error) => {
   console.error(`Unhandled Rejection: ${err.message}`);
   console.error(err.stack);
+  
+  // Capture error in Sentry
+  if (err instanceof Error) {
+    const { captureException } = require('./utils/sentry');
+    captureException(err);
+  }
+  
   // Close server & exit process
   process.exit(1);
 });

@@ -1,0 +1,49 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/services/api/**'
+      - '.github/workflows/deploy-api.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy API to Cloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - uses: pnpm/action-setup@v3
+        with:
+          version: '8'
+          run_install: false
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build API
+        run: pnpm --filter @pdfspark/api build
+      
+      # In a real project, you would deploy to your cloud provider here
+      # For example, using Railway, Render, or a custom server
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          # This is a placeholder for the actual deployment command
+          echo "Deploying to Railway..."
+          # npm install -g @railway/cli
+          # railway up --service api

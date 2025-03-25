@@ -1,5 +1,5 @@
-import React from 'react'
-import { cn } from '@utils/classnames'
+import React from 'react';
+import { cn } from '@utils/classnames';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger'
@@ -24,10 +24,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       ...props
     },
-    ref
+    ref,
   ) => {
     // Base classes for all button variants
-    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-colors duration-200'
+    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none transition-colors duration-200';
     
     // Size variations
     const sizeClasses = {
@@ -36,7 +36,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       md: 'px-4 py-2 text-sm',
       lg: 'px-5 py-2.5 text-base',
       xl: 'px-6 py-3 text-lg',
-    }
+    };
     
     // Variant variations
     const variantClasses = {
@@ -46,15 +46,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
       link: 'bg-transparent text-primary-600 hover:text-primary-700 hover:underline focus:ring-0 shadow-none',
       danger: 'bg-error-600 text-white hover:bg-error-700 focus:ring-2 focus:ring-offset-2 focus:ring-error-500 shadow',
-    }
+    };
     
     // Disabled & Loading states
     const stateClasses = (disabled || isLoading) 
       ? 'opacity-60 cursor-not-allowed' 
-      : 'cursor-pointer'
+      : 'cursor-pointer';
     
     // Full width class
-    const widthClass = fullWidth ? 'w-full' : ''
+    const widthClass = fullWidth ? 'w-full' : '';
     
     return (
       <button
@@ -65,7 +65,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           variantClasses[variant],
           stateClasses,
           widthClass,
-          className
+          className,
         )}
         disabled={disabled || isLoading}
         {...props}
@@ -81,10 +81,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {children}
         {!isLoading && rightIcon && <span className="ml-2">{rightIcon}</span>}
       </button>
-    )
-  }
-)
+    );
+  },
+);
 
-Button.displayName = 'Button'
+Button.displayName = 'Button';
 
-export default Button
+export default Button;

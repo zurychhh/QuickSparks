@@ -2,7 +2,9 @@
 
 A microservices-based platform for high-quality file conversions and document utilities.
 
-![CI/CD Pipeline](https://github.com/quicksparks/conversion-microservices/workflows/CI/CD%20Pipeline/badge.svg)
+![CI](https://github.com/QuickSparks/PDFSpark/actions/workflows/ci.yml/badge.svg)
+![Frontend Deploy](https://github.com/QuickSparks/PDFSpark/actions/workflows/deploy-frontend.yml/badge.svg)
+![API Deploy](https://github.com/QuickSparks/PDFSpark/actions/workflows/deploy-api.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-ISC-blue.svg)
 
 ## Features

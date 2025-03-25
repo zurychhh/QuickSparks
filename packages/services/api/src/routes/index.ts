@@ -1,6 +1,7 @@
 import express from 'express';
 import authRoutes from './auth.routes';
 import conversionRoutes from './conversion.routes';
+import healthRoutes from './health.routes';
 
 const router = express.Router();
 
@@ -8,14 +9,8 @@ const router = express.Router();
  * API Routes
  */
 
-// Health check route
-router.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'API is running',
-    timestamp: new Date().toISOString(),
-  });
-});
+// Health check routes
+router.use('/health', healthRoutes);
 
 // Authentication routes
 router.use('/auth', authRoutes);
