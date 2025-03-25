@@ -118,7 +118,7 @@ async function createMinimalProject() {
     
     // Create vercel.json
     const vercelConfig = {
-      "buildCommand": false,  // Static site, no build needed
+      "buildCommand": null,  // Static site, no build needed
       "outputDirectory": ".",
       "framework": null
     };
