@@ -10,5 +10,11 @@
     "enabled": true,
     "silent": false,
     "autoAlias": true
+  },
+  "ignoreCommand": "echo 'Never ignore commits!'",
+  "build": {
+    "env": {
+      "VERCEL_FORCE_NO_BUILD_CACHE": "1"
+    }
   }
 }
