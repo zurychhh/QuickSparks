@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:vercel": "vite build",
+    "build:test": "node build-test.mjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest run",
@@ -16,7 +17,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@sentry/browser": "^9.9.0",
+    "@sentry/browser": "^7.120.3",
     "@sentry/react": "^9.9.0",
     "axios": "^1.6.7",
     "clsx": "^2.1.0",
