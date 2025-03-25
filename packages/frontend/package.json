@@ -10,6 +10,7 @@
     "direct-deploy": "node direct-deploy.mjs",
     "vercel-deploy": "./direct-deploy.sh",
     "vercel-standalone": "node vercel-standalone.mjs",
+    "minimal-deploy": "node minimal-deploy.mjs",
     "build:test": "node build-test.mjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
