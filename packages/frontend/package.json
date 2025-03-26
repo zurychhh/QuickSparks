@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "build:vercel": "node fix-build.mjs && vite build",
+    "build": "npx vite build",
+    "build:vercel": "node fix-build.mjs && npx vite build",
     "direct-deploy": "node direct-deploy.mjs",
     "vercel-deploy": "./direct-deploy.sh",
     "vercel-standalone": "node vercel-standalone.mjs",
