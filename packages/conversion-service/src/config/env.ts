@@ -33,6 +33,8 @@ interface Environment {
   DEFAULT_PAYMENT_CURRENCY: string;
   PDF_TO_DOCX_PRICE: number;
   DOCX_TO_PDF_PRICE: number;
+  MOCK_MODE: boolean;
+  ENABLE_WEBSOCKETS: boolean;
 }
 
 // Default values for environment variables
@@ -59,12 +61,14 @@ const env: Environment = {
   DOWNLOAD_TOKEN_EXPIRY: parseInt(process.env.DOWNLOAD_TOKEN_EXPIRY || '3600', 10), // 1 hour
   PAYMENT_SERVICE_URL: process.env.PAYMENT_SERVICE_URL || 'http://localhost:5004',
   INTERNAL_API_KEY: process.env.INTERNAL_API_KEY || 'development-internal-api-key',
-  PAYMENT_REQUIRED: process.env.PAYMENT_REQUIRED === 'true' || true,
+  PAYMENT_REQUIRED: process.env.PAYMENT_REQUIRED === 'true' ? true : false,
   PAYMENT_SECRET_KEY: process.env.PAYMENT_SECRET_KEY || 'development-payment-secret',
   PAYMENT_SHOP_ID: process.env.PAYMENT_SHOP_ID || 'dev-shop',
   DEFAULT_PAYMENT_CURRENCY: process.env.DEFAULT_PAYMENT_CURRENCY || 'PLN',
   PDF_TO_DOCX_PRICE: parseFloat(process.env.PDF_TO_DOCX_PRICE || '4.99'),
   DOCX_TO_PDF_PRICE: parseFloat(process.env.DOCX_TO_PDF_PRICE || '4.99'),
+  MOCK_MODE: process.env.MOCK_MODE === 'true' ? true : false,
+  ENABLE_WEBSOCKETS: process.env.ENABLE_WEBSOCKETS === 'true' ? true : process.env.ENABLE_WEBSOCKETS === 'false' ? false : true,
 };
 
 // Validation for required environment variables in production
