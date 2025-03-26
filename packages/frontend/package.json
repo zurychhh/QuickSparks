@@ -26,7 +26,9 @@
     "verify:www": "node verify-www-fix.mjs",
     "deploy:fix": "node simple-fix-deploy.mjs",
     "deploy:pdfspark": "node pdfspark-deploy.mjs",
-    "test-local": "npm run build && npx serve -s dist"
+    "test-local": "npm run build && npx serve -s dist",
+    "fix:deploy": "node fix-vercel-deployment.mjs",
+    "verify:url": "node tools/check-deployment-url.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
