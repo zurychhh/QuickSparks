@@ -8,6 +8,7 @@ export interface FilePreviewProps {
   onConvert: () => void;
   isConverting?: boolean;
   className?: string;
+  showConvertButton?: boolean;
 }
 
 const FilePreview: React.FC<FilePreviewProps> = ({
@@ -16,6 +17,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   onConvert,
   isConverting = false,
   className,
+  showConvertButton = true,
 }) => {
   const fileType = file.type;
   const isPdf = fileType === 'application/pdf';
@@ -97,20 +99,23 @@ const FilePreview: React.FC<FilePreviewProps> = ({
             variant="outline"
             size="sm"
             onClick={onRemove}
-            className="mr-2"
+            className={showConvertButton ? "mr-2" : ""}
+            disabled={isConverting}
           >
             Remove
           </Button>
           
-          <Button
-            variant={isPdf || isDocx ? 'primary' : 'secondary'}
-            size="sm"
-            onClick={onConvert}
-            isLoading={isConverting}
-            disabled={isConverting}
-          >
-            {getConversionText()}
-          </Button>
+          {showConvertButton && (
+            <Button
+              variant={isPdf || isDocx ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={onConvert}
+              isLoading={isConverting}
+              disabled={isConverting}
+            >
+              {getConversionText()}
+            </Button>
+          )}
         </div>
       </div>
     </div>
