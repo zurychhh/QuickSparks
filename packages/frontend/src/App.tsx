@@ -10,12 +10,13 @@ import CheckoutPage from '@pages/Checkout';
 import ProductPage from '@pages/ProductPage';
 import AccountPage from '@pages/Account';
 import Layout from '@components/layout/Layout';
+import useAnalytics from '@hooks/useAnalytics';
 
 function App(): React.ReactElement {
   return (
-    <Router>
+    <Router basename="/pdfspark">
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<AnalyticsLayout />}>
           <Route index element={<HomePage />} />
           <Route path="convert" element={<ConversionPage />} />
           <Route path="convert/:id" element={<ConversionPage />} />
@@ -32,6 +33,19 @@ function App(): React.ReactElement {
       </Routes>
     </Router>
   );
+}
+
+// Wrapper component to initialize analytics after Router is initialized
+function AnalyticsLayout(): React.ReactElement {
+  try {
+    // Initialize analytics tracking (now safely within Router context)
+    useAnalytics();
+  } catch (error) {
+    // Silently handle analytics errors so they don't break the app
+    console.warn('Analytics initialization error:', error);
+  }
+  
+  return <Layout />;
 }
 
 export default App;
