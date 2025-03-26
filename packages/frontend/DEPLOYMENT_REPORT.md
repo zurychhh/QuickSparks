@@ -5,7 +5,7 @@ We have successfully completed the implementation and deployment of the PDFSpark
 
 ## Deployment Details
 
-- **Deployment URL**: [https://dist-g2rposr9c-zurychhhs-projects.vercel.app](https://dist-g2rposr9c-zurychhhs-projects.vercel.app)
+- **Deployment URL**: [https://deploy-dist-fmby5w1al-zurychhhs-projects.vercel.app](https://deploy-dist-fmby5w1al-zurychhhs-projects.vercel.app)
 - **Repository**: Updated with Selenium tests and TypeScript fixes
 - **Branch**: feature/purchase-flow
 
