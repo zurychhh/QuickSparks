@@ -1,0 +1,278 @@
+{
+  "timestamp": "2025-03-26T11:49:09.741Z",
+  "baseUrl": "https://dist-lxnutlox3-zurychhhs-projects.vercel.app/pdfspark",
+  "results": {
+    "routes": {
+      "results": [
+        {
+          "url": "https://dist-lxnutlox3-zurychhhs-projects.vercel.app/pdfspark",
+          "status": 401,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "no-store, max-age=0"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "13081"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 11:49:08 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "set-cookie": [
+              "_vercel_sso_nonce=ZGjoCTasFAxctZRYANcS9MS2; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000; includeSubDomains; preload"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-robots-tag": [
+              "noindex"
+            ],
+            "x-vercel-id": [
+              "arn1::6pccl-1742989748038-a19562788f91"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://dist-lxnutlox3-zurychhhs-projects.vercel.app/pdfspark/product",
+          "status": 401,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "no-store, max-age=0"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "13111"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 11:49:08 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "set-cookie": [
+              "_vercel_sso_nonce=I6tAb8vQDIDhw5kBmfDACSaT; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000; includeSubDomains; preload"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-robots-tag": [
+              "noindex"
+            ],
+            "x-vercel-id": [
+              "arn1::pxwhx-1742989748542-0468f18d3095"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://dist-lxnutlox3-zurychhhs-projects.vercel.app/pdfspark/pricing",
+          "status": 401,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "no-store, max-age=0"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "13111"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 11:49:08 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "set-cookie": [
+              "_vercel_sso_nonce=GkOV68NhKS1VDwaTc4ehhQvq; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000; includeSubDomains; preload"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-robots-tag": [
+              "noindex"
+            ],
+            "x-vercel-id": [
+              "arn1::4ptnr-1742989748806-6d2dc83f06c8"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://dist-lxnutlox3-zurychhhs-projects.vercel.app/pdfspark/convert",
+          "status": 401,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "no-store, max-age=0"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "13111"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 11:49:08 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "set-cookie": [
+              "_vercel_sso_nonce=93xDM6gR3yNoO1bUCfWlxo0k; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000; includeSubDomains; preload"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-robots-tag": [
+              "noindex"
+            ],
+            "x-vercel-id": [
+              "arn1::6cbj8-1742989748926-f9678ab6068c"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://dist-lxnutlox3-zurychhhs-projects.vercel.app/pdfspark/about",
+          "status": 401,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "no-store, max-age=0"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "13105"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 11:49:09 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "set-cookie": [
+              "_vercel_sso_nonce=fIEsDZsDL60Rbj6D9iMKftX1; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000; includeSubDomains; preload"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-robots-tag": [
+              "noindex"
+            ],
+            "x-vercel-id": [
+              "arn1::kwj6d-1742989749038-d67c4183775d"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://dist-lxnutlox3-zurychhhs-projects.vercel.app/pdfspark/health",
+          "status": 401,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "no-store, max-age=0"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "13108"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 11:49:09 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "set-cookie": [
+              "_vercel_sso_nonce=s7I1AFt2vruNO2jlyZmY6JSX; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000; includeSubDomains; preload"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-robots-tag": [
+              "noindex"
+            ],
+            "x-vercel-id": [
+              "arn1::x4vcf-1742989749149-44ea1e124de4"
+            ]
+          },
+          "contentValid": true
+        }
+      ],
+      "success": false
+    },
+    "securityHeaders": {
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "Content-Security-Policy": null,
+        "X-Content-Type-Options": null,
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": null,
+        "Referrer-Policy": null,
+        "Permissions-Policy": null
+      },
+      "success": false
+    },
+    "healthCheck": {
+      "success": false
+    },
+    "seoFiles": {
+      "robotsTxt": false,
+      "sitemapXml": false,
+      "success": false
+    }
+  },
+  "approved": true
+}

@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-03-26T11-47-32",
+  "backendType": "Real Backend API",
+  "backendUrl": "http://localhost:5000/api",
+  "totalRequests": 9,
+  "failedRequests": 0,
+  "totalAssertions": 14,
+  "failedAssertions": 0,
+  "totalTime": 132
+}

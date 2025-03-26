@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 import { initSentry } from './utils/sentry'
@@ -13,13 +13,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <FeedbackProvider>
       {/*
-        KLUCZOWA KONFIGURACJA:
-        basename ustawia podstawową ścieżkę dla wszystkich linków i routingów w aplikacji
-        dzięki temu wszystkie strony będą dostępne pod /pdfspark/...
+        Zastosowanie HashRouter zamiast BrowserRouter:
+        - Rozwiązuje problemy z MIME types
+        - Nie wymaga konfiguracji basename
+        - Linki będą miały format /#/scieżka zamiast /scieżka
       */}
-      <BrowserRouter basename="/pdfspark">
+      <HashRouter>
         <App />
-      </BrowserRouter>
+      </HashRouter>
     </FeedbackProvider>
   </React.StrictMode>,
 )

@@ -6,8 +6,8 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   
-  // Ustaw bazową ścieżkę dla aplikacji
-  base: '/pdfspark/',
+  // Użyj ścieżek relatywnych dla prostszego wdrożenia
+  base: './',
   
   resolve: {
     alias: {

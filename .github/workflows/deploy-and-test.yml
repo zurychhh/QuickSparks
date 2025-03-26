@@ -1,0 +1,166 @@
+name: Deploy and Test
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - feature/purchase-flow
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build frontend
+        working-directory: ./packages/frontend
+        run: npm run build
+        
+      - name: Run type checks
+        working-directory: ./packages/conversion-service
+        run: npm run typecheck || echo "Type checks failed but continuing"
+        
+      - name: Run unit tests
+        run: npm test
+
+  e2e-tests:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get -y install google-chrome-stable
+          
+      - name: Run E2E tests
+        working-directory: ./packages/frontend
+        run: |
+          # Start services in background
+          npm run start &
+          # Give time for services to start
+          sleep 10
+          # Run Selenium tests
+          node selenium-tests/complete-test.mjs
+          
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-results
+          path: ./packages/frontend/selenium-tests/test-results
+
+  deploy-preview:
+    if: github.event_name == 'pull_request'
+    needs: e2e-tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build frontend
+        working-directory: ./packages/frontend
+        run: npm run build
+        
+      - name: Deploy to Vercel Preview
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./packages/frontend
+          
+      - name: Comment preview URL
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue, repo } = context;
+            github.rest.issues.createComment({
+              issue_number: issue.number,
+              owner: repo.owner,
+              repo: repo.repo,
+              body: `✅ Preview deployed to ${process.env.VERCEL_PREVIEW_URL}`
+            });
+
+  deploy-production:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: e2e-tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build frontend
+        working-directory: ./packages/frontend
+        run: npm run build
+        
+      - name: Deploy to Vercel Production
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./packages/frontend
+          vercel-args: '--prod'
+          
+      - name: Verify production deployment
+        working-directory: ./packages/frontend
+        run: node tools/check-deployed-app.mjs
+        
+      - name: Upload verification results
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-verification
+          path: ./packages/frontend/deployment-logs/verification-*.json

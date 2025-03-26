@@ -2,13 +2,11 @@
   "version": 2,
   "public": true,
   "rewrites": [
-    { "source": "/pdfspark", "destination": "/index.html" },
-    { "source": "/pdfspark/", "destination": "/index.html" },
-    { "source": "/pdfspark/:path*", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
-      "source": "/pdfspark/:path*",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -17,7 +15,7 @@
       ]
     },
     {
-      "source": "/pdfspark/assets/:path*",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

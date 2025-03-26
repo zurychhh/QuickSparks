@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-03-26T11:47:32.839Z",
+  "fileValidation": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "passRate": 100
+  },
+  "conversionValidation": {
+    "total": 6,
+    "passed": 5,
+    "failed": 1,
+    "passRate": 83.33333333333334
+  },
+  "overallPassRate": 90.9090909090909,
+  "usedRealBackend": true,
+  "backendUrl": "http://localhost:3000/pdfspark/api/conversion/status?id=test123"
+}

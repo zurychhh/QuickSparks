@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-03-26T11-06-31",
+  "backendVerification": {
+    "verified": true,
+    "healthCheck": 200,
+    "statusCheck": 200
+  },
+  "totalRequests": 5,
+  "failedRequests": 5,
+  "totalAssertions": 6,
+  "failedAssertions": 6,
+  "totalTime": 86
+}

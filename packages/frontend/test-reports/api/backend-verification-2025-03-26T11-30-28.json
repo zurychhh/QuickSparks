@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-03-26T11-30-28",
+  "healthEndpoint": {
+    "available": true,
+    "status": 403,
+    "isJson": false,
+    "isHtml": false,
+    "data": null,
+    "responseText": "",
+    "url": "http://localhost:5000/api"
+  },
+  "backendType": "Real Backend API",
+  "backendUrl": "http://localhost:5000/api",
+  "conclusion": "Using real backend API for testing"
+}
