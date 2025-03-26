@@ -1,10 +1,10 @@
 {
   "version": 2,
   "public": true,
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/pdfspark/(.*)", "dest": "/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/pdfspark", "destination": "/index.html" },
+    { "source": "/pdfspark/(.*)", "destination": "/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {

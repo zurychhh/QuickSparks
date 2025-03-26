@@ -74,10 +74,10 @@ async function deploy() {
       const vercelConfig = {
         "version": 2,
         "public": true,
-        "routes": [
-          { "handle": "filesystem" },
-          { "src": "/pdfspark/(.*)", "dest": "/$1" },
-          { "src": "/(.*)", "dest": "/index.html" }
+        "rewrites": [
+          { "source": "/pdfspark", "destination": "/index.html" },
+          { "source": "/pdfspark/(.*)", "destination": "/$1" },
+          { "source": "/(.*)", "destination": "/index.html" }
         ],
         "headers": [
           {
@@ -109,7 +109,7 @@ async function deploy() {
     // Step 4: Deploy to Vercel
     console.log('Step 4: Deploying to Vercel...');
     try {
-      const { stdout } = await run('cd dist && vercel deploy --prod');
+      const { stdout } = await run('cd dist && vercel deploy --prod --yes');
       
       // Extract deployment URL
       const deployUrl = stdout.match(/https:\/\/[a-zA-Z0-9-]+\.vercel\.app/)?.[0];
