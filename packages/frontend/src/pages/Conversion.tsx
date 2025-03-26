@@ -106,6 +106,7 @@ interface ConversionOptionsType {
 
 const ConversionPage: React.FC = (): React.ReactElement => {
   const { conversionId } = useParams<{ conversionId?: string }>();
+  const feedbackContext = useFeedback(); // Move useFeedback hook to component level
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [conversionType, setConversionType] = useState<ConversionType>('pdf-to-docx');
   const [conversionOptions, setConversionOptions] = useState<ConversionOptionsType>({
@@ -236,8 +237,15 @@ const ConversionPage: React.FC = (): React.ReactElement => {
               }
             }, 2000);
 
-            // Cleanup interval on component unmount
-            return () => clearInterval(pollInterval);
+            // Create a cleanup function that will be called on unmount
+            const cleanup = () => {
+              console.log('Cleaning up polling interval');
+              clearInterval(pollInterval);
+              // Don't call any hooks here
+            };
+
+            // Return the cleanup function to React
+            return cleanup;
           }
         } catch (err) {
           console.error('Error fetching conversion:', err);
@@ -299,12 +307,13 @@ const ConversionPage: React.FC = (): React.ReactElement => {
 
   // Handle file removal
   const handleRemoveFile = (): void => {
-    const feedbackContext = useFeedback();
-
+    // Use feedbackContext from component level
     setSelectedFile(null);
     setError(null);
     setConvertedFileUrl(null);
     setCurrentStep('select');
+    setUploadStatus('idle');
+    setUploadProgress(null);
 
     // Show feedback for file removal
     feedbackContext.showFeedback('info', 'File removed. Select a new file to convert.', 3000);
@@ -452,16 +461,20 @@ const ConversionPage: React.FC = (): React.ReactElement => {
               }
             }, 2000); // Poll every 2 seconds
 
-            // Store interval ID in ref for cleanup
+            // Store interval ID for cleanup
             const currentIntervalId = pollInterval;
+            
+            // Create a cleanup function to handle unmounting
+            const cleanupInterval = () => {
+              if (currentIntervalId) {
+                clearInterval(currentIntervalId);
+                feedbackContext.hideFeedback();
+              }
+            };
+            
+            // Add the cleanup function to component unmount
             useEffect(() => {
-              return () => {
-                if (currentIntervalId) {
-                  clearInterval(currentIntervalId);
-                  // Hide any persistent feedback when unmounting
-                  feedbackContext.hideFeedback();
-                }
-              };
+              return cleanupInterval;
             }, []);
           } else {
             const errorMsg = 'Invalid server response. Please try again.';
@@ -641,6 +654,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                         <FilePreview
                           file={selectedFile}
                           onRemove={handleRemoveFile}
+                          onConvert={handleConvert} // Add the missing prop
                           isConverting={isConverting}
                           className="mb-0"
                           showConvertButton={false}
