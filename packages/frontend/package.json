@@ -13,7 +13,7 @@
     "minimal-deploy": "node minimal-deploy.mjs",
     "build:test": "node build-test.mjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
+    "preview": "vite preview --base=/pdfspark/",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -24,7 +24,9 @@
     "fix:www": "node fix-www-redirect.mjs",
     "deploy:www": "./deploy-www-fix.sh",
     "verify:www": "node verify-www-fix.mjs",
-    "deploy:fix": "node simple-fix-deploy.mjs"
+    "deploy:fix": "node simple-fix-deploy.mjs",
+    "deploy:pdfspark": "node pdfspark-deploy.mjs",
+    "test-local": "npm run build && npx serve -s dist"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

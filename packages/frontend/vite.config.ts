@@ -5,7 +5,10 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  
+  // Ustaw bazową ścieżkę dla aplikacji
   base: '/pdfspark/',
+  
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -29,14 +32,32 @@ export default defineConfig({
     },
   },
   build: {
+    // Upewnij się, że wszystkie zasoby mają odpowiednie ścieżki
     outDir: 'dist',
+    assetsDir: 'assets',
+    emptyOutDir: true,
     sourcemap: true,
+    
+    // Zapewnij, że wszystkie zasoby mają odpowiednie przedrostki ścieżek
     rollupOptions: {
       output: {
+        // Customowy format ścieżek dla skryptów i zasobów
         manualChunks: {
           react: ['react', 'react-dom'],
           router: ['react-router-dom'],
           zustand: ['zustand'],
+        },
+        // Customowy format ścieżek dla zasobów
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const extType = info[info.length - 1];
+          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name)) {
+            return `assets/img/[name].[hash][extname]`;
+          }
+          if (/\.css$/i.test(assetInfo.name)) {
+            return `assets/css/[name].[hash][extname]`;
+          }
+          return `assets/[name].[hash][extname]`;
         },
       },
     },

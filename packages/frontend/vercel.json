@@ -1,11 +1,31 @@
 {
   "version": 2,
   "public": true,
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "redirects": [{ "source": "/", "destination": "/pdfspark", "permanent": true }],
-  "buildCommand": "pnpm run build:vercel",
-  "devCommand": "pnpm run dev",
-  "installCommand": "pnpm install --no-frozen-lockfile",
-  "outputDirectory": "dist",
-  "framework": "vite"
+  "rewrites": [
+    { "source": "/pdfspark", "destination": "/index.html" },
+    { "source": "/pdfspark/", "destination": "/index.html" },
+    { "source": "/pdfspark/:path*", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/pdfspark/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/pdfspark/assets/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "trailingSlash": false,
+  "cleanUrls": true
 }
