@@ -20,7 +20,11 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy": "node vercel-deploy.mjs",
-    "deploy:vercel": "node final-deploy.mjs"
+    "deploy:vercel": "node final-deploy.mjs",
+    "fix:www": "node fix-www-redirect.mjs",
+    "deploy:www": "./deploy-www-fix.sh",
+    "verify:www": "node verify-www-fix.mjs",
+    "deploy:fix": "node simple-fix-deploy.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
