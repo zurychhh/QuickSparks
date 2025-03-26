@@ -40,7 +40,7 @@ async function deploy() {
     console.log('✅ Router configuration verified');
     
     console.log('Step 2: Building application...');
-    await run('npm run build');
+    await run('npm run build:vercel');
     console.log('✅ Build completed successfully');
     
     console.log('Step 3: Preparing Vercel configuration...');
