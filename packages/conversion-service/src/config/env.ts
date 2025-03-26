@@ -8,6 +8,7 @@ interface Environment {
   NODE_ENV: 'development' | 'production' | 'test';
   PORT: number;
   BASE_URL: string;
+  FRONTEND_URL: string;
   MONGODB_URI: string;
   UPLOADS_DIR: string;
   OUTPUTS_DIR: string;
@@ -42,6 +43,7 @@ const env: Environment = {
   NODE_ENV: (process.env.NODE_ENV as Environment['NODE_ENV']) || 'development',
   PORT: parseInt(process.env.PORT || '5001', 10),
   BASE_URL: process.env.BASE_URL || 'http://localhost:5001',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/conversion-service',
   UPLOADS_DIR: process.env.UPLOADS_DIR || 'uploads',
   OUTPUTS_DIR: process.env.OUTPUTS_DIR || 'outputs',
@@ -82,7 +84,8 @@ if (env.NODE_ENV === 'production') {
     'INTERNAL_API_KEY',
     'PAYMENT_SECRET_KEY',
     'PAYMENT_SHOP_ID',
-    'BASE_URL'
+    'BASE_URL',
+    'FRONTEND_URL'
   ];
   for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
