@@ -19,7 +19,8 @@
     "test:coverage": "vitest run --coverage",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "deploy": "node vercel-deploy.mjs"
+    "deploy": "node vercel-deploy.mjs",
+    "deploy:vercel": "node final-deploy.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
