@@ -92,62 +92,34 @@ async function fixDeployment() {
     );
     console.log('✅ Created vercel.json in dist-fix');
 
-    // Create a modified index.html that works both with and without /pdfspark
-    console.log('\nStep 4: Creating a modified index.html that handles both path patterns...');
+    // Create a modified index.html that works with HashRouter
+    console.log('\nStep 4: Creating a modified index.html for HashRouter implementation...');
     
     let indexHtml = fs.readFileSync(path.join(distFixDir, 'index.html'), 'utf8');
     
-    // Add dynamic base path script 
-    const basepathScript = `
-  <script>
-    // Dynamically set base path based on URL
-    (function() {
-      var pathname = window.location.pathname;
-      var basePath = '';
-      
-      // Check if we're under /pdfspark
-      if (pathname.startsWith('/pdfspark')) {
-        basePath = '/pdfspark/';
-      }
-      
-      // Set base dynamically
-      var baseElement = document.createElement('base');
-      baseElement.href = basePath;
-      document.head.prepend(baseElement);
-      
-      // Set a global for router to use
-      window.pdfspark_base_path = basePath ? basePath.slice(0, -1) : '';
-    })();
-  </script>`;
-    
-    // Insert the script right after the head tag
-    indexHtml = indexHtml.replace('<head>', '<head>' + basepathScript);
-    
-    // Remove any existing base tag
+    // Remove any existing base tag since we're using HashRouter now
     indexHtml = indexHtml.replace(/<base href="[^"]*"[^>]*>/g, '');
     
+    // Update paths to be relative
+    indexHtml = indexHtml.replace(/href="\/pdfspark\//g, 'href="./');
+    indexHtml = indexHtml.replace(/src="\/pdfspark\//g, 'src="./');
+    indexHtml = indexHtml.replace(/href="\/src/g, 'href="./src');
+    indexHtml = indexHtml.replace(/src="\/src/g, 'src="./src');
+    
     fs.writeFileSync(path.join(distFixDir, 'index.html'), indexHtml);
-    console.log('✅ Modified index.html with dynamic base path script');
+    console.log('✅ Modified index.html for HashRouter implementation');
 
-    // Create a modified main.js that checks for base path
-    console.log('\nStep 5: Creating app initializer script...');
+    // Create a simple monitoring script
+    console.log('\nStep 5: Creating simple monitoring script...');
     
     const initScript = `
-// Path detection script
+// HashRouter monitoring script
 window.addEventListener('DOMContentLoaded', function() {
   // Get the React app container
   var root = document.getElementById('root');
   if (!root) return;
   
-  var pathname = window.location.pathname;
-  
-  // Redirect if needed
-  if (pathname === '/pdfspark') {
-    window.location.href = '/pdfspark/';
-    return;
-  }
-  
-  // Create a note about the current path mode
+  // Add a small indicator to show we're in HashRouter mode
   var pathNote = document.createElement('div');
   pathNote.style.position = 'fixed';
   pathNote.style.bottom = '5px';
@@ -158,25 +130,25 @@ window.addEventListener('DOMContentLoaded', function() {
   pathNote.style.fontSize = '10px';
   pathNote.style.borderRadius = '3px';
   pathNote.style.zIndex = '9999';
-  
-  if (pathname.startsWith('/pdfspark')) {
-    pathNote.textContent = 'Path mode: /pdfspark';
-  } else {
-    pathNote.textContent = 'Path mode: direct';
-  }
+  pathNote.textContent = 'HashRouter mode';
   
   document.body.appendChild(pathNote);
+  
+  // Log navigation to help with debugging
+  window.addEventListener('hashchange', function() {
+    console.log('Navigation to: ' + window.location.hash);
+  });
 });
 `;
     
-    fs.writeFileSync(path.join(distFixDir, 'path-init.js'), initScript);
+    fs.writeFileSync(path.join(distFixDir, 'hash-router-monitor.js'), initScript);
     
-    // Update index.html to include the init script
+    // Update index.html to include the monitoring script with relative path
     indexHtml = fs.readFileSync(path.join(distFixDir, 'index.html'), 'utf8');
-    indexHtml = indexHtml.replace('</body>', '<script src="/path-init.js"></script></body>');
+    indexHtml = indexHtml.replace('</body>', '<script src="./hash-router-monitor.js"></script></body>');
     fs.writeFileSync(path.join(distFixDir, 'index.html'), indexHtml);
     
-    console.log('✅ Created initializer script and added to index.html');
+    console.log('✅ Created HashRouter monitoring script and added to index.html');
 
     // Create package.json in dist-fix
     console.log('\nStep 6: Creating package.json...');
@@ -186,7 +158,12 @@ window.addEventListener('DOMContentLoaded', function() {
       "private": true,
       "type": "module",
       "scripts": {
-        "start": "serve -s"
+        "start": "serve -s",
+        "build": "npx vite build",
+        "vercel-build": "npx vite build"
+      },
+      "dependencies": {
+        "vite": "^5.1.6"
       }
     };
     
@@ -200,7 +177,7 @@ window.addEventListener('DOMContentLoaded', function() {
     console.log('\nStep 7: Deploying to Vercel...');
     try {
       // First set project settings to public
-      await run(`cd ${distFixDir} && vercel --public`);
+      await run(`cd ${distFixDir} && vercel --public --yes`);
       
       // Then deploy with production flag
       const { stdout } = await run(`cd ${distFixDir} && vercel deploy --prod --yes --public`);
