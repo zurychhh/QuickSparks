@@ -133,7 +133,7 @@ export const uploadFile = ({
   }
   
   // Make request
-  logDebug('Uploading file', { fileName: file.name, fileSize: file.size });
+  logDebug('Uploading file', { fileName: file.name, fileSize: file.size, fileType: file.type });
   api.post(API_CONFIG.endpoints.convert, formData, config)
     .then((response) => {
       logDebug('Upload successful', response.data);

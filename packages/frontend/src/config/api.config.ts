@@ -11,15 +11,23 @@ const getBaseUrl = () => {
   return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 };
 
+// Helper function to normalize URL paths
+export const normalizeUrlPath = (url: string): string => {
+  // Make sure URL starts with a slash
+  const urlWithLeadingSlash = url.startsWith('/') ? url : `/${url}`;
+  // Make sure URL ends with a slash for API consistency
+  return urlWithLeadingSlash.endsWith('/') ? urlWithLeadingSlash : `${urlWithLeadingSlash}/`;
+};
+
 export const API_CONFIG = {
   baseUrl: getBaseUrl(),
   timeout: 30000,  // 30 sekund timeout
   endpoints: {
-    convert: '/conversions/upload',
-    status: '/conversions',
-    download: '/downloads/token',
-    thumbnails: '/thumbnails',
-    payments: '/payments'
+    convert: '/conversions/upload/',
+    status: '/conversions/',
+    download: '/downloads/token/',
+    thumbnails: '/thumbnails/',
+    payments: '/payments/'
   }
 };
 

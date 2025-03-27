@@ -32,11 +32,25 @@ export function useWebSocket(url: string, authToken: string) {
       return;
     }
     
+    // Normalize URL and add auth token
+    let connectionUrl = url;
+    
+    // Ensure URL has proper protocol
+    if (!connectionUrl.startsWith('ws://') && !connectionUrl.startsWith('wss://')) {
+      // Auto-detect protocol based on current page
+      const isSecure = window.location.protocol === 'https:';
+      connectionUrl = `${isSecure ? 'wss' : 'ws'}://${connectionUrl}`;
+    }
+    
+    // Remove trailing slash before adding query parameters
+    connectionUrl = connectionUrl.endsWith('/') ? connectionUrl.slice(0, -1) : connectionUrl;
+    
     // Add auth token to URL
-    const connectionUrl = `${url}?token=${encodeURIComponent(authToken)}`;
+    connectionUrl = `${connectionUrl}?token=${encodeURIComponent(authToken)}`;
     
     try {
       setStatus(WebSocketStatus.CONNECTING);
+      console.log('Connecting to WebSocket:', connectionUrl);
       socketRef.current = new WebSocket(connectionUrl);
       
       // Connection opened

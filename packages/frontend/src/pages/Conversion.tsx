@@ -323,8 +323,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
   const handleConvert = async (): Promise<void> => {
     if (!selectedFile) return;
 
-    // Get the feedback context
-    const feedbackContext = useFeedback();
+    // Using feedbackContext from component level
 
     setIsConverting(true);
     setError(null);
@@ -472,10 +471,9 @@ const ConversionPage: React.FC = (): React.ReactElement => {
               }
             };
             
-            // Add the cleanup function to component unmount
-            useEffect(() => {
-              return cleanupInterval;
-            }, []);
+            // We'll use the existing useEffect cleanup mechanism instead of creating a new one in the handler
+            // This is because React hooks can't be called conditionally inside a function
+            return;
           } else {
             const errorMsg = 'Invalid server response. Please try again.';
             setError(errorMsg);
@@ -899,8 +897,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                             setIsConverting(false);
                             setUploadStatus('idle');
 
-                            // Show feedback for cancellation
-                            const feedbackContext = useFeedback();
+                            // Show feedback for cancellation - using component-level context
                             feedbackContext.showFeedback('info', 'Conversion cancelled', 2000);
                           }}
                           animate={true}
