@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { captureException } from '../utils/sentry';
+import DOMPurify from 'dompurify';
 import {
   uploadFile,
   createCancelToken,
@@ -8,6 +8,7 @@ import {
   getDownloadToken,
   UploadProgress as UploadProgressType,
 } from '../services/api';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 import { cn } from '../utils/classnames';
 import { useFeedback } from '../context/FeedbackContext';
 import Card from '../components/ui/Card';
@@ -67,7 +68,7 @@ const FileViewer = ({
           </svg>
         </div>
         <h4 className="text-base font-medium text-gray-900 mb-2 text-center">
-          {fileName || 'Your file'}
+          {fileName ? DOMPurify.sanitize(fileName) : 'Your file'}
         </h4>
         <p className="text-sm text-gray-500 mb-4 text-center px-2">
           Click the download button to save your converted file.
@@ -107,7 +108,12 @@ interface ConversionOptionsType {
 
 const ConversionPage: React.FC = (): React.ReactElement => {
   const { conversionId } = useParams<{ conversionId?: string }>();
-  const feedbackContext = useFeedback(); // Move useFeedback hook to component level
+  const feedbackContext = useFeedback();
+  const errorHandler = useErrorHandler('ConversionPage', { 
+    captureExceptions: true,
+    showFeedback: true
+  });
+  
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [conversionType, setConversionType] = useState<ConversionType>('pdf-to-docx');
   const [conversionOptions, setConversionOptions] = useState<ConversionOptionsType>({
@@ -116,7 +122,6 @@ const ConversionPage: React.FC = (): React.ReactElement => {
     preserveFormatting: true,
   });
   const [isConverting, setIsConverting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [convertedFileUrl, setConvertedFileUrl] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<UploadProgressType | null>(null);
   const [uploadStatus, setUploadStatus] = useState<
@@ -151,115 +156,119 @@ const ConversionPage: React.FC = (): React.ReactElement => {
 
   // Load existing conversion if ID is provided in URL
   useEffect(() => {
-    if (conversionId) {
-      // Fetch conversion status
-      const fetchConversion = async () => {
-        try {
-          setIsConverting(true);
-          setUploadStatus('processing');
-          setCurrentStep('convert');
+    if (!conversionId) return;
+    
+    // Store interval ID in a ref for proper cleanup
+    const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    
+    // Fetch conversion status
+    const fetchConversion = async () => {
+      try {
+        setIsConverting(true);
+        setUploadStatus('processing');
+        setCurrentStep('convert');
 
-          const statusResponse = await getConversionStatus(conversionId);
-          const status = statusResponse.data.status;
+        const statusResponse = await getConversionStatus(conversionId);
+        const status = statusResponse.data.status;
 
-          if (status === 'completed') {
-            // Get download token (this will be protected by payment verification on backend)
-            try {
-              const tokenResponse = await getDownloadToken(statusResponse.data.resultFile.id);
-              const downloadUrl = tokenResponse.data.downloadUrl;
-              setConvertedFileUrl(downloadUrl);
+        if (status === 'completed') {
+          // Get download token (this will be protected by payment verification on backend)
+          try {
+            const tokenResponse = await getDownloadToken(statusResponse.data.resultFile.id);
+            const downloadUrl = tokenResponse.data.downloadUrl;
+            setConvertedFileUrl(downloadUrl);
+            setUploadStatus('success');
+            setCurrentStep('download');
+          } catch (err) {
+            // Handle using our error handler, but special case for payment required
+            const errorInfo = errorHandler.handleError(err, 'getDownloadToken');
+            
+            // If payment required, we don't show it as an error
+            if (errorInfo.statusCode === 402) {
               setUploadStatus('success');
               setCurrentStep('download');
-            } catch (err) {
-              // If we get a 402 Payment Required error, we don't show it as an error
-              // The payment component will handle this case
-              if (
-                err &&
-                typeof err === 'object' &&
-                'response' in err &&
-                err.response &&
-                typeof err.response === 'object' &&
-                'status' in err.response &&
-                err.response.status === 402
-              ) {
-                setUploadStatus('success');
-                setCurrentStep('download');
-              } else {
-                throw err;
-              }
+              errorHandler.clearError(); // Clear the error since we're handling it specially
+            } else {
+              // For other errors, propagate
+              throw err;
             }
-          } else if (status === 'failed') {
-            setError(`Conversion failed: ${statusResponse.data.error || 'Unknown error'}`);
-            setUploadStatus('error');
-          } else {
-            // It's still processing, set up polling
-            // Similar to handleConvert logic
-            const pollInterval = setInterval(async () => {
-              try {
-                const updatedResponse = await getConversionStatus(conversionId);
-                const updatedStatus = updatedResponse.data.status;
-
-                if (updatedStatus === 'completed') {
-                  clearInterval(pollInterval);
-                  setUploadStatus('success');
-                  setCurrentStep('download');
-
-                  // Get download token (may require payment)
-                  try {
-                    const tokenResponse = await getDownloadToken(
-                      updatedResponse.data.resultFile.id,
-                    );
-                    const downloadUrl = tokenResponse.data.downloadUrl;
-                    setConvertedFileUrl(downloadUrl);
-                  } catch (e) {
-                    // If payment required, we don't show an error
-                    if (
-                      e &&
-                      typeof e === 'object' &&
-                      'response' in e &&
-                      e.response &&
-                      typeof e.response === 'object' &&
-                      'status' in e.response &&
-                      e.response.status !== 402
-                    ) {
-                      throw e;
-                    }
-                  }
-                } else if (updatedStatus === 'failed') {
-                  clearInterval(pollInterval);
-                  setError(`Conversion failed: ${updatedResponse.data.error || 'Unknown error'}`);
-                  setUploadStatus('error');
-                }
-              } catch (err) {
-                console.error('Status check error:', err);
-                clearInterval(pollInterval);
-                setError('Failed to check conversion status. Please try again.');
-                setUploadStatus('error');
-              }
-            }, 2000);
-
-            // Create a cleanup function that will be called on unmount
-            const cleanup = () => {
-              console.log('Cleaning up polling interval');
-              clearInterval(pollInterval);
-              // Don't call any hooks here
-            };
-
-            // Return the cleanup function to React
-            return cleanup;
           }
-        } catch (err) {
-          console.error('Error fetching conversion:', err);
-          captureException(err);
-          setError('Failed to load conversion. Please try again.');
+        } else if (status === 'failed') {
+          const errorMessage = `Conversion failed: ${statusResponse.data.error || 'Unknown error'}`;
+          errorHandler.handleError(new Error(errorMessage), 'conversionFailed');
           setUploadStatus('error');
-        } finally {
-          setIsConverting(false);
-        }
-      };
+        } else {
+          // It's still processing, set up polling
+          // Similar to handleConvert logic
+          pollIntervalRef.current = setInterval(async () => {
+            const [updatedResponse, checkError] = await errorHandler.runSafe(
+              () => getConversionStatus(conversionId),
+              'statusPolling'
+            );
+            
+            // Handle error in status check
+            if (checkError) {
+              if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+              }
+              setUploadStatus('error');
+              return;
+            }
+            
+            const updatedStatus = updatedResponse?.data.status;
 
-      fetchConversion();
-    }
+            if (updatedStatus === 'completed') {
+              if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+              }
+              setUploadStatus('success');
+              setCurrentStep('download');
+
+              // Get download token (may require payment)
+              const [tokenResponse, tokenError] = await errorHandler.runSafe(
+                () => getDownloadToken(updatedResponse.data.resultFile.id),
+                'getDownloadToken'
+              );
+              
+              // Handle payment required as a special case
+              if (tokenError && tokenError.statusCode === 402) {
+                errorHandler.clearError(); // Clear the error since we're handling it specially
+              } else if (tokenResponse) {
+                const downloadUrl = tokenResponse.data.downloadUrl;
+                setConvertedFileUrl(downloadUrl);
+              }
+            } else if (updatedStatus === 'failed') {
+              if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+              }
+              
+              const errorMessage = `Conversion failed: ${updatedResponse?.data.error || 'Unknown error'}`;
+              errorHandler.handleError(new Error(errorMessage), 'conversionFailed');
+              setUploadStatus('error');
+            }
+          }, 2000);
+        }
+      } catch (err) {
+        errorHandler.handleError(err, 'fetchConversion');
+        setUploadStatus('error');
+      } finally {
+        setIsConverting(false);
+      }
+    };
+
+    fetchConversion();
+    
+    // Cleanup function to clear any active intervals when component unmounts
+    return () => {
+      console.log('Cleaning up polling interval in useEffect');
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
   }, [conversionId]);
 
   // Determine accepted file types based on conversion type
@@ -320,12 +329,26 @@ const ConversionPage: React.FC = (): React.ReactElement => {
     feedbackContext.showFeedback('info', 'File removed. Select a new file to convert.', 3000);
   };
 
+  // Ref to store the status polling interval
+  const statusPollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Cleanup function for status polling
+  useEffect(() => {
+    // Cleanup function to handle unmounting
+    return () => {
+      if (statusPollingIntervalRef.current) {
+        console.log('Cleaning up status polling interval');
+        clearInterval(statusPollingIntervalRef.current);
+        statusPollingIntervalRef.current = null;
+      }
+    };
+  }, []);
+  
   // Handle conversion
   const handleConvert = async (): Promise<void> => {
     if (!selectedFile) return;
 
     // Using feedbackContext from component level
-
     setIsConverting(true);
     setError(null);
     setUploadStatus('uploading');
@@ -337,6 +360,12 @@ const ConversionPage: React.FC = (): React.ReactElement => {
 
     // Reset cancel token
     cancelTokenRef.current = createCancelToken();
+    
+    // Clear any existing status polling interval
+    if (statusPollingIntervalRef.current) {
+      clearInterval(statusPollingIntervalRef.current);
+      statusPollingIntervalRef.current = null;
+    }
 
     try {
       // Upload the file with progress tracking
@@ -383,13 +412,17 @@ const ConversionPage: React.FC = (): React.ReactElement => {
             setCurrentConversionId(conversionId);
 
             // Start polling for conversion status
-            const pollInterval = setInterval(async () => {
+            statusPollingIntervalRef.current = setInterval(async () => {
               try {
                 const statusResponse = await getConversionStatus(conversionId);
                 const status = statusResponse.data.status;
 
                 if (status === 'completed') {
-                  clearInterval(pollInterval);
+                  // Clear the interval
+                  if (statusPollingIntervalRef.current) {
+                    clearInterval(statusPollingIntervalRef.current);
+                    statusPollingIntervalRef.current = null;
+                  }
 
                   // Hide the loading feedback
                   feedbackContext.hideFeedback();
@@ -436,7 +469,12 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                     }
                   }
                 } else if (status === 'failed') {
-                  clearInterval(pollInterval);
+                  // Clear the interval
+                  if (statusPollingIntervalRef.current) {
+                    clearInterval(statusPollingIntervalRef.current);
+                    statusPollingIntervalRef.current = null;
+                  }
+                  
                   const errorMsg = `Conversion failed: ${statusResponse.data.error || 'Unknown error'}`;
                   setError(errorMsg);
                   setUploadStatus('error');
@@ -449,7 +487,13 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                 // Keep polling if status is 'pending' or 'processing'
               } catch (err) {
                 console.error('Status check error:', err);
-                clearInterval(pollInterval);
+                
+                // Clear the interval
+                if (statusPollingIntervalRef.current) {
+                  clearInterval(statusPollingIntervalRef.current);
+                  statusPollingIntervalRef.current = null;
+                }
+                
                 const errorMsg = 'Failed to check conversion status. Please try again.';
                 setError(errorMsg);
                 setUploadStatus('error');
@@ -460,21 +504,6 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                 feedbackContext.showFeedback('error', errorMsg, 5000);
               }
             }, 2000); // Poll every 2 seconds
-
-            // Store interval ID for cleanup
-            const currentIntervalId = pollInterval;
-            
-            // Create a cleanup function to handle unmounting
-            const cleanupInterval = () => {
-              if (currentIntervalId) {
-                clearInterval(currentIntervalId);
-                feedbackContext.hideFeedback();
-              }
-            };
-            
-            // We'll use the existing useEffect cleanup mechanism instead of creating a new one in the handler
-            // This is because React hooks can't be called conditionally inside a function
-            return;
           } else {
             const errorMsg = 'Invalid server response. Please try again.';
             setError(errorMsg);
@@ -684,16 +713,16 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                     <div className="mb-6">
                       <UploadProgress
                         progress={uploadProgress.percentage}
-                        fileName={selectedFile?.name}
+                        fileName={selectedFile?.name ? DOMPurify.sanitize(selectedFile.name) : undefined}
                         fileSize={selectedFile?.size}
                         status={uploadStatus}
-                        error={error || undefined}
+                        error={errorHandler.error?.message}
                       />
                     </div>
                   )}
 
                   {/* Error message display */}
-                  {error && (
+                  {errorHandler.isError && (
                     <div className="mb-6 rounded-md bg-error-50 p-4">
                       <div className="flex">
                         <div className="flex-shrink-0">
@@ -712,7 +741,30 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                           </svg>
                         </div>
                         <div className="ml-3">
-                          <p className="text-sm text-error-700">{error}</p>
+                          <p className="text-sm text-error-700">{errorHandler.error?.message}</p>
+                          {errorHandler.error?.code && (
+                            <p className="text-xs text-error-500 mt-1">
+                              Error code: {errorHandler.error.code}
+                            </p>
+                          )}
+                        </div>
+                        <div className="ml-auto pl-3">
+                          <div className="-mx-1.5 -my-1.5">
+                            <button
+                              type="button"
+                              onClick={() => errorHandler.clearError()}
+                              className="inline-flex rounded-md p-1.5 text-error-500 hover:bg-error-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error-600"
+                            >
+                              <span className="sr-only">Dismiss</span>
+                              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -783,7 +835,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
 
                       <FileViewer
                         fileUrl={convertedFileUrl}
-                        fileName={selectedFile?.name || 'Your Converted File'}
+                        fileName={selectedFile?.name ? DOMPurify.sanitize(selectedFile.name) : 'Your Converted File'}
                       />
 
                       {/* Payment section if needed */}

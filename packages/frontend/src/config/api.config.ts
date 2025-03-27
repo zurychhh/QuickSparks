@@ -12,6 +12,16 @@ const getBaseUrl = () => {
   return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 };
 
+// Get WebSocket URL based on environment
+const getWebSocketUrl = () => {
+  // In production, use a relative path that will be handled by Vercel proxy
+  if (isProd) {
+    return '/api/ws';
+  }
+  // In development environment, connect directly to the backend WebSocket endpoint
+  return import.meta.env.VITE_WS_URL || 'ws://localhost:5000/api/ws';
+};
+
 // Helper function to normalize URL paths
 export const normalizeUrlPath = (url: string): string => {
   // Make sure URL starts with a slash
@@ -22,6 +32,7 @@ export const normalizeUrlPath = (url: string): string => {
 
 export const API_CONFIG = {
   baseUrl: getBaseUrl(),
+  WS_URL: getWebSocketUrl(),
   timeout: 30000,  // 30 sekund timeout
   endpoints: {
     convert: '/conversions/upload/',
