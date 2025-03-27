@@ -161,8 +161,9 @@ export const uploadFile = ({
   
   // Use the normalizeUrlPath function imported at the top level
   
-  // Normalize the upload endpoint
-  const endpoint = normalizeUrlPath(API_CONFIG.endpoints.convert);
+  // Normalize the upload endpoint - use a clean endpoint without double slashes
+  // We already have trailing slashes in the endpoints config
+  const endpoint = API_CONFIG.endpoints.convert;
   
   // Make request with detailed logging
   logDebug('Uploading file', { 
@@ -175,17 +176,57 @@ export const uploadFile = ({
   
   console.log(`Starting file upload to: ${API_CONFIG.baseUrl}${endpoint}`);
   
+  // Add specific debugging for formData contents
+  try {
+    console.log('Form data keys being sent:');
+    for (const key of formData.keys()) {
+      console.log(`- ${key}`);
+    }
+  } catch (err) {
+    console.error('Error inspecting form data:', err);
+  }
+  
+  // Explicitly detect file type and add it to the console for debugging
+  console.log('File details:', {
+    type: file.type,
+    extension: file.name.split('.').pop(),
+    size: `${Math.round(file.size / 1024)} KB`
+  });
+  
   api.post(endpoint, formData, config)
     .then((response) => {
       logDebug('Upload successful', response.data);
       console.log('File successfully uploaded:', file.name);
+      
+      // Handle different response structures
+      let responseData = response.data;
+      
+      // If the response is wrapped in a 'data' property, unwrap it
+      if (responseData && responseData.data) {
+        responseData = {
+          ...responseData,
+          data: responseData.data
+        };
+      }
+      
       if (onSuccess) {
-        onSuccess(response);
+        onSuccess({
+          ...response,
+          data: responseData
+        });
       }
     })
     .catch((error) => {
       logDebug('Upload failed', error);
       console.error('File upload failed:', file.name, error.message);
+      
+      // Add more context to error logging
+      if (error.response) {
+        console.error('Server responded with:', error.response.status, error.response.data);
+      } else if (error.request) {
+        console.error('No response received from server');
+      }
+      
       if (onError) {
         onError(error);
       }
@@ -197,15 +238,41 @@ export const uploadFile = ({
  */
 export const getConversionStatus = async (conversionId: string): Promise<any> => {
   try {
-    // Use the normalizeUrlPath function imported at the top level
-    const endpoint = normalizeUrlPath(`${API_CONFIG.endpoints.status}${conversionId}`);
+    // Create endpoint without double slashes
+    const endpoint = `${API_CONFIG.endpoints.status}${conversionId}`;
     
     logDebug(`Checking conversion status for: ${conversionId} at endpoint: ${endpoint}`);
+    console.log(`Making status request to: ${API_CONFIG.baseUrl}${endpoint}`);
+    
     const response = await api.get(endpoint);
     logDebug('Conversion status response:', response.data);
-    return response.data;
+    
+    // Handle different response structures
+    let responseData = response.data;
+    
+    // For compatibility with different API formats
+    if (response.data && typeof response.data === 'object') {
+      // If the data is already properly structured, return it
+      if (response.data.status) {
+        responseData = response.data;
+      } 
+      // If the data is wrapped in a data property
+      else if (response.data.data && response.data.data.status) {
+        responseData = response.data.data;
+      }
+    }
+    
+    console.log('Processed status response:', responseData);
+    return { data: responseData };
   } catch (error) {
     logDebug(`Status check failed for conversion: ${conversionId}`, error);
+    console.error(`Status check error details for ${conversionId}:`, error);
+    
+    // Add more detailed error logging
+    if (error.response) {
+      console.error('Server responded with:', error.response.status, error.response.data);
+    }
+    
     captureException(error);
     throw error;
   }
@@ -266,22 +333,57 @@ export const generateConversionThumbnail = async (conversionId: string, options:
  */
 export const getDownloadToken = async (fileId: string, expiresIn?: number): Promise<any> => {
   try {
-    // Use the normalizeUrlPath function imported at the top level
-    
     const params: any = {};
     if (expiresIn) {
       params.expiresIn = expiresIn;
     }
     
-    // Use the endpoint from the API_CONFIG and normalize it
-    const endpoint = normalizeUrlPath(`${API_CONFIG.endpoints.download}${fileId}`);
+    // Create clean endpoint without double slashes
+    const endpoint = `${API_CONFIG.endpoints.download}${fileId}`;
     
     logDebug(`Getting download token for file: ${fileId} at endpoint: ${endpoint}`);
+    console.log(`Making download token request to: ${API_CONFIG.baseUrl}${endpoint}`);
+    
     const response = await api.get(endpoint, { params });
     logDebug('Download token response:', response.data);
-    return response.data;
+    
+    // Handle different response structures
+    let downloadData = response.data;
+    
+    // If the response is wrapped in a data property, unwrap it
+    if (response.data && response.data.data) {
+      downloadData = response.data.data;
+    }
+    
+    // Ensure downloadUrl is available
+    if (!downloadData.downloadUrl && downloadData.url) {
+      downloadData.downloadUrl = downloadData.url;
+    }
+    
+    console.log('Processed download token:', downloadData);
+    return { data: downloadData };
   } catch (error) {
     logDebug(`Failed to get download token for file: ${fileId}`, error);
+    console.error(`Download token error details for ${fileId}:`, error);
+    
+    // Add more detailed error logging
+    if (error.response) {
+      console.error('Server responded with:', error.response.status, error.response.data);
+      
+      // Handle payment required error specifically
+      if (error.response.status === 402) {
+        console.log('Payment required for download - returning controlled error');
+        return { 
+          data: { 
+            error: 'Payment required',
+            status: 402,
+            message: 'Payment is required to download this file',
+            paymentRequired: true
+          }
+        };
+      }
+    }
+    
     captureException(error);
     throw error;
   }
