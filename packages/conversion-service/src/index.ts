@@ -47,8 +47,8 @@ const corsOptions = {
       'http://localhost:8080'             // Webpack local development
     ];
     
-    logger.debug("Allowed origins:", allowedOrigins);
-    logger.debug("FRONTEND_URL from env:", env.FRONTEND_URL);
+    logger.info("Allowed origins:", allowedOrigins);
+    logger.info("FRONTEND_URL from env:", env.FRONTEND_URL);
     
     // In development mode, accept all origins
     if (env.NODE_ENV === 'development') {
