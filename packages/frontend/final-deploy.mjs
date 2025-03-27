@@ -32,10 +32,12 @@ async function deploy() {
     }
     console.log('✅ Vite configuration verified');
     
-    // Check if Router has basename="/pdfspark"
+    // Check if Router has basename="/pdfspark" in either App.tsx or main.tsx
     const appFile = fs.readFileSync(path.join(__dirname, 'src/App.tsx'), 'utf8');
-    if (!appFile.includes('basename="/pdfspark"')) {
-      throw new Error('App.tsx is missing Router basename="/pdfspark" configuration');
+    const mainFile = fs.readFileSync(path.join(__dirname, 'src/main.tsx'), 'utf8');
+    
+    if (!appFile.includes('basename="/pdfspark"') && !mainFile.includes('basename="/pdfspark"')) {
+      throw new Error('Neither App.tsx nor main.tsx has Router basename="/pdfspark" configuration');
     }
     console.log('✅ Router configuration verified');
     
