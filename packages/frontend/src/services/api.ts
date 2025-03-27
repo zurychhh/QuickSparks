@@ -13,19 +13,46 @@ const api = axios.create({
   withCredentials: true // For cookies if needed
 });
 
+// Store CSRF token in memory (not localStorage)
+let csrfToken: string | null = null;
+
+// Function to fetch CSRF token
+const fetchCsrfToken = async (): Promise<string> => {
+  try {
+    // Only fetch a new token if we don't have one
+    if (!csrfToken) {
+      const response = await api.get('/auth/csrf-token');
+      if (response.data?.token) {
+        csrfToken = response.data.token;
+      }
+    }
+    return csrfToken || '';
+  } catch (error) {
+    console.error('Failed to fetch CSRF token:', error);
+    return '';
+  }
+};
+
 // Interceptor to handle request
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     // Log request for debugging
     logDebug(`Sending request to: ${config.url}`, config);
     console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     
-    // Get token from local storage
-    const token = localStorage.getItem('authToken');
-    
-    // If token exists, add it to the request header
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Add CSRF token to mutating requests (except for the CSRF token endpoint itself)
+    if (
+      ['POST', 'PUT', 'PATCH', 'DELETE'].includes(config.method?.toUpperCase() || '') &&
+      !(config.url?.includes('/auth/csrf-token'))
+    ) {
+      try {
+        const token = await fetchCsrfToken();
+        if (token) {
+          config.headers['X-CSRF-Token'] = token;
+        }
+      } catch (tokenError) {
+        console.error('Error setting CSRF token:', tokenError);
+      }
     }
     
     // Log request payload for debugging
@@ -73,9 +100,10 @@ api.interceptors.response.use(
       
       // Detailed handling for common error codes
       if (status === 401) {
-        // Clear authentication data
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
+        // No need to remove items from localStorage
+        // The server should invalidate the cookie in the response
+        // Auth state should be managed centrally in the app
+        console.log('Authentication error, redirecting to login page');
         
         // Redirect to login page
         window.location.href = '/login';
