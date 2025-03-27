@@ -18,7 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         - Nie wymaga konfiguracji basename
         - Linki będą miały format /#/scieżka zamiast /scieżka
       */}
-      <HashRouter basename="/pdfspark">
+      <HashRouter>
         <App />
       </HashRouter>
     </FeedbackProvider>
