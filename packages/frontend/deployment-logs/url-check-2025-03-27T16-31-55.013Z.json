@@ -1,0 +1,32 @@
+{
+  "vercelUrl": "https://quicksparks.dev/pdfspark",
+  "timestamp": "2025-03-27T16:31:55.015Z",
+  "results": {
+    "": {
+      "fullUrl": "https://quicksparks.dev/pdfspark",
+      "statusCode": 308,
+      "success": false
+    },
+    "/convert": {
+      "fullUrl": "https://quicksparks.dev/pdfspark/convert",
+      "statusCode": 308,
+      "success": false
+    },
+    "/pricing": {
+      "fullUrl": "https://quicksparks.dev/pdfspark/pricing",
+      "statusCode": 308,
+      "success": false
+    },
+    "/about": {
+      "fullUrl": "https://quicksparks.dev/pdfspark/about",
+      "statusCode": 308,
+      "success": false
+    },
+    "/product": {
+      "fullUrl": "https://quicksparks.dev/pdfspark/product",
+      "statusCode": 308,
+      "success": false
+    }
+  },
+  "allSuccessful": false
+}
