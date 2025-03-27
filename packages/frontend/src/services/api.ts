@@ -38,6 +38,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     logDebug('Received response:', response);
+    console.log(`API Request successful: ${response.config.method?.toUpperCase()} ${response.config.url}`);
     return response;
   },
   (error) => {
@@ -46,25 +47,51 @@ api.interceptors.response.use(
     // Log error to Sentry
     captureException(error);
     
-    // Lepsza obsługa błędów
+    // Enhanced error handling with more detailed logging
     if (error.response) {
-      // Serwer zwrócił odpowiedź z błędem
-      console.error(`API Error [${error.response.status}]:`, error.response.data);
+      // Server returned an error response
+      const status = error.response.status;
+      const method = error.config?.method?.toUpperCase() || 'UNKNOWN';
+      const url = error.config?.url || 'unknown-url';
       
-      // Handle 401 Unauthorized
-      if (error.response.status === 401) {
+      // Log detailed error information
+      console.error(`API Error [${status}] for ${method} ${url}:`, error.response.data);
+      console.error('Request headers:', error.config?.headers);
+      
+      // Detailed handling for common error codes
+      if (status === 401) {
         // Clear authentication data
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
         
         // Redirect to login page
         window.location.href = '/login';
+      } else if (status === 405) {
+        // Method Not Allowed - Log additional debugging information
+        console.error('405 Method Not Allowed Error Details:');
+        console.error('- Requested URL:', url);
+        console.error('- Method Used:', method);
+        console.error('- Available Methods:', error.response.headers['allow'] || 'Not specified in response');
+        console.error('- Content Type:', error.config?.headers['Content-Type'] || 'Not specified');
+        console.error('- Base URL configured:', api.defaults.baseURL);
+      } else if (status === 404) {
+        // Not Found - Log endpoint information
+        console.error('404 Not Found Error Details:');
+        console.error('- Requested URL:', url);
+        console.error('- Full URL:', error.config?.baseURL ? `${error.config.baseURL}${url}` : url);
+      } else if (status === 500) {
+        // Server Error - Log server error information
+        console.error('500 Server Error Details:');
+        console.error('- Error Message:', error.response.data.message || 'No specific error message');
       }
     } else if (error.request) {
-      // Żądanie zostało wysłane, ale brak odpowiedzi
+      // Request was made but no response received
       console.error('API Error: No response received', error.request);
+      console.error('Request URL:', error.config?.url);
+      console.error('Request Method:', error.config?.method?.toUpperCase());
+      console.error('Request Headers:', error.config?.headers);
     } else {
-      // Coś poszło nie tak podczas tworzenia żądania
+      // Error in setting up the request
       console.error('API Error:', error.message);
     }
     
@@ -132,17 +159,34 @@ export const uploadFile = ({
     config.cancelToken = cancelToken.token;
   }
   
-  // Make request
-  logDebug('Uploading file', { fileName: file.name, fileSize: file.size, fileType: file.type });
-  api.post(API_CONFIG.endpoints.convert, formData, config)
+  // Import the normalizeUrlPath function for consistent endpoint formatting
+  const { normalizeUrlPath } = require('../config/api.config');
+  
+  // Normalize the upload endpoint
+  const endpoint = normalizeUrlPath(API_CONFIG.endpoints.convert);
+  
+  // Make request with detailed logging
+  logDebug('Uploading file', { 
+    fileName: file.name, 
+    fileSize: file.size, 
+    fileType: file.type,
+    endpoint: endpoint,
+    baseUrl: API_CONFIG.baseUrl
+  });
+  
+  console.log(`Starting file upload to: ${API_CONFIG.baseUrl}${endpoint}`);
+  
+  api.post(endpoint, formData, config)
     .then((response) => {
       logDebug('Upload successful', response.data);
+      console.log('File successfully uploaded:', file.name);
       if (onSuccess) {
         onSuccess(response);
       }
     })
     .catch((error) => {
       logDebug('Upload failed', error);
+      console.error('File upload failed:', file.name, error.message);
       if (onError) {
         onError(error);
       }
@@ -154,8 +198,12 @@ export const uploadFile = ({
  */
 export const getConversionStatus = async (conversionId: string): Promise<any> => {
   try {
-    logDebug(`Checking conversion status for: ${conversionId}`);
-    const response = await api.get(`${API_CONFIG.endpoints.status}/${conversionId}`);
+    // Import the normalizeUrlPath function from API_CONFIG
+    const { normalizeUrlPath } = require('../config/api.config');
+    const endpoint = normalizeUrlPath(`${API_CONFIG.endpoints.status}${conversionId}`);
+    
+    logDebug(`Checking conversion status for: ${conversionId} at endpoint: ${endpoint}`);
+    const response = await api.get(endpoint);
     logDebug('Conversion status response:', response.data);
     return response.data;
   } catch (error) {
@@ -220,14 +268,23 @@ export const generateConversionThumbnail = async (conversionId: string, options:
  */
 export const getDownloadToken = async (fileId: string, expiresIn?: number): Promise<any> => {
   try {
+    // Import the normalizeUrlPath function
+    const { normalizeUrlPath } = require('../config/api.config');
+    
     const params: any = {};
     if (expiresIn) {
       params.expiresIn = expiresIn;
     }
     
-    const response = await api.get(`/downloads/token/${fileId}`, { params });
+    // Use the endpoint from the API_CONFIG and normalize it
+    const endpoint = normalizeUrlPath(`${API_CONFIG.endpoints.download}${fileId}`);
+    
+    logDebug(`Getting download token for file: ${fileId} at endpoint: ${endpoint}`);
+    const response = await api.get(endpoint, { params });
+    logDebug('Download token response:', response.data);
     return response.data;
   } catch (error) {
+    logDebug(`Failed to get download token for file: ${fileId}`, error);
     captureException(error);
     throw error;
   }

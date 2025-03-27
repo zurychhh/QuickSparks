@@ -2,9 +2,10 @@
 
 // Używamy różnych bazowych adresów URL w zależności od środowiska
 const getBaseUrl = () => {
-  // W środowisku produkcyjnym używamy relatywnego URL - proxy Vercel zajmie się resztą
+  // W środowisku produkcyjnym używamy absolutnego URL do API backendu
   if (process.env.NODE_ENV === 'production' || import.meta.env.PROD) {
-    return '/api';
+    // Bezpośredni URL do backendu zamiast relatywnego - to naprawia błąd 405
+    return 'https://pdfspark-conversion-service.onrender.com/api';
   }
 
   // W środowisku deweloperskim używamy localhost lub podanego adresu

@@ -35,18 +35,24 @@ export function useWebSocket(url: string, authToken: string) {
     // Normalize URL and add auth token
     let connectionUrl = url;
     
+    // Enhanced debugging for WebSocket URL construction
+    console.log('Original WebSocket URL:', url);
+    
     // Ensure URL has proper protocol
     if (!connectionUrl.startsWith('ws://') && !connectionUrl.startsWith('wss://')) {
       // Auto-detect protocol based on current page
       const isSecure = window.location.protocol === 'https:';
       connectionUrl = `${isSecure ? 'wss' : 'ws'}://${connectionUrl}`;
+      console.log('Protocol added to WebSocket URL:', connectionUrl);
     }
     
     // Remove trailing slash before adding query parameters
     connectionUrl = connectionUrl.endsWith('/') ? connectionUrl.slice(0, -1) : connectionUrl;
+    console.log('Trailing slash removed from WebSocket URL:', connectionUrl);
     
     // Add auth token to URL
     connectionUrl = `${connectionUrl}?token=${encodeURIComponent(authToken)}`;
+    console.log('Final WebSocket URL with token:', connectionUrl);
     
     try {
       setStatus(WebSocketStatus.CONNECTING);

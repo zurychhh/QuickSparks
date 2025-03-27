@@ -516,8 +516,8 @@ const ConversionPage: React.FC = (): React.ReactElement => {
   const handleDownload = (): void => {
     if (!convertedFileUrl) return;
 
-    const feedbackContext = useFeedback();
-
+    // Use feedbackContext from component level instead of calling the hook inside this function
+    
     // Show download started feedback
     feedbackContext.showFeedback(
       'success',
