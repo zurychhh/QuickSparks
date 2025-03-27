@@ -1,8 +1,8 @@
 {
   "lastDeployment": {
-    "timestamp": "2025-03-25T12:40:47.862Z",
+    "timestamp": "2025-03-27T16:31:17.090Z",
     "version": "1.0.1",
-    "gitCommit": "58eae34",
+    "gitCommit": "651c397",
     "status": "pending",
     "environment": "production"
   },
@@ -14,7 +14,7 @@
   },
   "monitoring": {
     "enabled": true,
-    "lastChecked": "2025-03-25T12:40:47.863Z",
+    "lastChecked": "2025-03-27T16:31:17.091Z",
     "forcedDeployment": true
   }
 }
