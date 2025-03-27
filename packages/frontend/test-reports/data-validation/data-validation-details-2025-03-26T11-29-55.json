@@ -1,0 +1,127 @@
+{
+  "summary": {
+    "timestamp": "2025-03-26T11:29:55.283Z",
+    "fileValidation": {
+      "total": 5,
+      "passed": 2,
+      "failed": 3,
+      "passRate": 40
+    },
+    "conversionValidation": {
+      "total": 5,
+      "passed": 4,
+      "failed": 1,
+      "passRate": 80
+    },
+    "overallPassRate": 60
+  },
+  "details": {
+    "fileValidation": [
+      {
+        "sample": 1,
+        "status": "passed",
+        "data": {
+          "name": "sample-document.pdf",
+          "size": 1024,
+          "type": "pdf"
+        }
+      },
+      {
+        "sample": 2,
+        "status": "passed",
+        "data": {
+          "name": "document.docx",
+          "size": 2048,
+          "type": "docx"
+        }
+      },
+      {
+        "sample": 3,
+        "status": "failed",
+        "data": {
+          "name": "",
+          "size": 1024,
+          "type": "pdf"
+        },
+        "errors": [
+          "Field name should have a minimum length of 1"
+        ]
+      },
+      {
+        "sample": 4,
+        "status": "failed",
+        "data": {
+          "name": "doc.pdf",
+          "size": -5,
+          "type": "pdf"
+        },
+        "errors": [
+          "Field size must be at least 0"
+        ]
+      },
+      {
+        "sample": 5,
+        "status": "failed",
+        "data": {
+          "name": "doc.xyz",
+          "size": 1024,
+          "type": "xyz"
+        },
+        "errors": [
+          "Field type must be one of [pdf, docx, doc, txt], but got xyz"
+        ]
+      }
+    ],
+    "conversionValidation": [
+      {
+        "sample": 1,
+        "status": "passed",
+        "data": {
+          "id": "conv-123456",
+          "status": "pending",
+          "progress": 0
+        }
+      },
+      {
+        "sample": 2,
+        "status": "passed",
+        "data": {
+          "id": "conv-789012",
+          "status": "processing",
+          "progress": 45
+        }
+      },
+      {
+        "sample": 3,
+        "status": "passed",
+        "data": {
+          "id": "conv-345678",
+          "status": "completed",
+          "progress": 100
+        }
+      },
+      {
+        "sample": 4,
+        "status": "passed",
+        "data": {
+          "id": "conv-901234",
+          "status": "failed"
+        }
+      },
+      {
+        "sample": 5,
+        "status": "failed",
+        "data": {
+          "id": "x",
+          "status": "unknown",
+          "progress": 150
+        },
+        "errors": [
+          "Field id should have a minimum length of 5",
+          "Field status must be one of [pending, processing, completed, failed], but got unknown",
+          "Field progress must be at most 100"
+        ]
+      }
+    ]
+  }
+}

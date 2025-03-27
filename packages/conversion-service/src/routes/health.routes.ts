@@ -65,4 +65,58 @@ router.get('/details', async (req, res) => {
   });
 });
 
+// Test CORS configuration
+router.get('/test-cors', (req, res) => {
+  logger.info('CORS test endpoint accessed', {
+    headers: req.headers,
+    origin: req.headers.origin
+  });
+  
+  res.status(200).json({
+    message: 'CORS is working correctly',
+    requestHeaders: {
+      origin: req.headers.origin,
+      referer: req.headers.referer
+    },
+    corsHeaders: {
+      'Access-Control-Allow-Origin': res.getHeader('Access-Control-Allow-Origin'),
+      'Access-Control-Allow-Methods': res.getHeader('Access-Control-Allow-Methods'),
+      'Access-Control-Allow-Headers': res.getHeader('Access-Control-Allow-Headers'),
+      'Access-Control-Allow-Credentials': res.getHeader('Access-Control-Allow-Credentials')
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Debugging endpoint to help diagnose issues
+router.get('/debug', (req, res) => {
+  const debugInfo = {
+    server: {
+      environment: env.NODE_ENV,
+      uptime: process.uptime(),
+      memoryUsage: process.memoryUsage(),
+      nodeVersion: process.version
+    },
+    request: {
+      headers: req.headers,
+      ip: req.ip,
+      originalUrl: req.originalUrl,
+      protocol: req.protocol,
+      secure: req.secure
+    },
+    configuration: {
+      frontendUrl: env.FRONTEND_URL,
+      port: env.PORT,
+      mongodbUri: env.MONGODB_URI ? '✓ Set' : '✗ Not set',
+      redisUri: env.REDIS_URI ? '✓ Set' : '✗ Not set',
+      uploadsDir: env.UPLOADS_DIR,
+      outputsDir: env.OUTPUTS_DIR
+    }
+  };
+  
+  logger.info('Debug endpoint accessed', debugInfo);
+  
+  res.status(200).json(debugInfo);
+});
+
 export default router;

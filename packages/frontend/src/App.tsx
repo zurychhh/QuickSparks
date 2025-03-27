@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import HomePage from '@pages/Home';
 import NotFoundPage from '@pages/NotFound';
 import ConversionPage from '@pages/Conversion';
@@ -14,24 +14,22 @@ import useAnalytics from '@hooks/useAnalytics';
 
 function App(): React.ReactElement {
   return (
-    <Router basename="/pdfspark">
-      <Routes>
-        <Route path="/" element={<AnalyticsLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="convert" element={<ConversionPage />} />
-          <Route path="convert/:id" element={<ConversionPage />} />
-          <Route path="pricing" element={<PricingPage />} />
-          <Route path="about" element={<AboutPage />} />
-          <Route path="product" element={<ProductPage />} />
-          <Route path="checkout" element={<CheckoutPage />} />
-          <Route path="checkout/success" element={<CheckoutSuccessPage />} />
-          <Route path="account" element={<AccountPage />} />
-          <Route path="account/downloads" element={<AccountPage />} />
-          <Route path="health" element={<Health />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<AnalyticsLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="convert" element={<ConversionPage />} />
+        <Route path="convert/:id" element={<ConversionPage />} />
+        <Route path="pricing" element={<PricingPage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route path="product" element={<ProductPage />} />
+        <Route path="checkout" element={<CheckoutPage />} />
+        <Route path="checkout/success" element={<CheckoutSuccessPage />} />
+        <Route path="account" element={<AccountPage />} />
+        <Route path="account/downloads" element={<AccountPage />} />
+        <Route path="health" element={<Health />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
   );
 }
 

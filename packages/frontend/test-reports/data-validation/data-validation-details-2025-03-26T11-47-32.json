@@ -1,0 +1,136 @@
+{
+  "summary": {
+    "timestamp": "2025-03-26T11:47:32.839Z",
+    "fileValidation": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "passRate": 100
+    },
+    "conversionValidation": {
+      "total": 6,
+      "passed": 5,
+      "failed": 1,
+      "passRate": 83.33333333333334
+    },
+    "overallPassRate": 90.9090909090909,
+    "usedRealBackend": true,
+    "backendUrl": "http://localhost:3000/pdfspark/api/conversion/status?id=test123"
+  },
+  "details": {
+    "fileValidation": [
+      {
+        "sample": 1,
+        "data": {
+          "name": "invalid-file.txt",
+          "size": 37,
+          "type": "txt",
+          "lastModified": 1742984232590.3542
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 2,
+        "data": {
+          "name": "large-test.pdf",
+          "size": 2097167,
+          "type": "pdf",
+          "lastModified": 1742984232585.292
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 3,
+        "data": {
+          "name": "robots.txt",
+          "size": 136,
+          "type": "txt",
+          "lastModified": 1742973702390.4902
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 4,
+        "data": {
+          "name": "sample-test.docx",
+          "size": 35,
+          "type": "docx",
+          "lastModified": 1742981837092.4026
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 5,
+        "data": {
+          "name": "sample-test.pdf",
+          "size": 53,
+          "type": "pdf",
+          "lastModified": 1742981837092.512
+        },
+        "status": "passed"
+      }
+    ],
+    "conversionValidation": [
+      {
+        "sample": 1,
+        "data": {
+          "id": "test123",
+          "status": "completed",
+          "progress": 100,
+          "created_at": "2025-03-26T11:47:32.834Z",
+          "updated_at": "2025-03-26T11:47:32.834Z"
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 2,
+        "data": {
+          "id": "conv-123456",
+          "status": "pending",
+          "progress": 0
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 3,
+        "data": {
+          "id": "conv-789012",
+          "status": "processing",
+          "progress": 45
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 4,
+        "data": {
+          "id": "conv-345678",
+          "status": "completed",
+          "progress": 100
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 5,
+        "data": {
+          "id": "conv-901234",
+          "status": "failed"
+        },
+        "status": "passed"
+      },
+      {
+        "sample": 6,
+        "data": {
+          "id": "x",
+          "status": "unknown",
+          "progress": 150
+        },
+        "errors": [
+          "Field 'id' should have a minimum length of 5",
+          "Field 'status' must be one of [pending, processing, completed, failed], but got 'unknown'",
+          "Field 'progress' must be at most 100"
+        ],
+        "status": "failed"
+      }
+    ]
+  }
+}

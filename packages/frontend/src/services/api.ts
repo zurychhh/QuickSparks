@@ -1,9 +1,11 @@
 import axios, { AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios';
 import { captureException } from '@utils/sentry';
+import { API_CONFIG, logDebug } from '../config/api.config';
 
 // Create an axios instance with default config
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: API_CONFIG.baseUrl,
+  timeout: API_CONFIG.timeout,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,6 +14,9 @@ const api = axios.create({
 // Interceptor to handle request
 api.interceptors.request.use(
   (config) => {
+    // Log request for debugging
+    logDebug(`Sending request to: ${config.url}`, config);
+    
     // Get token from local storage
     const token = localStorage.getItem('authToken');
     
@@ -23,6 +28,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    logDebug('Request error:', error);
     captureException(error);
     return Promise.reject(error);
   }
@@ -30,19 +36,36 @@ api.interceptors.request.use(
 
 // Interceptor to handle response
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    logDebug('Received response:', response);
+    return response;
+  },
   (error) => {
+    logDebug('Response error:', error);
+    
     // Log error to Sentry
     captureException(error);
     
-    // Handle 401 Unauthorized
-    if (error.response && error.response.status === 401) {
-      // Clear authentication data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
+    // Lepsza obsługa błędów
+    if (error.response) {
+      // Serwer zwrócił odpowiedź z błędem
+      console.error(`API Error [${error.response.status}]:`, error.response.data);
       
-      // Redirect to login page
-      window.location.href = '/login';
+      // Handle 401 Unauthorized
+      if (error.response.status === 401) {
+        // Clear authentication data
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        
+        // Redirect to login page
+        window.location.href = '/login';
+      }
+    } else if (error.request) {
+      // Żądanie zostało wysłane, ale brak odpowiedzi
+      console.error('API Error: No response received', error.request);
+    } else {
+      // Coś poszło nie tak podczas tworzenia żądania
+      console.error('API Error:', error.message);
     }
     
     return Promise.reject(error);
@@ -110,13 +133,16 @@ export const uploadFile = ({
   }
   
   // Make request
-  api.post('/conversions/upload', formData, config)
+  logDebug('Uploading file', { fileName: file.name, fileSize: file.size });
+  api.post(API_CONFIG.endpoints.convert, formData, config)
     .then((response) => {
+      logDebug('Upload successful', response.data);
       if (onSuccess) {
         onSuccess(response);
       }
     })
     .catch((error) => {
+      logDebug('Upload failed', error);
       if (onError) {
         onError(error);
       }
@@ -128,9 +154,12 @@ export const uploadFile = ({
  */
 export const getConversionStatus = async (conversionId: string): Promise<any> => {
   try {
-    const response = await api.get(`/conversions/${conversionId}`);
+    logDebug(`Checking conversion status for: ${conversionId}`);
+    const response = await api.get(`${API_CONFIG.endpoints.status}/${conversionId}`);
+    logDebug('Conversion status response:', response.data);
     return response.data;
   } catch (error) {
+    logDebug(`Status check failed for conversion: ${conversionId}`, error);
     captureException(error);
     throw error;
   }
@@ -146,9 +175,12 @@ export const getUserConversions = async (page: number = 1, limit: number = 10, s
       params.status = status;
     }
     
-    const response = await api.get('/conversions', { params });
+    logDebug('Fetching user conversions', params);
+    const response = await api.get(API_CONFIG.endpoints.status, { params });
+    logDebug('User conversions response:', response.data);
     return response.data;
   } catch (error) {
+    logDebug('Failed to fetch user conversions', error);
     captureException(error);
     throw error;
   }
@@ -159,9 +191,12 @@ export const getUserConversions = async (page: number = 1, limit: number = 10, s
  */
 export const generateThumbnail = async (fileId: string, options: { page?: number; width?: number } = {}): Promise<any> => {
   try {
-    const response = await api.post(`/thumbnails/generate/${fileId}`, options);
+    logDebug(`Generating thumbnail for file: ${fileId}`, options);
+    const response = await api.post(`${API_CONFIG.endpoints.thumbnails}/generate/${fileId}`, options);
+    logDebug('Thumbnail generated successfully', response.data);
     return response.data;
   } catch (error) {
+    logDebug(`Failed to generate thumbnail for file: ${fileId}`, error);
     captureException(error);
     throw error;
   }

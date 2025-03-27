@@ -40,7 +40,7 @@ async function deploy() {
     console.log('✅ Router configuration verified');
     
     console.log('Step 2: Building application...');
-    await run('npm run build');
+    await run('npm run build:vercel');
     console.log('✅ Build completed successfully');
     
     console.log('Step 3: Preparing Vercel configuration...');
@@ -49,29 +49,39 @@ async function deploy() {
     const vercelConfig = {
       "version": 2,
       "public": true,
-      "redirects": [
-        { 
-          "source": "/", 
-          "destination": "/pdfspark", 
-          "permanent": true 
-        }
-      ],
+      "cleanUrls": true,
       "rewrites": [
-        { "source": "/pdfspark/:path*", "destination": "/pdfspark/index.html" },
-        { "source": "/(.*)", "destination": "/pdfspark/index.html" }
+        { "source": "/pdfspark", "destination": "/index.html" },
+        { "source": "/pdfspark/(.*)", "destination": "/$1" }
       ],
       "headers": [
         {
-          "source": "/pdfspark/:path*",
+          "source": "/(.*)",
           "headers": [
             {
               "key": "Cache-Control",
               "value": "public, max-age=0, must-revalidate"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=31536000; includeSubDomains; preload"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "DENY"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "1; mode=block"
             }
           ]
         },
         {
-          "source": "/pdfspark/assets/:path*",
+          "source": "/assets/(.*)",
           "headers": [
             {
               "key": "Cache-Control",

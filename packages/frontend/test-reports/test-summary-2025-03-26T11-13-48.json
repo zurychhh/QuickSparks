@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-03-26T11-13-48",
+  "categories": {
+    "functional": {
+      "status": "failed",
+      "error": "Command failed: npm run test:functional\n(node:67143) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:67145) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:67144) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:67146) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    "performance": {
+      "status": "passed"
+    },
+    "uiux": {
+      "status": "failed",
+      "error": "Command failed: npm run backstop:reference\n"
+    },
+    "crossBrowser": {
+      "status": "failed",
+      "error": "Command failed: npx playwright test --config=playwright.config.ts --project=chromium\n(node:67440) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:67442) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:67441) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:67443) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    },
+    "api": {
+      "status": "failed",
+      "error": "Command failed: npm run test:api\nnode:events:485\n      throw er; // Unhandled 'error' event\n      ^\n\nError: listen EADDRINUSE: address already in use :::3000\n    at Server.setupListenHandle [as _listen2] (node:net:1939:16)\n    at listenInCluster (node:net:1996:12)\n    at Server.listen (node:net:2101:7)\n    at Function.listen (/Users/user/conversion-microservices/packages/frontend/node_modules/express/lib/application.js:635:24)\n    at file:///Users/user/conversion-microservices/packages/frontend/comprehensive-tests/mock-api-server.js:92:20\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:98:5)\nEmitted 'error' event on Server instance at:\n    at emitErrorNT (node:net:1975:8)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {\n  code: 'EADDRINUSE',\n  errno: -48,\n  syscall: 'listen',\n  address: '::',\n  port: 3000\n}\n\nNode.js v23.10.0\n"
+    },
+    "dataValidation": {
+      "status": "failed",
+      "error": "Command failed: npm run test:data-validation\nNo test files found, exiting with code 1\n\nfilter: tests/data-validation/validation-test.js\ninclude: **/*.{test,spec}.?(c|m)[jt]s?(x)\nexclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*\n\n❌ Error running data validation tests: Command failed: npx vitest run tests/data-validation/validation-test.js --reporter=verbose\n"
+    },
+    "deployment": {
+      "status": "skipped",
+      "message": "Docker prerequisites not met"
+    },
+    "seo": {
+      "status": "passed"
+    }
+  },
+  "startTime": "2025-03-26T11:13:48.613Z",
+  "endTime": "2025-03-26T11:15:10.830Z",
+  "overallStatus": "failed"
+}

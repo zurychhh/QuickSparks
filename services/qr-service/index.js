@@ -1,5 +1,5 @@
 const express = require('express');
-const QRCode = require('qrcode');
+//const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
 
@@ -23,11 +23,11 @@ app.get('/status', (req, res) => {
 app.post('/generate', async (req, res) => {
   try {
     const { text, size, dark, light } = req.body;
-    
+
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
     }
-    
+
     // QR Code options
     const options = {
       errorCorrectionLevel: 'H',
@@ -40,21 +40,21 @@ app.post('/generate', async (req, res) => {
       },
       width: parseInt(size) || 300
     };
-    
+
     // Generate QR code
     const fileName = `qrcode-${Date.now()}.png`;
     const filePath = path.join(uploadsDir, fileName);
-    
+
     // Two approaches - either save to file or return as data URL
     await QRCode.toFile(filePath, text, options);
-    
+
     // Also generate as base64 for embedding directly in response
     const qrDataUrl = await QRCode.toDataURL(text, options);
-    
+
     // In a real app, you'd store this file somewhere permanent
     // and potentially use a CDN or object storage
     const fileUrl = `/qr-service/downloads/${fileName}`;
-    
+
     res.json({
       url: fileUrl,
       qr: qrDataUrl,

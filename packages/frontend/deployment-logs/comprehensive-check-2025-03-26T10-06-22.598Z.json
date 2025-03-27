@@ -1,0 +1,359 @@
+{
+  "timestamp": "2025-03-26T10:06:22.595Z",
+  "results": [
+    {
+      "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app",
+      "finalUrl": "https://dist-awirridfu-zurychhhs-projects.vercel.app",
+      "status": 401,
+      "headers": {
+        "cache-control": "no-store, max-age=0",
+        "content-length": "13057",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:20 GMT",
+        "server": "Vercel",
+        "set-cookie": [
+          "_vercel_sso_nonce=SJ0jcxp1B2xhwpjL8hQvHt2u; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+        ],
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "x-robots-tag": "noindex",
+        "x-vercel-id": "arn1::thqt9-1742983580909-788d1ca8109f"
+      },
+      "isAuthPage": true,
+      "is404Page": false,
+      "dataPreview": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,ini...",
+      "success": false,
+      "redirectChain": []
+    },
+    {
+      "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark",
+      "finalUrl": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark",
+      "status": 401,
+      "headers": {
+        "cache-control": "no-store, max-age=0",
+        "content-length": "13081",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:20 GMT",
+        "server": "Vercel",
+        "set-cookie": [
+          "_vercel_sso_nonce=iacXjvYjjEFAa8XWNIo22EzK; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+        ],
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "x-robots-tag": "noindex",
+        "x-vercel-id": "arn1::thqt9-1742983580956-b42e69336240"
+      },
+      "isAuthPage": true,
+      "is404Page": false,
+      "dataPreview": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,ini...",
+      "success": false,
+      "redirectChain": []
+    },
+    {
+      "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark/convert",
+      "finalUrl": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark/convert",
+      "status": 401,
+      "headers": {
+        "cache-control": "no-store, max-age=0",
+        "content-length": "13111",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:20 GMT",
+        "server": "Vercel",
+        "set-cookie": [
+          "_vercel_sso_nonce=XM9jBC7mzPXqtWJzcQ6fOuzL; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+        ],
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "x-robots-tag": "noindex",
+        "x-vercel-id": "arn1::thqt9-1742983580994-8ff6a1fdaa9d"
+      },
+      "isAuthPage": true,
+      "is404Page": false,
+      "dataPreview": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,ini...",
+      "success": false,
+      "redirectChain": []
+    },
+    {
+      "url": "https://www.quicksparks.dev/pdfspark",
+      "finalUrl": "https://www.quicksparks.dev/pdfspark",
+      "status": 404,
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-length": "79",
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:21 GMT",
+        "permissions-policy": "camera=(), microphone=(), geolocation=()",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "x-vercel-error": "NOT_FOUND",
+        "x-vercel-id": "arn1::95975-1742983581358-b45a85ccc0e7",
+        "x-xss-protection": "1; mode=block"
+      },
+      "isAuthPage": false,
+      "is404Page": false,
+      "dataPreview": "The page could not be found\n\nNOT_FOUND\n\narn1::95975-1742983581358-b45a85ccc0e7\n",
+      "success": false,
+      "redirectChain": [
+        {
+          "originalUrl": "https://quicksparks.dev",
+          "statusCode": 308,
+          "location": "https://www.quicksparks.dev/"
+        },
+        {
+          "originalUrl": "https://www.quicksparks.dev/",
+          "statusCode": 308,
+          "location": "/pdfspark"
+        }
+      ]
+    },
+    {
+      "url": "https://www.quicksparks.dev/pdfspark",
+      "finalUrl": "https://www.quicksparks.dev/pdfspark",
+      "status": 404,
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-length": "79",
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:21 GMT",
+        "permissions-policy": "camera=(), microphone=(), geolocation=()",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "x-vercel-error": "NOT_FOUND",
+        "x-vercel-id": "arn1::hjc6q-1742983581524-d8097ff62fe4",
+        "x-xss-protection": "1; mode=block"
+      },
+      "isAuthPage": false,
+      "is404Page": false,
+      "dataPreview": "The page could not be found\n\nNOT_FOUND\n\narn1::hjc6q-1742983581524-d8097ff62fe4\n",
+      "success": false,
+      "redirectChain": [
+        {
+          "originalUrl": "https://quicksparks.dev/pdfspark",
+          "statusCode": 308,
+          "location": "https://www.quicksparks.dev/pdfspark"
+        }
+      ]
+    },
+    {
+      "url": "https://www.quicksparks.dev/pdfspark/convert",
+      "finalUrl": "https://www.quicksparks.dev/pdfspark/convert",
+      "status": 404,
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-length": "79",
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:21 GMT",
+        "permissions-policy": "camera=(), microphone=(), geolocation=()",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "x-vercel-error": "NOT_FOUND",
+        "x-vercel-id": "arn1::pltpb-1742983581685-c8d58a82605d",
+        "x-xss-protection": "1; mode=block"
+      },
+      "isAuthPage": false,
+      "is404Page": false,
+      "dataPreview": "The page could not be found\n\nNOT_FOUND\n\narn1::pltpb-1742983581685-c8d58a82605d\n",
+      "success": false,
+      "redirectChain": [
+        {
+          "originalUrl": "https://quicksparks.dev/pdfspark/convert",
+          "statusCode": 308,
+          "location": "https://www.quicksparks.dev/pdfspark/convert"
+        }
+      ]
+    },
+    {
+      "url": "https://www.quicksparks.dev/pdfspark",
+      "finalUrl": "https://www.quicksparks.dev/pdfspark",
+      "status": 404,
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-length": "79",
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:21 GMT",
+        "permissions-policy": "camera=(), microphone=(), geolocation=()",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "x-vercel-error": "NOT_FOUND",
+        "x-vercel-id": "arn1::687md-1742983581843-c12d13643d75",
+        "x-xss-protection": "1; mode=block"
+      },
+      "isAuthPage": false,
+      "is404Page": false,
+      "dataPreview": "The page could not be found\n\nNOT_FOUND\n\narn1::687md-1742983581843-c12d13643d75\n",
+      "success": false,
+      "redirectChain": [
+        {
+          "originalUrl": "https://www.quicksparks.dev",
+          "statusCode": 308,
+          "location": "/pdfspark"
+        }
+      ]
+    },
+    {
+      "url": "https://www.quicksparks.dev/pdfspark",
+      "finalUrl": "https://www.quicksparks.dev/pdfspark",
+      "status": 404,
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-length": "79",
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:21 GMT",
+        "permissions-policy": "camera=(), microphone=(), geolocation=()",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "x-vercel-error": "NOT_FOUND",
+        "x-vercel-id": "arn1::d4ms8-1742983581885-33f258b76229",
+        "x-xss-protection": "1; mode=block"
+      },
+      "isAuthPage": false,
+      "is404Page": false,
+      "dataPreview": "The page could not be found\n\nNOT_FOUND\n\narn1::d4ms8-1742983581885-33f258b76229\n",
+      "success": false,
+      "redirectChain": []
+    },
+    {
+      "url": "https://www.quicksparks.dev/pdfspark/convert",
+      "finalUrl": "https://www.quicksparks.dev/pdfspark/convert",
+      "status": 404,
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-length": "79",
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:21 GMT",
+        "permissions-policy": "camera=(), microphone=(), geolocation=()",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "Vercel",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "x-vercel-error": "NOT_FOUND",
+        "x-vercel-id": "arn1::m4wt2-1742983581924-2677e63b5dcb",
+        "x-xss-protection": "1; mode=block"
+      },
+      "isAuthPage": false,
+      "is404Page": false,
+      "dataPreview": "The page could not be found\n\nNOT_FOUND\n\narn1::m4wt2-1742983581924-2677e63b5dcb\n",
+      "success": false,
+      "redirectChain": []
+    },
+    {
+      "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app",
+      "finalUrl": "https://dist-awirridfu-zurychhhs-projects.vercel.app",
+      "status": 401,
+      "headers": {
+        "cache-control": "no-store, max-age=0",
+        "content-length": "13057",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:21 GMT",
+        "server": "Vercel",
+        "set-cookie": [
+          "_vercel_sso_nonce=cMUeETuuaOmB2O4RCwEJOTKb; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+        ],
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "x-robots-tag": "noindex",
+        "x-vercel-id": "arn1::thqt9-1742983581963-ea54d66ce83c"
+      },
+      "isAuthPage": true,
+      "is404Page": false,
+      "dataPreview": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,ini...",
+      "success": false,
+      "redirectChain": []
+    },
+    {
+      "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark",
+      "finalUrl": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark",
+      "status": 401,
+      "headers": {
+        "cache-control": "no-store, max-age=0",
+        "content-length": "13081",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:22 GMT",
+        "server": "Vercel",
+        "set-cookie": [
+          "_vercel_sso_nonce=XJRidwT9rtPqtDK5t3R2lkM4; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+        ],
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "x-robots-tag": "noindex",
+        "x-vercel-id": "arn1::thqt9-1742983582002-03c844d3923e"
+      },
+      "isAuthPage": true,
+      "is404Page": false,
+      "dataPreview": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,ini...",
+      "success": false,
+      "redirectChain": []
+    },
+    {
+      "url": "https://public-deploy-g9qef7gwd-zurychhhs-projects.vercel.app",
+      "finalUrl": "https://public-deploy-g9qef7gwd-zurychhhs-projects.vercel.app",
+      "status": 401,
+      "headers": {
+        "cache-control": "no-store, max-age=0",
+        "content-length": "13084",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:22 GMT",
+        "server": "Vercel",
+        "set-cookie": [
+          "_vercel_sso_nonce=gOoTByoHvAZOR95F55yC2jtO; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+        ],
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "x-robots-tag": "noindex",
+        "x-vercel-id": "arn1::vv9ml-1742983582147-389362af8f79"
+      },
+      "isAuthPage": true,
+      "is404Page": false,
+      "dataPreview": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,ini...",
+      "success": false,
+      "redirectChain": []
+    },
+    {
+      "url": "https://public-deploy-g9qef7gwd-zurychhhs-projects.vercel.app/pdfspark",
+      "finalUrl": "https://public-deploy-g9qef7gwd-zurychhhs-projects.vercel.app/pdfspark",
+      "status": 401,
+      "headers": {
+        "cache-control": "no-store, max-age=0",
+        "content-length": "13108",
+        "content-type": "text/html; charset=utf-8",
+        "date": "Wed, 26 Mar 2025 10:06:22 GMT",
+        "server": "Vercel",
+        "set-cookie": [
+          "_vercel_sso_nonce=FejSdM5Cu1Yf90Sn1s4cQ3Sg; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+        ],
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "x-robots-tag": "noindex",
+        "x-vercel-id": "arn1::thqt9-1742983582348-a7ad4c9b3e15"
+      },
+      "isAuthPage": true,
+      "is404Page": false,
+      "dataPreview": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,ini...",
+      "success": false,
+      "redirectChain": []
+    }
+  ],
+  "summary": {
+    "totalUrls": 13,
+    "successfulUrls": 0,
+    "authPages": 7,
+    "notFoundPages": 0,
+    "errors": 0
+  }
+}

@@ -25,9 +25,56 @@ declare global {
 const app = express();
 
 // Apply middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Configure CORS for specific origins
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    logger.info("CORS request from origin:", origin);
+    
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) {
+      logger.info("Accepting request with no origin");
+      return callback(null, true);
+    }
+    
+    // List of allowed origins
+    const allowedOrigins = [
+      env.FRONTEND_URL,                   // Environment variable frontend URL
+      'https://pdfspark.vercel.app',      // Main production domain
+      'https://pdfspark-git-main.vercel.app', // Branch deployment
+      'http://localhost:3000',            // React local development
+      'http://localhost:5173',            // Vite local development
+      'http://127.0.0.1:5173',            // Vite local IP
+      'http://localhost:8080'             // Webpack local development
+    ];
+    
+    logger.info("Allowed origins:", allowedOrigins);
+    logger.info("FRONTEND_URL from env:", env.FRONTEND_URL);
+    
+    // In development mode, accept all origins
+    if (env.NODE_ENV === 'development') {
+      logger.info("Development mode: accepting all origins");
+      callback(null, true);
+      return;
+    }
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
+      logger.info("Origin allowed:", origin);
+      callback(null, true);
+    } else {
+      logger.warn("Origin rejected:", origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  maxAge: 86400  // 24 hours
+};
+
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Create required directories if they don't exist
 const uploadsDir = path.join(process.cwd(), env.UPLOADS_DIR);
