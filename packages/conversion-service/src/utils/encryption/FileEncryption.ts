@@ -9,6 +9,7 @@ import { Transform } from 'stream';
 import logger from '../logger';
 import env from '../../config/env';
 import { getErrorMessage } from '../errorHandling';
+import { validateFile } from '../fileValidation';
 
 // Constants for encryption settings
 const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
@@ -527,6 +528,18 @@ class FileEncryption {
     tagPath: string;
   }> {
     try {
+      // Validate file before encryption
+      const validation = await validateFile(inputPath, {
+        maxSize: 200 * 1024 * 1024, // 200MB max file size
+        validateContent: true // Enable content validation
+      });
+
+      if (!validation.valid) {
+        throw new Error(`File validation failed: ${validation.reason}`);
+      }
+
+      logger.info(`File validation passed for: ${inputPath} (${validation.type}, ${validation.size} bytes)`);
+      
       // Get file stats
       const stats = await fsPromises.stat(inputPath);
 
