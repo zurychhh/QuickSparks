@@ -1,0 +1,274 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Conversion Microservices API",
+  "description": "JSON Schema definitions for all API endpoints",
+  "definitions": {
+    "ServiceStatusResponse": {
+      "type": "object",
+      "properties": {
+        "status": { 
+          "type": "string", 
+          "enum": ["online", "offline"],
+          "description": "The status of the service"
+        },
+        "service": { 
+          "type": "string",
+          "description": "The name of the service" 
+        }
+      },
+      "required": ["status", "service"],
+      "additionalProperties": false
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "error": { 
+          "type": "string",
+          "description": "Error message" 
+        }
+      },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "RegisterRequest": {
+      "type": "object",
+      "properties": {
+        "username": { 
+          "type": "string", 
+          "minLength": 3, 
+          "maxLength": 50,
+          "description": "Username for the new account"
+        },
+        "password": { 
+          "type": "string", 
+          "minLength": 8, 
+          "maxLength": 100,
+          "description": "Password for the new account" 
+        },
+        "email": { 
+          "type": "string", 
+          "format": "email", 
+          "maxLength": 100,
+          "description": "Email address for the new account"
+        }
+      },
+      "required": ["username", "password", "email"],
+      "additionalProperties": false
+    },
+    "LoginRequest": {
+      "type": "object",
+      "properties": {
+        "username": { 
+          "type": "string",
+          "description": "Username for authentication" 
+        },
+        "password": { 
+          "type": "string",
+          "description": "Password for authentication" 
+        }
+      },
+      "required": ["username", "password"],
+      "additionalProperties": false
+    },
+    "ValidateTokenRequest": {
+      "type": "object",
+      "properties": {
+        "token": { 
+          "type": "string",
+          "description": "JWT token to validate" 
+        }
+      },
+      "required": ["token"],
+      "additionalProperties": false
+    },
+    "UserResponse": {
+      "type": "object",
+      "properties": {
+        "id": { 
+          "type": "number",
+          "description": "User ID" 
+        },
+        "username": { 
+          "type": "string",
+          "description": "Username" 
+        },
+        "email": { 
+          "type": "string", 
+          "format": "email",
+          "description": "User email address"
+        },
+        "createdAt": { 
+          "type": "string", 
+          "format": "date-time",
+          "description": "Account creation timestamp"
+        }
+      },
+      "required": ["id", "username", "email", "createdAt"],
+      "additionalProperties": false
+    },
+    "LoginResponse": {
+      "type": "object",
+      "properties": {
+        "id": { 
+          "type": "number",
+          "description": "User ID" 
+        },
+        "username": { 
+          "type": "string",
+          "description": "Username" 
+        },
+        "email": { 
+          "type": "string", 
+          "format": "email",
+          "description": "User email address"
+        },
+        "createdAt": { 
+          "type": "string", 
+          "format": "date-time",
+          "description": "Account creation timestamp"
+        },
+        "token": { 
+          "type": "string",
+          "description": "JWT authentication token" 
+        }
+      },
+      "required": ["id", "username", "email", "createdAt", "token"],
+      "additionalProperties": false
+    },
+    "TokenValidationResponse": {
+      "type": "object",
+      "properties": {
+        "valid": { 
+          "type": "boolean",
+          "description": "Whether the token is valid" 
+        },
+        "user": {
+          "type": "object",
+          "properties": {
+            "userId": { 
+              "type": "number",
+              "description": "User ID from the token" 
+            },
+            "username": { 
+              "type": "string",
+              "description": "Username from the token" 
+            }
+          },
+          "required": ["userId", "username"],
+          "additionalProperties": false,
+          "description": "User information extracted from the token"
+        }
+      },
+      "required": ["valid", "user"],
+      "additionalProperties": false
+    },
+    "PdfConvertRequest": {
+      "type": "object",
+      "properties": {
+        "text": { 
+          "type": "string", 
+          "minLength": 1,
+          "description": "Text content to convert to PDF"
+        }
+      },
+      "required": ["text"],
+      "additionalProperties": false
+    },
+    "PdfConvertResponse": {
+      "type": "object",
+      "properties": {
+        "url": { 
+          "type": "string",
+          "description": "URL to download the generated PDF" 
+        },
+        "fileName": { 
+          "type": "string",
+          "description": "Name of the generated PDF file" 
+        },
+        "message": { 
+          "type": "string",
+          "description": "Success message" 
+        }
+      },
+      "required": ["url", "fileName", "message"],
+      "additionalProperties": false
+    },
+    "QrGenerateRequest": {
+      "type": "object",
+      "properties": {
+        "text": { 
+          "type": "string", 
+          "minLength": 1,
+          "description": "Text or URL to encode in the QR code"
+        },
+        "size": { 
+          "type": "number", 
+          "nullable": true,
+          "description": "Size of the QR code in pixels (optional)"
+        },
+        "dark": { 
+          "type": "string", 
+          "nullable": true,
+          "description": "Color of the dark modules (optional)"
+        },
+        "light": { 
+          "type": "string", 
+          "nullable": true,
+          "description": "Color of the light modules (optional)"
+        }
+      },
+      "required": ["text"],
+      "additionalProperties": false
+    },
+    "QrGenerateResponse": {
+      "type": "object",
+      "properties": {
+        "url": { 
+          "type": "string",
+          "description": "URL to download the QR code image" 
+        },
+        "qr": { 
+          "type": "string",
+          "description": "Base64 data URL of the QR code" 
+        },
+        "fileName": { 
+          "type": "string",
+          "description": "Name of the generated QR code file" 
+        },
+        "message": { 
+          "type": "string",
+          "description": "Success message" 
+        }
+      },
+      "required": ["url", "qr", "fileName", "message"],
+      "additionalProperties": false
+    },
+    "ImageConvertResponse": {
+      "type": "object",
+      "properties": {
+        "url": { 
+          "type": "string",
+          "description": "URL to download the processed image" 
+        },
+        "fileName": { 
+          "type": "string",
+          "description": "Name of the processed image file" 
+        },
+        "width": { 
+          "type": "number",
+          "description": "Width of the processed image in pixels" 
+        },
+        "format": { 
+          "type": "string",
+          "description": "Format of the processed image" 
+        },
+        "message": { 
+          "type": "string",
+          "description": "Success message" 
+        }
+      },
+      "required": ["url", "fileName", "width", "format", "message"],
+      "additionalProperties": false
+    }
+  }
+}

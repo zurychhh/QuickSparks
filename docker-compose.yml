@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - PDF_SERVICE_URL=http://pdf-service:3001
+      - IMAGE_SERVICE_URL=http://image-service:3002
+      - QR_SERVICE_URL=http://qr-service:3003
+      - AUTH_SERVICE_URL=http://auth-service:3004
+    depends_on:
+      - pdf-service
+      - image-service
+      - qr-service
+      - auth-service
+    volumes:
+      - ./gateway:/app/src
+      - /app/node_modules
+    restart: unless-stopped
+
+  pdf-service:
+    build:
+      context: .
+      dockerfile: packages/pdf-service/Dockerfile
+    environment:
+      - PDF_SERVICE_PORT=3001
+    volumes:
+      - ./packages/pdf-service:/app/src
+      - pdf-uploads:/app/uploads
+      - /app/node_modules
+    restart: unless-stopped
+
+  image-service:
+    build:
+      context: .
+      dockerfile: packages/image-service/Dockerfile
+    environment:
+      - IMAGE_SERVICE_PORT=3002
+    volumes:
+      - ./packages/image-service:/app/src
+      - image-uploads:/app/uploads
+      - /app/node_modules
+    restart: unless-stopped
+
+  qr-service:
+    build:
+      context: .
+      dockerfile: packages/qr-service/Dockerfile
+    environment:
+      - QR_SERVICE_PORT=3003
+    volumes:
+      - ./packages/qr-service:/app/src
+      - qr-uploads:/app/uploads
+      - /app/node_modules
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: packages/auth-service/Dockerfile
+    environment:
+      - AUTH_SERVICE_PORT=3004
+      - JWT_SECRET=your-secret-key
+    volumes:
+      - ./packages/auth-service:/app/src
+      - /app/node_modules
+    restart: unless-stopped
+
+volumes:
+  pdf-uploads:
+  image-uploads:
+  qr-uploads:
