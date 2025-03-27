@@ -81,6 +81,19 @@ const uploader = multer({
 // Middleware to handle file upload
 export const fileUploadMiddleware = (fieldName = 'file') => {
   return (req: Request, res: Response, next: NextFunction) => {
+    // Handle preflight OPTIONS request for CORS
+    if (req.method === 'OPTIONS') {
+      // Return success status - CORS headers are handled by the cors middleware
+      return res.status(204).end();
+    }
+    
+    // Set up CORS headers especially for file upload - this reinforces the CORS configuration
+    // from the main CORS middleware to ensure it's applied here as well
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
     // Use single file upload
     const upload = uploader.single(fieldName);
     
@@ -88,6 +101,7 @@ export const fileUploadMiddleware = (fieldName = 'file') => {
       if (err instanceof multer.MulterError) {
         // A Multer error occurred when uploading
         if (err.code === 'LIMIT_FILE_SIZE') {
+          logger.warn(`File size limit exceeded: ${err.message}`);
           return res.status(400).json({
             success: false,
             message: `File too large. Max size: ${env.MAX_FILE_SIZE / (1024 * 1024)}MB`
@@ -100,6 +114,7 @@ export const fileUploadMiddleware = (fieldName = 'file') => {
         });
       } else if (err) {
         // Non-Multer error
+        logger.error('File upload error:', err);
         return res.status(400).json({
           success: false,
           message: err.message
@@ -108,11 +123,15 @@ export const fileUploadMiddleware = (fieldName = 'file') => {
       
       // No file was provided
       if (!req.file) {
+        logger.warn('No file provided in upload request');
         return res.status(400).json({
           success: false,
           message: 'No file uploaded'
         });
       }
+      
+      // Log successful file upload
+      logger.info(`File uploaded successfully: ${req.file.originalname} (${req.file.size} bytes)`);
       
       // Continue to next middleware
       next();

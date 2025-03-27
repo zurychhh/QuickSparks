@@ -27,21 +27,54 @@ const app = express();
 // Apply middleware
 // Configure CORS for specific origins
 const corsOptions = {
-  origin: [
-    'https://pdfspark.vercel.app',      // Main production domain
-    'https://pdfspark-git-main.vercel.app', // Branch deployment
-    'http://localhost:3000'             // For local development
-  ],
+  origin: function(origin, callback) {
+    // Lista dozwolonych domen
+    const allowedOrigins = [
+      'https://pdfspark.vercel.app',            // Main production domain
+      'https://www.pdfspark.vercel.app',        // www subdomain
+      'https://pdfspark-git-main.vercel.app',   // Branch deployment
+      'https://quicksparks.dev',                // Main custom domain
+      'https://www.quicksparks.dev',            // www custom domain
+      'http://localhost:3000',                  // Local dev with React
+      'http://localhost:5173',                  // Local dev with Vite
+      env.FRONTEND_URL                          // From env variables
+    ].filter(Boolean); // Remove any undefined/empty values
+    
+    // In development, allow any origin
+    if (env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    console.log(`CORS request from origin: ${origin}`);
+    
+    // Allow requests with no origin (like mobile apps, curl, etc)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // Check if origin is in the allowed list
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Check if origin ends with allowed domain (subdomains)
+    for (const allowed of allowedOrigins) {
+      if (origin.endsWith(allowed.replace(/^https?:\/\//, ''))) {
+        return callback(null, true);
+      }
+    }
+    
+    console.error(`Origin blocked by CORS: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Content-Disposition'],
+  exposedHeaders: ['Content-Disposition'], // Expose headers for file downloads
   credentials: true,
-  maxAge: 86400  // 24 hours
+  maxAge: 86400,  // 24 hours
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
-
-// Dynamically add FRONTEND_URL to allowed origins if provided
-if (env.FRONTEND_URL && !corsOptions.origin.includes(env.FRONTEND_URL)) {
-  (corsOptions.origin as string[]).push(env.FRONTEND_URL);
-}
 
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));

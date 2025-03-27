@@ -167,11 +167,14 @@ export const uploadFile = ({
     size: `${(file.size / 1024 / 1024).toFixed(2)} MB`
   });
   
-  // Request config
+  // Request config with enhanced CORS support
   const config: AxiosRequestConfig = {
     headers: {
-      'Content-Type': 'multipart/form-data'
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
     },
+    withCredentials: true, // Important for CORS with cookies
     onUploadProgress: (progressEvent) => {
       if (onProgress && progressEvent.total) {
         const loaded = progressEvent.loaded;
