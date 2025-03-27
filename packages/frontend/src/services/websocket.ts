@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { captureException } from '@utils/sentry';
+import { API_CONFIG } from '../config/api.config';
 
 // WebSocket connection status
 export enum WebSocketStatus {
@@ -35,14 +36,29 @@ export function useWebSocket(url: string, authToken: string) {
     // Normalize URL and add auth token
     let connectionUrl = url;
     
+    // Extract WebSocket URL based on environment
+    if (process.env.NODE_ENV === 'production' || import.meta.env.PROD) {
+      // W produkcji użyj względnej ścieżki
+      connectionUrl = window.location.origin + '/socket.io';
+      console.log('Production WebSocket URL (relative):', connectionUrl);
+    } else {
+      // W rozwoju lub jeśli podano pełny URL, użyj go bezpośrednio
+      if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
+        // Jeśli to nie jest pełny URL WebSocket, użyj domyślnego backendu
+        connectionUrl = 'http://localhost:5000/socket.io';
+        console.log('Development WebSocket URL:', connectionUrl);
+      }
+    }
+    
     // Enhanced debugging for WebSocket URL construction
     console.log('Original WebSocket URL:', url);
+    console.log('Normalized WebSocket URL:', connectionUrl);
     
     // Ensure URL has proper protocol
     if (!connectionUrl.startsWith('ws://') && !connectionUrl.startsWith('wss://')) {
       // Auto-detect protocol based on current page
       const isSecure = window.location.protocol === 'https:';
-      connectionUrl = `${isSecure ? 'wss' : 'ws'}://${connectionUrl}`;
+      connectionUrl = `${isSecure ? 'wss' : 'ws'}://${connectionUrl.replace(/^https?:///, '')}`;
       console.log('Protocol added to WebSocket URL:', connectionUrl);
     }
     
@@ -63,17 +79,20 @@ export function useWebSocket(url: string, authToken: string) {
       socketRef.current.onopen = () => {
         setStatus(WebSocketStatus.CONNECTED);
         setError(null);
+        console.log(`WebSocket connected with ID: ${socketRef.current?.url}`);
       };
       
       // Connection closed
-      socketRef.current.onclose = () => {
+      socketRef.current.onclose = (event) => {
         setStatus(WebSocketStatus.DISCONNECTED);
+        console.log(`WebSocket disconnected: ${event.reason || 'No reason provided'}`);
       };
       
       // Connection error
       socketRef.current.onerror = (event) => {
         setStatus(WebSocketStatus.ERROR);
         setError(new Error('WebSocket connection error'));
+        console.error('WebSocket connection error:', event);
         captureException(new Error('WebSocket connection error'), { extra: { event } });
       };
       
@@ -81,6 +100,7 @@ export function useWebSocket(url: string, authToken: string) {
       socketRef.current.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data) as WebSocketMessage;
+          console.log('WebSocket message received:', message.type);
           
           setLastMessage(message);
           setMessageHistory((prev) => [...prev, message]);
@@ -97,12 +117,14 @@ export function useWebSocket(url: string, authToken: string) {
             });
           }
         } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
           captureException(error);
         }
       };
     } catch (error) {
       setStatus(WebSocketStatus.ERROR);
       setError(error instanceof Error ? error : new Error('Unknown WebSocket error'));
+      console.error('Error initializing WebSocket:', error);
       captureException(error);
     }
   }, [url, authToken]);

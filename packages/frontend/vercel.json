@@ -1,15 +1,27 @@
 {
   "version": 2,
   "public": true,
-  "rewrites": [
-    { 
-      "source": "/api/:path*",
-      "destination": "https://pdfspark-conversion-service.onrender.com/api/:path*"
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://pdfspark-conversion-service.onrender.com/api/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept, Origin"
+      }
     },
-    { 
-      "source": "/(.*)", 
-      "destination": "/index.html" 
-    }
+    {
+      "src": "/socket.io/(.*)",
+      "dest": "https://pdfspark-conversion-service.onrender.com/socket.io/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization"
+      }
+    },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
   "headers": [
     {
@@ -22,10 +34,7 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     },
     {

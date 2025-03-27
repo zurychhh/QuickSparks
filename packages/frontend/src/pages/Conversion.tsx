@@ -16,6 +16,7 @@ import FileUpload from '../components/ui/FileUpload';
 import FilePreview from '../components/ui/FilePreview';
 import ConversionSteps, { ConversionStep } from '../components/ui/ConversionSteps';
 import ConversionOptions from '../components/ui/ConversionOptions';
+import CorsTest from '../components/CorsTest';
 // Fallback for FileViewer if the actual component isn't available
 const FileViewer = ({
   fileUrl,
@@ -547,6 +548,9 @@ const ConversionPage: React.FC = (): React.ReactElement => {
               Get high-quality document conversion with our state-of-the-art technology.
             </p>
           </div>
+          
+          {/* CORS test component */}
+          {process.env.NODE_ENV !== 'production' && <CorsTest />}
 
           {/* Steps indicator */}
           <ConversionSteps currentStep={currentStep} className="mb-6 md:mb-8" />

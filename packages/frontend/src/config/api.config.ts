@@ -1,14 +1,14 @@
 // Konfiguracja API dla różnych środowisk
 
-// Używamy różnych bazowych adresów URL w zależności od środowiska
-const getBaseUrl = () => {
-  // W środowisku produkcyjnym używamy absolutnego URL do API backendu
-  if (process.env.NODE_ENV === 'production' || import.meta.env.PROD) {
-    // Bezpośredni URL do backendu zamiast relatywnego - to naprawia błąd 405
-    return 'https://pdfspark-conversion-service.onrender.com/api';
-  }
+const isProd = process.env.NODE_ENV === 'production' || import.meta.env.PROD;
 
-  // W środowisku deweloperskim używamy localhost lub podanego adresu
+// Bazowe URL do API
+const getBaseUrl = () => {
+  // W produkcji używamy względnej ścieżki, która będzie obsługiwana przez proxy Vercel
+  if (isProd) {
+    return '/api';
+  }
+  // W środowisku deweloperskim łączymy się bezpośrednio z backendem
   return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 };
 
@@ -28,7 +28,10 @@ export const API_CONFIG = {
     status: '/conversions/',
     download: '/downloads/token/',
     thumbnails: '/thumbnails/',
-    payments: '/payments/'
+    payments: '/payments/',
+    health: '/health/',
+    corsTest: '/cors-test/',        // Endpoint testowy
+    debugHeaders: '/debug-headers/' // Endpoint diagnostyczny
   }
 };
 

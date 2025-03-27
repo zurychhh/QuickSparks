@@ -8,7 +8,9 @@ const api = axios.create({
   timeout: API_CONFIG.timeout,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json'
   },
+  withCredentials: true // For cookies if needed
 });
 
 // Interceptor to handle request
@@ -16,6 +18,7 @@ api.interceptors.request.use(
   (config) => {
     // Log request for debugging
     logDebug(`Sending request to: ${config.url}`, config);
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     
     // Get token from local storage
     const token = localStorage.getItem('authToken');
@@ -25,10 +28,16 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    // Log request payload for debugging
+    if (config.data && typeof config.data !== 'string' && !(config.data instanceof FormData)) {
+      console.log('Request payload:', config.data);
+    }
+    
     return config;
   },
   (error) => {
     logDebug('Request error:', error);
+    console.error('Request error:', error);
     captureException(error);
     return Promise.reject(error);
   }
@@ -38,11 +47,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     logDebug('Received response:', response);
-    console.log(`API Request successful: ${response.config.method?.toUpperCase()} ${response.config.url}`);
+    console.log(`API Response: ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`);
     return response;
   },
   (error) => {
     logDebug('Response error:', error);
+    console.error('API Error:', error.message);
     
     // Log error to Sentry
     captureException(error);
@@ -56,6 +66,9 @@ api.interceptors.response.use(
       
       // Log detailed error information
       console.error(`API Error [${status}] for ${method} ${url}:`, error.response.data);
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
       console.error('Request headers:', error.config?.headers);
       
       // Detailed handling for common error codes
@@ -86,13 +99,13 @@ api.interceptors.response.use(
       }
     } else if (error.request) {
       // Request was made but no response received
-      console.error('API Error: No response received', error.request);
+      console.error('No response received');
       console.error('Request URL:', error.config?.url);
       console.error('Request Method:', error.config?.method?.toUpperCase());
       console.error('Request Headers:', error.config?.headers);
     } else {
       // Error in setting up the request
-      console.error('API Error:', error.message);
+      console.error('Error setup:', error.message);
     }
     
     return Promise.reject(error);
@@ -130,18 +143,34 @@ export const uploadFile = ({
   // Create FormData instance
   const formData = new FormData();
   
+  console.log(`Starting file upload to: ${API_CONFIG.baseUrl}${API_CONFIG.endpoints.convert}`);
+  console.log('Form data keys being sent:');
+  
   // Append file to form data
   formData.append('file', file);
+  console.log('- file');
   
   // Append additional data
   Object.entries(additionalData).forEach(([key, value]) => {
-    formData.append(key, typeof value === 'string' ? value : JSON.stringify(value));
+    // Convert values properly for FormData
+    if (typeof value === 'boolean' || typeof value === 'object') {
+      formData.append(key, JSON.stringify(value));
+    } else {
+      formData.append(key, String(value));
+    }
+    console.log(`- ${key}`);
+  });
+  
+  console.log('File details:', {
+    name: file.name,
+    type: file.type,
+    size: `${(file.size / 1024 / 1024).toFixed(2)} MB`
   });
   
   // Request config
   const config: AxiosRequestConfig = {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'multipart/form-data'
     },
     onUploadProgress: (progressEvent) => {
       if (onProgress && progressEvent.total) {
@@ -150,6 +179,7 @@ export const uploadFile = ({
         const percentage = Math.round((loaded * 100) / total);
         
         onProgress({ loaded, total, percentage });
+        console.log(`Upload progress: ${percentage}%`);
       }
     },
   };
@@ -158,8 +188,6 @@ export const uploadFile = ({
   if (cancelToken) {
     config.cancelToken = cancelToken.token;
   }
-  
-  // Use the normalizeUrlPath function imported at the top level
   
   // Normalize the upload endpoint - use a clean endpoint without double slashes
   // We already have trailing slashes in the endpoints config
@@ -172,25 +200,6 @@ export const uploadFile = ({
     fileType: file.type,
     endpoint: endpoint,
     baseUrl: API_CONFIG.baseUrl
-  });
-  
-  console.log(`Starting file upload to: ${API_CONFIG.baseUrl}${endpoint}`);
-  
-  // Add specific debugging for formData contents
-  try {
-    console.log('Form data keys being sent:');
-    for (const key of formData.keys()) {
-      console.log(`- ${key}`);
-    }
-  } catch (err) {
-    console.error('Error inspecting form data:', err);
-  }
-  
-  // Explicitly detect file type and add it to the console for debugging
-  console.log('File details:', {
-    type: file.type,
-    extension: file.name.split('.').pop(),
-    size: `${Math.round(file.size / 1024)} KB`
   });
   
   api.post(endpoint, formData, config)
@@ -218,13 +227,15 @@ export const uploadFile = ({
     })
     .catch((error) => {
       logDebug('Upload failed', error);
-      console.error('File upload failed:', file.name, error.message);
+      console.error(`File upload failed: ${file.name}`, error.message);
       
       // Add more context to error logging
       if (error.response) {
-        console.error('Server responded with:', error.response.status, error.response.data);
+        console.error('Server responded with error:', error.response.data);
       } else if (error.request) {
         console.error('No response received from server');
+      } else {
+        console.error('Error setting up request:', error.message);
       }
       
       if (onError) {
@@ -526,6 +537,20 @@ export const createCustomerPortalSession = async (): Promise<any> => {
   } catch (error) {
     captureException(error);
     throw error;
+  }
+};
+
+/**
+ * Test CORS configuration
+ */
+export const testCors = async (): Promise<boolean> => {
+  try {
+    const response = await api.get(API_CONFIG.endpoints.corsTest);
+    console.log('CORS test successful!', response.data);
+    return true;
+  } catch (error) {
+    console.error('CORS test failed:', error);
+    return false;
   }
 };
 
