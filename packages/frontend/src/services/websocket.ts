@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { captureException } from '@utils/sentry';
+import { API_CONFIG, logDebug } from '../config/api.config';
 
 // WebSocket connection status
 export enum WebSocketStatus {
@@ -13,6 +14,31 @@ export enum WebSocketStatus {
 export interface WebSocketMessage {
   type: string;
   data: any;
+}
+
+// Helper function to extract base URL for WebSocket connection
+export function getWebSocketBaseUrl(): string {
+  try {
+    // Extract base URL from API config (remove /api suffix)
+    const baseUrl = API_CONFIG.baseUrl.replace(/\/api$/, '');
+    logDebug("WebSocket base URL extraction:", {
+      originalApiUrl: API_CONFIG.baseUrl,
+      extractedBaseUrl: baseUrl
+    });
+    
+    // For relative URLs, use window.location.origin
+    if (baseUrl.startsWith('/')) {
+      const socketUrl = window.location.origin;
+      logDebug("Using window.location.origin for WebSocket:", socketUrl);
+      return socketUrl;
+    }
+    
+    return baseUrl;
+  } catch (error) {
+    console.error("Error extracting WebSocket base URL:", error);
+    // Fallback to current origin if something fails
+    return window.location.origin;
+  }
 }
 
 // Custom hook for WebSocket connection
@@ -29,29 +55,37 @@ export function useWebSocket(url: string, authToken: string) {
   // Connect to WebSocket
   const connect = useCallback(() => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
+      logDebug("WebSocket already connected, skipping connection");
       return;
     }
     
-    // Add auth token to URL
-    const connectionUrl = `${url}?token=${encodeURIComponent(authToken)}`;
-    
     try {
+      logDebug("Attempting to connect to WebSocket:", url);
+      
+      // Add auth token to URL
+      const connectionUrl = `${url}?token=${encodeURIComponent(authToken)}`;
+      
       setStatus(WebSocketStatus.CONNECTING);
+      logDebug("WebSocket connecting to:", connectionUrl);
+      
       socketRef.current = new WebSocket(connectionUrl);
       
       // Connection opened
       socketRef.current.onopen = () => {
+        logDebug("WebSocket connection established successfully");
         setStatus(WebSocketStatus.CONNECTED);
         setError(null);
       };
       
       // Connection closed
-      socketRef.current.onclose = () => {
+      socketRef.current.onclose = (event) => {
+        logDebug("WebSocket connection closed:", event.reason || "No reason provided");
         setStatus(WebSocketStatus.DISCONNECTED);
       };
       
       // Connection error
       socketRef.current.onerror = (event) => {
+        console.error("WebSocket connection error:", event);
         setStatus(WebSocketStatus.ERROR);
         setError(new Error('WebSocket connection error'));
         captureException(new Error('WebSocket connection error'), { extra: { event } });
@@ -60,7 +94,10 @@ export function useWebSocket(url: string, authToken: string) {
       // Listen for messages
       socketRef.current.onmessage = (event) => {
         try {
+          logDebug("WebSocket message received:", event.data);
+          
           const message = JSON.parse(event.data) as WebSocketMessage;
+          logDebug("Parsed WebSocket message:", message);
           
           setLastMessage(message);
           setMessageHistory((prev) => [...prev, message]);
@@ -68,15 +105,21 @@ export function useWebSocket(url: string, authToken: string) {
           // Notify listeners
           if (message.type && messageListenersRef.current.has(message.type)) {
             const listeners = messageListenersRef.current.get(message.type);
+            logDebug(`Notifying ${listeners?.size || 0} listeners for message type: ${message.type}`);
+            
             listeners?.forEach((listener) => {
               try {
                 listener(message.data);
               } catch (error) {
+                console.error("Error in WebSocket message listener:", error);
                 captureException(error);
               }
             });
+          } else {
+            logDebug(`No listeners registered for message type: ${message.type || 'undefined'}`);
           }
         } catch (error) {
+          console.error("Error processing WebSocket message:", error);
           captureException(error);
         }
       };

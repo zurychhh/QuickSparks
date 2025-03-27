@@ -37,6 +37,34 @@ const getFriendlyFileType = (mimeType: string): string => {
   return typeMap[mimeType] || mimeType;
 };
 
+// Helper function to determine if a file should be accepted based on extension
+const isValidFileByExtension = (file: File, acceptedTypes: string[]): boolean => {
+  console.log(`Validating file by extension: ${file.name}, ${file.type}`);
+  
+  // Extract extension from filename
+  const extension = file.name.split('.').pop()?.toLowerCase() || '';
+  console.log(`File extension: ${extension}`);
+  
+  // Map extensions to MIME types
+  const extensionMimeMap: Record<string, string[]> = {
+    'pdf': ['application/pdf'],
+    'docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    'doc': ['application/msword'],
+  };
+  
+  // Check if the extension is valid and if any of the accepted types include this extension's MIME types
+  const isValid = Object.entries(extensionMimeMap).some(([ext, mimeTypes]) => {
+    if (ext === extension) {
+      // Check if any of this extension's MIME types are in the accepted types
+      return mimeTypes.some(mime => acceptedTypes.includes(mime));
+    }
+    return false;
+  });
+  
+  console.log(`File validation by extension result: ${isValid}`);
+  return isValid;
+};
+
 const FileUpload: React.FC<FileUploadProps> = ({
   onFileAccepted,
   onFileRejected,
@@ -56,26 +84,65 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: any[]) => {
+      console.log("FileUpload.onDrop:", { acceptedFiles, fileRejections });
       setUploadError(null);
 
+      // Check if there are rejected files but we should accept them based on file extension
+      if (fileRejections.length > 0 && acceptedFiles.length === 0) {
+        const rejectedFile = fileRejections[0].file;
+        console.log("Checking rejected file by extension:", rejectedFile.name);
+        
+        // If the file is valid by extension but was rejected by MIME type
+        if (rejectedFile && isValidFileByExtension(rejectedFile, acceptedFileTypes)) {
+          console.log("File was rejected by MIME type but is valid by extension, accepting it");
+          
+          // Show animation effect
+          setIsDropSuccess(true);
+
+          // Display success feedback
+          showFeedback('success', `File "${rejectedFile.name}" selected successfully`, 3000);
+
+          // Accept the file despite React-Dropzone's rejection
+          onFileAccepted(rejectedFile);
+          return;
+        }
+      }
+
       if (acceptedFiles.length > 0) {
+        // Log file details for debugging
+        const file = acceptedFiles[0];
+        console.log("File accepted:", {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          lastModified: new Date(file.lastModified).toISOString()
+        });
+        
         // Show animation effect
         setIsDropSuccess(true);
 
         // Display success feedback
-        showFeedback('success', `File "${acceptedFiles[0].name}" selected successfully`, 3000);
+        showFeedback('success', `File "${file.name}" selected successfully`, 3000);
 
-        onFileAccepted(acceptedFiles[0]);
+        onFileAccepted(file);
       }
 
-      if (fileRejections.length > 0) {
+      if (fileRejections.length > 0 && !isDropSuccess) {
         const errors = fileRejections[0].errors;
+        const rejectedFile = fileRejections[0].file;
+        
+        console.log("File rejected:", {
+          name: rejectedFile.name,
+          type: rejectedFile.type,
+          size: rejectedFile.size,
+          errors: errors.map((e: any) => ({ code: e.code, message: e.message }))
+        });
 
         // Determine error type for user-friendly message
         let errorMessage = errorText;
 
         if (errors.some((e: any) => e.code === 'file-too-large')) {
-          errorMessage = `File is too large. Maximum size: ${maxSize / (1024 * 1024)}MB`;
+          errorMessage = `File is too large. Maximum size: ${(maxSize / (1024 * 1024)).toFixed(1)}MB`;
         } else if (errors.some((e: any) => e.code === 'file-invalid-type')) {
           const friendlyTypes = acceptedFileTypes.map(type => getFriendlyFileType(type)).join(', ');
           errorMessage = `Invalid file type. We only accept ${friendlyTypes} files.`;
