@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { cn } from '../../utils/classnames';
+import { cn } from '@/utils/classnames';
 import Button from './Button';
-import { useFeedback } from '../../context/FeedbackContext';
+import { useFeedback } from '@/context/FeedbackContext';
 
 export interface FileUploadProps {
   onFileAccepted: (file: File) => void;

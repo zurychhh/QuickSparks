@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { captureException } from '@utils/sentry';
-import { API_CONFIG, logDebug } from '../config/api.config';
+import { captureException } from '@/utils/sentry';
+import { API_CONFIG, logDebug } from '@/config/api.config';
 
 // WebSocket connection status
 export enum WebSocketStatus {
