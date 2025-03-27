@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import HomePage from '@pages/Home';
 import NotFoundPage from '@pages/NotFound';
 import ConversionPage from '@pages/Conversion';
@@ -14,9 +14,8 @@ import useAnalytics from '@hooks/useAnalytics';
 
 function App(): React.ReactElement {
   return (
-    <BrowserRouter basename="/pdfspark">
-      <Routes>
-        <Route path="/" element={<AnalyticsLayout />}>
+    <Routes>
+      <Route path="/" element={<AnalyticsLayout />}>
         <Route index element={<HomePage />} />
         <Route path="convert" element={<ConversionPage />} />
         <Route path="convert/:id" element={<ConversionPage />} />
@@ -31,7 +30,6 @@ function App(): React.ReactElement {
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
-    </BrowserRouter>
   );
 }
 
