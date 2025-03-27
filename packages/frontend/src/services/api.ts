@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios';
 import { captureException } from '@utils/sentry';
-import { API_CONFIG, logDebug } from '../config/api.config';
+import { API_CONFIG, logDebug, normalizeUrlPath } from '../config/api.config';
 
 // Create an axios instance with default config
 const api = axios.create({
@@ -159,8 +159,7 @@ export const uploadFile = ({
     config.cancelToken = cancelToken.token;
   }
   
-  // Import the normalizeUrlPath function for consistent endpoint formatting
-  const { normalizeUrlPath } = require('../config/api.config');
+  // Use the normalizeUrlPath function imported at the top level
   
   // Normalize the upload endpoint
   const endpoint = normalizeUrlPath(API_CONFIG.endpoints.convert);
@@ -198,8 +197,7 @@ export const uploadFile = ({
  */
 export const getConversionStatus = async (conversionId: string): Promise<any> => {
   try {
-    // Import the normalizeUrlPath function from API_CONFIG
-    const { normalizeUrlPath } = require('../config/api.config');
+    // Use the normalizeUrlPath function imported at the top level
     const endpoint = normalizeUrlPath(`${API_CONFIG.endpoints.status}${conversionId}`);
     
     logDebug(`Checking conversion status for: ${conversionId} at endpoint: ${endpoint}`);
@@ -268,8 +266,7 @@ export const generateConversionThumbnail = async (conversionId: string, options:
  */
 export const getDownloadToken = async (fileId: string, expiresIn?: number): Promise<any> => {
   try {
-    // Import the normalizeUrlPath function
-    const { normalizeUrlPath } = require('../config/api.config');
+    // Use the normalizeUrlPath function imported at the top level
     
     const params: any = {};
     if (expiresIn) {
