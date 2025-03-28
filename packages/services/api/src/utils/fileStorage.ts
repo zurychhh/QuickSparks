@@ -1,19 +1,15 @@
 import fs from 'fs';
+import { promises as fsPromises } from 'fs';
+import { createReadStream, createWriteStream } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { promisify } from 'util';
+import { pipeline } from 'stream/promises';
+import { Transform } from 'stream';
 import { createLogger } from '@utils/logger';
 import env from '@config/env';
 
-const mkdir = promisify(fs.mkdir);
-const writeFile = promisify(fs.writeFile);
-const readFile = promisify(fs.readFile);
-const unlink = promisify(fs.unlink);
-const stat = promisify(fs.stat);
-const fsync = promisify(fs.fsync);
-const open = promisify(fs.open);
-const close = promisify(fs.close);
-const access = promisify(fs.access);
+// Import StreamedFileStorage which handles streaming operations
+import StreamedFileStorage from './streamedFileStorage';
 
 const logger = createLogger('fileStorage');
 
@@ -36,13 +32,31 @@ export const generateSecureFilename = (originalFilename: string): string => {
 };
 
 /**
- * Generate user-specific storage path
+ * Generate user-specific storage path with path traversal protection
  */
 export const getUserStoragePath = (userId: string): string => {
+  // Validate userId to prevent path traversal attacks
+  if (!userId || typeof userId !== 'string') {
+    throw new Error('Invalid userId provided');
+  }
+  
+  // Ensure userId only contains alphanumeric characters, hyphens, and underscores
+  if (!/^[a-zA-Z0-9_-]+$/.test(userId)) {
+    throw new Error('Invalid userId format');
+  }
+  
   const basePath = path.join(process.cwd(), env.UPLOAD_DIR || 'uploads');
   const userPath = path.join(basePath, userId);
   
-  return userPath;
+  // Normalize path to resolve any potential directory traversal attempts
+  const normalizedPath = path.normalize(userPath);
+  
+  // Verify the normalized path still starts with the base path to prevent directory traversal
+  if (!normalizedPath.startsWith(basePath)) {
+    throw new Error('Path traversal attempt detected');
+  }
+  
+  return normalizedPath;
 };
 
 /**
@@ -83,132 +97,121 @@ export const calculateFileExpiration = (userTier: 'free' | 'basic' | 'premium' |
 
 /**
  * Save file securely with encryption
+ * This version uses the StreamedFileStorage for automatic selection between
+ * streaming and buffering based on file size
  */
 export const saveFileSecurely = async (
   filePath: string,
   fileBuffer: Buffer,
   userId: string
 ): Promise<EncryptedFileMetadata> => {
-  // Get encryption key
-  const keySecret = env.FILE_ENCRYPTION_SECRET || 'default-secure-key-for-file-encryption';
-  const keyIdentifier = crypto.createHash('sha256').update(userId + keySecret).digest('hex').substring(0, 8);
-  
-  // Derive a key using PBKDF2
-  const salt = crypto.randomBytes(16);
-  const key = crypto.pbkdf2Sync(keySecret + userId, salt, 100000, 32, 'sha512');
-  
-  // Generate initialization vector
-  const iv = crypto.randomBytes(16);
-  
-  // Create cipher and encrypt
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-  const encrypted = Buffer.concat([
-    cipher.update(fileBuffer),
-    cipher.final()
-  ]);
-  
-  // Get authentication tag
-  const authTag = cipher.getAuthTag();
-  
-  // Compose final encrypted file with metadata
-  const encryptedFile = Buffer.concat([
-    salt,
-    iv,
-    authTag,
-    encrypted
-  ]);
-  
-  // Write encrypted file
-  await writeFile(filePath, encryptedFile);
-  
-  // Return metadata for database
-  return {
-    encryptionMethod: 'aes-256-gcm',
-    hasIv: true,
-    hasAuthTag: true,
-    keyIdentifier
-  };
+  try {
+    // Use the StreamedFileStorage implementation for better memory efficiency
+    return await StreamedFileStorage.saveBufferSecurely(filePath, fileBuffer, userId);
+  } catch (error) {
+    logger.error(`Error saving file securely: ${filePath}`, error);
+    throw new Error(`Failed to save file securely: ${error instanceof Error ? error.message : String(error)}`);
+  }
 };
 
 /**
  * Read and decrypt file
+ * Uses the StreamedFileStorage implementation for better memory efficiency
  */
 export const readFileSecurely = async (
   filePath: string,
   userId: string
 ): Promise<Buffer> => {
-  // Read encrypted file
-  const encryptedFile = await readFile(filePath);
-  
-  // Extract components
-  const salt = encryptedFile.subarray(0, 16);
-  const iv = encryptedFile.subarray(16, 32);
-  const authTag = encryptedFile.subarray(32, 48);
-  const encrypted = encryptedFile.subarray(48);
-  
-  // Get encryption key
-  const keySecret = env.FILE_ENCRYPTION_SECRET || 'default-secure-key-for-file-encryption';
-  
-  // Derive key using PBKDF2
-  const key = crypto.pbkdf2Sync(keySecret + userId, salt, 100000, 32, 'sha512');
-  
-  // Create decipher
-  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-  decipher.setAuthTag(authTag);
-  
-  // Decrypt
-  const decrypted = Buffer.concat([
-    decipher.update(encrypted),
-    decipher.final()
-  ]);
-  
-  return decrypted;
+  try {
+    // Use the StreamedFileStorage implementation which handles smart selection 
+    // between streaming and buffering based on file size
+    return await StreamedFileStorage.readFileSecurely(filePath, userId);
+  } catch (error) {
+    logger.error(`Error reading file securely: ${filePath}`, error);
+    throw new Error(`Failed to read file securely: ${error instanceof Error ? error.message : String(error)}`);
+  }
 };
 
 /**
- * Securely delete a file
+ * Securely delete a file using streaming for better memory efficiency
  */
 export const secureDeleteFile = async (filePath: string): Promise<boolean> => {
   try {
     // Verify file exists
     try {
-      await access(filePath, fs.constants.F_OK);
+      await fsPromises.access(filePath, fs.constants.F_OK);
     } catch (err) {
       logger.info(`File does not exist, skipping deletion: ${filePath}`);
       return false;
     }
     
     // Get file size
-    const stats = await stat(filePath);
+    const stats = await fsPromises.stat(filePath);
     const fileSize = stats.size;
     
-    // Open file for writing
-    const fd = await open(filePath, 'w');
-    
-    try {
-      // Multiple pass overwrite (simplified for implementation)
-      for (let pass = 0; pass < 3; pass++) {
-        // Create buffer with random data
-        const buffer = crypto.randomBytes(8192); // 8KB chunks
-        
-        // Write buffer repeatedly until file is overwritten
-        let bytesWritten = 0;
-        while (bytesWritten < fileSize) {
-          const writeSize = Math.min(buffer.length, fileSize - bytesWritten);
-          await fs.promises.write(fd, buffer, 0, writeSize, bytesWritten);
-          bytesWritten += writeSize;
+    // For small files (< 1MB), use the original approach
+    if (fileSize < 1024 * 1024) {
+      // Open file for writing
+      const fd = await fsPromises.open(filePath, 'w');
+      
+      try {
+        // Multiple pass overwrite (simplified for implementation)
+        for (let pass = 0; pass < 3; pass++) {
+          // Create buffer with random data
+          const buffer = crypto.randomBytes(8192); // 8KB chunks
+          
+          // Write buffer repeatedly until file is overwritten
+          let bytesWritten = 0;
+          while (bytesWritten < fileSize) {
+            const writeSize = Math.min(buffer.length, fileSize - bytesWritten);
+            await fd.write(buffer, 0, writeSize, bytesWritten);
+            bytesWritten += writeSize;
+          }
+          
+          // Flush to disk
+          await fd.sync();
         }
-        
-        // Flush to disk
-        await fsync(fd);
+      } finally {
+        // Close file
+        await fd.close();
       }
-    } finally {
-      // Close file
-      await close(fd);
+    } else {
+      // For larger files, use a streaming approach
+      logger.info(`Using streaming for secure deletion of large file: ${filePath} (${fileSize} bytes)`);
+      
+      for (let pass = 0; pass < 3; pass++) {
+        // Create a random data transform stream
+        const randomDataStream = new Transform({
+          transform(chunk, encoding, callback) {
+            // Replace with random data
+            const randomChunk = crypto.randomBytes(chunk.length);
+            callback(null, randomChunk);
+          }
+        });
+        
+        // Create write stream to the file
+        const writeStream = createWriteStream(filePath);
+        
+        // Create source stream with the correct length
+        const source = crypto.randomBytes(Math.min(64 * 1024, fileSize)); // Use a 64KB buffer
+        const sourceStream = {
+          [Symbol.asyncIterator]: async function*() {
+            let remaining = fileSize;
+            while (remaining > 0) {
+              const chunkSize = Math.min(source.length, remaining);
+              yield source.subarray(0, chunkSize);
+              remaining -= chunkSize;
+            }
+          }
+        };
+        
+        // Process the streams
+        await pipeline(sourceStream, randomDataStream, writeStream);
+      }
     }
     
     // Delete the overwritten file
-    await unlink(filePath);
+    await fsPromises.unlink(filePath);
     logger.info(`Securely deleted file: ${filePath}`);
     
     return true;
