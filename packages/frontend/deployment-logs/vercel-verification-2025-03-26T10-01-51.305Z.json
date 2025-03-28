@@ -1,0 +1,132 @@
+{
+  "timestamp": "2025-03-26T10:01:51.680Z",
+  "baseUrl": "https://dist-awirridfu-zurychhhs-projects.vercel.app",
+  "results": {
+    "routes": {
+      "results": [
+        {
+          "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/",
+          "status": 401,
+          "headers": {
+            "cache-control": "no-store, max-age=0",
+            "content-length": "13057",
+            "content-type": "text/html; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 10:01:51 GMT",
+            "server": "Vercel",
+            "set-cookie": [
+              "_vercel_sso_nonce=k7MxjChYNbHKJJaxN2udL5yg; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-frame-options": "DENY",
+            "x-robots-tag": "noindex",
+            "x-vercel-id": "arn1::75qnd-1742983311509-da57475cd074"
+          },
+          "data": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Authentication Required</title><style>/*!normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css*/html{line-height:1.15;-webkit-text-size-adjust:100%;height:-webkit-fill-available}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color...",
+          "success": false
+        },
+        {
+          "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark",
+          "status": 401,
+          "headers": {
+            "cache-control": "no-store, max-age=0",
+            "content-length": "13081",
+            "content-type": "text/html; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 10:01:51 GMT",
+            "server": "Vercel",
+            "set-cookie": [
+              "_vercel_sso_nonce=mqS1lVCypYNKC9Z8Q97ICHkp; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-frame-options": "DENY",
+            "x-robots-tag": "noindex",
+            "x-vercel-id": "arn1::75qnd-1742983311567-e052f68007ee"
+          },
+          "data": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Authentication Required</title><style>/*!normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css*/html{line-height:1.15;-webkit-text-size-adjust:100%;height:-webkit-fill-available}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color...",
+          "success": false
+        },
+        {
+          "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark/convert",
+          "status": 401,
+          "headers": {
+            "cache-control": "no-store, max-age=0",
+            "content-length": "13111",
+            "content-type": "text/html; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 10:01:51 GMT",
+            "server": "Vercel",
+            "set-cookie": [
+              "_vercel_sso_nonce=a6fwiAgfh0zJ7nQozKRzip15; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-frame-options": "DENY",
+            "x-robots-tag": "noindex",
+            "x-vercel-id": "arn1::75qnd-1742983311605-6752d497d1a2"
+          },
+          "data": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Authentication Required</title><style>/*!normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css*/html{line-height:1.15;-webkit-text-size-adjust:100%;height:-webkit-fill-available}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color...",
+          "success": false
+        },
+        {
+          "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark/product",
+          "status": 401,
+          "headers": {
+            "cache-control": "no-store, max-age=0",
+            "content-length": "13111",
+            "content-type": "text/html; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 10:01:51 GMT",
+            "server": "Vercel",
+            "set-cookie": [
+              "_vercel_sso_nonce=Glm9WAu3booFbGKAcnDY5t8D; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-frame-options": "DENY",
+            "x-robots-tag": "noindex",
+            "x-vercel-id": "arn1::wzjsw-1742983311642-82bd33ec9bdf"
+          },
+          "data": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Authentication Required</title><style>/*!normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css*/html{line-height:1.15;-webkit-text-size-adjust:100%;height:-webkit-fill-available}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color...",
+          "success": false
+        },
+        {
+          "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark/pricing",
+          "status": 401,
+          "headers": {
+            "cache-control": "no-store, max-age=0",
+            "content-length": "13111",
+            "content-type": "text/html; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 10:01:51 GMT",
+            "server": "Vercel",
+            "set-cookie": [
+              "_vercel_sso_nonce=MCMSvpHo0viCBtMVxHFJNMWc; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-frame-options": "DENY",
+            "x-robots-tag": "noindex",
+            "x-vercel-id": "arn1::wzjsw-1742983311681-c85ed073e2bd"
+          },
+          "data": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Authentication Required</title><style>/*!normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css*/html{line-height:1.15;-webkit-text-size-adjust:100%;height:-webkit-fill-available}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color...",
+          "success": false
+        },
+        {
+          "url": "https://dist-awirridfu-zurychhhs-projects.vercel.app/pdfspark/about",
+          "status": 401,
+          "headers": {
+            "cache-control": "no-store, max-age=0",
+            "content-length": "13105",
+            "content-type": "text/html; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 10:01:51 GMT",
+            "server": "Vercel",
+            "set-cookie": [
+              "_vercel_sso_nonce=rcbZjMxhXLBSUwUo0D4p8RGI; Max-Age=3600; Path=/; Secure; HttpOnly; SameSite=Lax"
+            ],
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-frame-options": "DENY",
+            "x-robots-tag": "noindex",
+            "x-vercel-id": "arn1::wzjsw-1742983311718-3bec690c9994"
+          },
+          "data": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Authentication Required</title><style>/*!normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css*/html{line-height:1.15;-webkit-text-size-adjust:100%;height:-webkit-fill-available}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color...",
+          "success": false
+        }
+      ],
+      "success": false
+    }
+  },
+  "approved": false
+}

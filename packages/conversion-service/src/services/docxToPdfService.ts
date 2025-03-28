@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { promises as fsPromises } from 'fs';
 import path from 'path';
 import mammoth from 'mammoth';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
@@ -28,15 +29,17 @@ export async function convertDocxToPdf(
   
   try {
     // Make sure input file exists
-    if (!fs.existsSync(inputPath)) {
+    try {
+      await fsPromises.access(inputPath, fs.constants.F_OK);
+    } catch (err) {
       throw new Error(`Input file not found: ${inputPath}`);
     }
     
     // Create output directory if it doesn't exist
     const outputDir = path.dirname(outputPath);
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
+    await fsPromises.mkdir(outputDir, { recursive: true }).catch(() => {
+      // Directory already exists, ignore error
+    });
     
     // Extract HTML content from DOCX using mammoth
     const result = await mammoth.convertToHtml({ path: inputPath });
@@ -64,7 +67,7 @@ export async function convertDocxToPdf(
     
     // Save the PDF
     const pdfBytes = await pdfDoc.save();
-    fs.writeFileSync(outputPath, pdfBytes);
+    await fsPromises.writeFile(outputPath, pdfBytes);
     
     const conversionTime = Date.now() - startTime;
     

@@ -1,0 +1,14 @@
+{
+  "name": "pdfspark-frontend-fixed",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "serve -s",
+    "build": "npx vite build",
+    "vercel-build": "npx vite build"
+  },
+  "dependencies": {
+    "vite": "^5.1.6"
+  }
+}

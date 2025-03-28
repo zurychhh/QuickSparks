@@ -1,28 +1,70 @@
 import axios, { AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios';
 import { captureException } from '@utils/sentry';
+import { API_CONFIG, logDebug, normalizeUrlPath } from '../config/api.config';
 
 // Create an axios instance with default config
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: API_CONFIG.baseUrl,
+  timeout: API_CONFIG.timeout,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json'
   },
+  withCredentials: true // For cookies if needed
 });
+
+// Store CSRF token in memory (not localStorage)
+let csrfToken: string | null = null;
+
+// Function to fetch CSRF token
+const fetchCsrfToken = async (): Promise<string> => {
+  try {
+    // Only fetch a new token if we don't have one
+    if (!csrfToken) {
+      const response = await api.get('/auth/csrf-token');
+      if (response.data?.token) {
+        csrfToken = response.data.token;
+      }
+    }
+    return csrfToken || '';
+  } catch (error) {
+    console.error('Failed to fetch CSRF token:', error);
+    return '';
+  }
+};
 
 // Interceptor to handle request
 api.interceptors.request.use(
-  (config) => {
-    // Get token from local storage
-    const token = localStorage.getItem('authToken');
+  async (config) => {
+    // Log request for debugging
+    logDebug(`Sending request to: ${config.url}`, config);
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     
-    // If token exists, add it to the request header
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Add CSRF token to mutating requests (except for the CSRF token endpoint itself)
+    if (
+      ['POST', 'PUT', 'PATCH', 'DELETE'].includes(config.method?.toUpperCase() || '') &&
+      !(config.url?.includes('/auth/csrf-token'))
+    ) {
+      try {
+        const token = await fetchCsrfToken();
+        if (token) {
+          config.headers['X-CSRF-Token'] = token;
+        }
+      } catch (tokenError) {
+        console.error('Error setting CSRF token:', tokenError);
+      }
+    }
+    
+    // Log request payload for debugging
+    if (config.data && typeof config.data !== 'string' && !(config.data instanceof FormData)) {
+      console.log('Request payload:', config.data);
     }
     
     return config;
   },
   (error) => {
+    logDebug('Request error:', error);
+    console.error('Request error:', error);
     captureException(error);
     return Promise.reject(error);
   }
@@ -30,19 +72,68 @@ api.interceptors.request.use(
 
 // Interceptor to handle response
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    logDebug('Received response:', response);
+    console.log(`API Response: ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`);
+    return response;
+  },
   (error) => {
+    logDebug('Response error:', error);
+    console.error('API Error:', error.message);
+    
     // Log error to Sentry
     captureException(error);
     
-    // Handle 401 Unauthorized
-    if (error.response && error.response.status === 401) {
-      // Clear authentication data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
+    // Enhanced error handling with more detailed logging
+    if (error.response) {
+      // Server returned an error response
+      const status = error.response.status;
+      const method = error.config?.method?.toUpperCase() || 'UNKNOWN';
+      const url = error.config?.url || 'unknown-url';
       
-      // Redirect to login page
-      window.location.href = '/login';
+      // Log detailed error information
+      console.error(`API Error [${status}] for ${method} ${url}:`, error.response.data);
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+      console.error('Request headers:', error.config?.headers);
+      
+      // Detailed handling for common error codes
+      if (status === 401) {
+        // No need to remove items from localStorage
+        // The server should invalidate the cookie in the response
+        // Auth state should be managed centrally in the app
+        console.log('Authentication error, redirecting to login page');
+        
+        // Redirect to login page
+        window.location.href = '/login';
+      } else if (status === 405) {
+        // Method Not Allowed - Log additional debugging information
+        console.error('405 Method Not Allowed Error Details:');
+        console.error('- Requested URL:', url);
+        console.error('- Method Used:', method);
+        console.error('- Available Methods:', error.response.headers['allow'] || 'Not specified in response');
+        console.error('- Content Type:', error.config?.headers['Content-Type'] || 'Not specified');
+        console.error('- Base URL configured:', api.defaults.baseURL);
+      } else if (status === 404) {
+        // Not Found - Log endpoint information
+        console.error('404 Not Found Error Details:');
+        console.error('- Requested URL:', url);
+        console.error('- Full URL:', error.config?.baseURL ? `${error.config.baseURL}${url}` : url);
+      } else if (status === 500) {
+        // Server Error - Log server error information
+        console.error('500 Server Error Details:');
+        console.error('- Error Message:', error.response.data.message || 'No specific error message');
+      }
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('No response received');
+      console.error('Request URL:', error.config?.url);
+      console.error('Request Method:', error.config?.method?.toUpperCase());
+      console.error('Request Headers:', error.config?.headers);
+    } else {
+      // Error in setting up the request
+      console.error('Error setup:', error.message);
     }
     
     return Promise.reject(error);
@@ -80,19 +171,38 @@ export const uploadFile = ({
   // Create FormData instance
   const formData = new FormData();
   
+  console.log(`Starting file upload to: ${API_CONFIG.baseUrl}${API_CONFIG.endpoints.convert}`);
+  console.log('Form data keys being sent:');
+  
   // Append file to form data
   formData.append('file', file);
+  console.log('- file');
   
   // Append additional data
   Object.entries(additionalData).forEach(([key, value]) => {
-    formData.append(key, typeof value === 'string' ? value : JSON.stringify(value));
+    // Convert values properly for FormData
+    if (typeof value === 'boolean' || typeof value === 'object') {
+      formData.append(key, JSON.stringify(value));
+    } else {
+      formData.append(key, String(value));
+    }
+    console.log(`- ${key}`);
   });
   
-  // Request config
+  console.log('File details:', {
+    name: file.name,
+    type: file.type,
+    size: `${(file.size / 1024 / 1024).toFixed(2)} MB`
+  });
+  
+  // Request config with enhanced CORS support
   const config: AxiosRequestConfig = {
     headers: {
       'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
     },
+    withCredentials: true, // Important for CORS with cookies
     onUploadProgress: (progressEvent) => {
       if (onProgress && progressEvent.total) {
         const loaded = progressEvent.loaded;
@@ -100,6 +210,7 @@ export const uploadFile = ({
         const percentage = Math.round((loaded * 100) / total);
         
         onProgress({ loaded, total, percentage });
+        console.log(`Upload progress: ${percentage}%`);
       }
     },
   };
@@ -109,14 +220,55 @@ export const uploadFile = ({
     config.cancelToken = cancelToken.token;
   }
   
-  // Make request
-  api.post('/conversions/upload', formData, config)
+  // Normalize the upload endpoint - use a clean endpoint without double slashes
+  // We already have trailing slashes in the endpoints config
+  const endpoint = API_CONFIG.endpoints.convert;
+  
+  // Make request with detailed logging
+  logDebug('Uploading file', { 
+    fileName: file.name, 
+    fileSize: file.size, 
+    fileType: file.type,
+    endpoint: endpoint,
+    baseUrl: API_CONFIG.baseUrl
+  });
+  
+  api.post(endpoint, formData, config)
     .then((response) => {
+      logDebug('Upload successful', response.data);
+      console.log('File successfully uploaded:', file.name);
+      
+      // Handle different response structures
+      let responseData = response.data;
+      
+      // If the response is wrapped in a 'data' property, unwrap it
+      if (responseData && responseData.data) {
+        responseData = {
+          ...responseData,
+          data: responseData.data
+        };
+      }
+      
       if (onSuccess) {
-        onSuccess(response);
+        onSuccess({
+          ...response,
+          data: responseData
+        });
       }
     })
     .catch((error) => {
+      logDebug('Upload failed', error);
+      console.error(`File upload failed: ${file.name}`, error.message);
+      
+      // Add more context to error logging
+      if (error.response) {
+        console.error('Server responded with error:', error.response.data);
+      } else if (error.request) {
+        console.error('No response received from server');
+      } else {
+        console.error('Error setting up request:', error.message);
+      }
+      
       if (onError) {
         onError(error);
       }
@@ -128,9 +280,41 @@ export const uploadFile = ({
  */
 export const getConversionStatus = async (conversionId: string): Promise<any> => {
   try {
-    const response = await api.get(`/conversions/${conversionId}`);
-    return response.data;
+    // Create endpoint without double slashes
+    const endpoint = `${API_CONFIG.endpoints.status}${conversionId}`;
+    
+    logDebug(`Checking conversion status for: ${conversionId} at endpoint: ${endpoint}`);
+    console.log(`Making status request to: ${API_CONFIG.baseUrl}${endpoint}`);
+    
+    const response = await api.get(endpoint);
+    logDebug('Conversion status response:', response.data);
+    
+    // Handle different response structures
+    let responseData = response.data;
+    
+    // For compatibility with different API formats
+    if (response.data && typeof response.data === 'object') {
+      // If the data is already properly structured, return it
+      if (response.data.status) {
+        responseData = response.data;
+      } 
+      // If the data is wrapped in a data property
+      else if (response.data.data && response.data.data.status) {
+        responseData = response.data.data;
+      }
+    }
+    
+    console.log('Processed status response:', responseData);
+    return { data: responseData };
   } catch (error) {
+    logDebug(`Status check failed for conversion: ${conversionId}`, error);
+    console.error(`Status check error details for ${conversionId}:`, error);
+    
+    // Add more detailed error logging
+    if (error.response) {
+      console.error('Server responded with:', error.response.status, error.response.data);
+    }
+    
     captureException(error);
     throw error;
   }
@@ -146,9 +330,12 @@ export const getUserConversions = async (page: number = 1, limit: number = 10, s
       params.status = status;
     }
     
-    const response = await api.get('/conversions', { params });
+    logDebug('Fetching user conversions', params);
+    const response = await api.get(API_CONFIG.endpoints.status, { params });
+    logDebug('User conversions response:', response.data);
     return response.data;
   } catch (error) {
+    logDebug('Failed to fetch user conversions', error);
     captureException(error);
     throw error;
   }
@@ -159,9 +346,12 @@ export const getUserConversions = async (page: number = 1, limit: number = 10, s
  */
 export const generateThumbnail = async (fileId: string, options: { page?: number; width?: number } = {}): Promise<any> => {
   try {
-    const response = await api.post(`/thumbnails/generate/${fileId}`, options);
+    logDebug(`Generating thumbnail for file: ${fileId}`, options);
+    const response = await api.post(`${API_CONFIG.endpoints.thumbnails}/generate/${fileId}`, options);
+    logDebug('Thumbnail generated successfully', response.data);
     return response.data;
   } catch (error) {
+    logDebug(`Failed to generate thumbnail for file: ${fileId}`, error);
     captureException(error);
     throw error;
   }
@@ -190,9 +380,52 @@ export const getDownloadToken = async (fileId: string, expiresIn?: number): Prom
       params.expiresIn = expiresIn;
     }
     
-    const response = await api.get(`/downloads/token/${fileId}`, { params });
-    return response.data;
+    // Create clean endpoint without double slashes
+    const endpoint = `${API_CONFIG.endpoints.download}${fileId}`;
+    
+    logDebug(`Getting download token for file: ${fileId} at endpoint: ${endpoint}`);
+    console.log(`Making download token request to: ${API_CONFIG.baseUrl}${endpoint}`);
+    
+    const response = await api.get(endpoint, { params });
+    logDebug('Download token response:', response.data);
+    
+    // Handle different response structures
+    let downloadData = response.data;
+    
+    // If the response is wrapped in a data property, unwrap it
+    if (response.data && response.data.data) {
+      downloadData = response.data.data;
+    }
+    
+    // Ensure downloadUrl is available
+    if (!downloadData.downloadUrl && downloadData.url) {
+      downloadData.downloadUrl = downloadData.url;
+    }
+    
+    console.log('Processed download token:', downloadData);
+    return { data: downloadData };
   } catch (error) {
+    logDebug(`Failed to get download token for file: ${fileId}`, error);
+    console.error(`Download token error details for ${fileId}:`, error);
+    
+    // Add more detailed error logging
+    if (error.response) {
+      console.error('Server responded with:', error.response.status, error.response.data);
+      
+      // Handle payment required error specifically
+      if (error.response.status === 402) {
+        console.log('Payment required for download - returning controlled error');
+        return { 
+          data: { 
+            error: 'Payment required',
+            status: 402,
+            message: 'Payment is required to download this file',
+            paymentRequired: true
+          }
+        };
+      }
+    }
+    
     captureException(error);
     throw error;
   }
@@ -335,6 +568,20 @@ export const createCustomerPortalSession = async (): Promise<any> => {
   } catch (error) {
     captureException(error);
     throw error;
+  }
+};
+
+/**
+ * Test CORS configuration
+ */
+export const testCors = async (): Promise<boolean> => {
+  try {
+    const response = await api.get(API_CONFIG.endpoints.corsTest);
+    console.log('CORS test successful!', response.data);
+    return true;
+  } catch (error) {
+    console.error('CORS test failed:', error);
+    return false;
   }
 };
 

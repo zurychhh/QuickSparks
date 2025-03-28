@@ -1,0 +1,19 @@
+{
+  "date": "2025-03-26T11-29-24",
+  "results": [
+    {
+      "url": "http://localhost:3000/pdfspark/",
+      "performance": 100,
+      "accessibility": 59,
+      "bestPractices": 86,
+      "seo": 80,
+      "reportFile": "/Users/user/conversion-microservices/packages/frontend/test-reports/lighthouse/2025-03-26T11-29-24-home.html"
+    }
+  ],
+  "averages": {
+    "performance": 100,
+    "accessibility": 59,
+    "bestPractices": 86,
+    "seo": 80
+  }
+}

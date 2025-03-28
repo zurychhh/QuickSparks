@@ -1,0 +1,37 @@
+{
+  "/": {
+    "status": 308,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  },
+  "/pdfspark": {
+    "status": 404,
+    "success": false,
+    "snippet": "The page could not be found\n\nNOT_FOUND\n\narn1::54gx"
+  },
+  "/pdfspark/": {
+    "status": 404,
+    "success": false,
+    "snippet": "The page could not be found\n\nNOT_FOUND\n\narn1::54gx"
+  },
+  "/pdfspark/convert": {
+    "status": 404,
+    "success": false,
+    "snippet": "The page could not be found\n\nNOT_FOUND\n\narn1::54gx"
+  },
+  "/pdfspark/product": {
+    "status": 404,
+    "success": false,
+    "snippet": "The page could not be found\n\nNOT_FOUND\n\narn1::54gx"
+  },
+  "/pdfspark/pricing": {
+    "status": 404,
+    "success": false,
+    "snippet": "The page could not be found\n\nNOT_FOUND\n\narn1::54gx"
+  },
+  "/pdfspark/about": {
+    "status": 404,
+    "success": false,
+    "snippet": "The page could not be found\n\nNOT_FOUND\n\narn1::54gx"
+  }
+}

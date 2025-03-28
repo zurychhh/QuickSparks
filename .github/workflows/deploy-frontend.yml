@@ -2,9 +2,14 @@ name: Deploy Frontend
 
 on:
   push:
-    branches: [main]
+    branches: [main, production]
     paths:
       - 'packages/frontend/**'
+      - 'packages/services/api/src/utils/streamedFileStorage.ts'
+      - 'packages/services/api/src/utils/streamUtils.ts'
+      - 'packages/services/api/src/utils/encryption/**'
+      - 'packages/services/api/src/utils/memoryMonitor.ts'
+      - 'packages/services/api/src/middleware/streamedFileUpload.ts'
       - '.github/workflows/deploy-frontend.yml'
   workflow_dispatch:
 

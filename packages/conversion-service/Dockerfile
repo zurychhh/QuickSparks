@@ -1,5 +1,19 @@
 FROM node:20-slim AS builder
 
+# Install dependencies for PDF processing
+RUN apt-get update && apt-get install -y \
+    g++ \
+    make \
+    python3 \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev \
+    fonts-dejavu \
+    fontconfig && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install dependencies first to leverage Docker cache
@@ -14,6 +28,17 @@ RUN npm run build
 
 # Create production image
 FROM node:20-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libcairo2 \
+    libpango1.0-0 \
+    libjpeg62-turbo \
+    libgif7 \
+    librsvg2-2 \
+    fonts-dejavu \
+    fontconfig && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

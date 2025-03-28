@@ -1,10 +1,66 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "version": 2,
+  "public": true,
+  "routes": [
+    {
+      "src": "/api/conversions/upload(/?.*)",
+      "methods": ["OPTIONS", "POST"],
+      "dest": "https://pdfspark-conversion-service.onrender.com/api/conversions/upload$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://pdfspark.app",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Content-Length, Authorization, Accept, Origin, Content-Disposition",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Max-Age": "86400"
+      }
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "https://pdfspark-conversion-service.onrender.com/api/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://pdfspark.app",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept, Origin, Content-Disposition",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Expose-Headers": "Content-Disposition"
+      }
+    },
+    {
+      "src": "/socket.io/(.*)",
+      "dest": "https://pdfspark-conversion-service.onrender.com/socket.io/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://pdfspark.app",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept, Origin",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
-  "buildCommand": "pnpm run build:vercel",
-  "devCommand": "pnpm run dev",
-  "installCommand": "pnpm install --no-frozen-lockfile",
-  "outputDirectory": "dist",
-  "framework": "vite"
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://ajax.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://pdfspark-conversion-service.onrender.com; frame-ancestors 'none';" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/hash-router-monitor.js",
+      "headers": [{ "key": "Content-Type", "value": "text/javascript" }]
+    }
+  ]
 }

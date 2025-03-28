@@ -1,0 +1,452 @@
+{
+  "timestamp": "2025-03-25T18:51:14.776Z",
+  "baseUrl": "https://quicksparks.dev/pdfspark",
+  "results": {
+    "routes": {
+      "results": [
+        {
+          "url": "https://quicksparks.dev/pdfspark",
+          "status": 200,
+          "success": true,
+          "headers": {
+            "accept-ranges": [
+              "bytes"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "age": [
+              "0"
+            ],
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-disposition": [
+              "inline; filename=\"pdfspark\""
+            ],
+            "content-encoding": [
+              "br"
+            ],
+            "content-length": [
+              "759"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Tue, 25 Mar 2025 18:51:11 GMT"
+            ],
+            "etag": [
+              "\"12207a535d94b44bb84d4648ac6886f3\""
+            ],
+            "last-modified": [
+              "Tue, 25 Mar 2025 18:51:11 GMT"
+            ],
+            "permissions-policy": [
+              "camera=(), microphone=(), geolocation=()"
+            ],
+            "referrer-policy": [
+              "strict-origin-when-cross-origin"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=31536000; includeSubDomains; preload"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-vercel-cache": [
+              "HIT"
+            ],
+            "x-vercel-id": [
+              "arn1::q2psw-1742928671277-42cb14b9f987"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ]
+          }
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/product",
+          "status": 200,
+          "success": true,
+          "headers": {
+            "accept-ranges": [
+              "bytes"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "age": [
+              "0"
+            ],
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-disposition": [
+              "inline; filename=\"index.html\""
+            ],
+            "content-encoding": [
+              "br"
+            ],
+            "content-length": [
+              "759"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Tue, 25 Mar 2025 18:51:12 GMT"
+            ],
+            "etag": [
+              "\"12207a535d94b44bb84d4648ac6886f3\""
+            ],
+            "last-modified": [
+              "Tue, 25 Mar 2025 18:51:12 GMT"
+            ],
+            "permissions-policy": [
+              "camera=(), microphone=(), geolocation=()"
+            ],
+            "referrer-policy": [
+              "strict-origin-when-cross-origin"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=31536000; includeSubDomains; preload"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-vercel-cache": [
+              "HIT"
+            ],
+            "x-vercel-id": [
+              "arn1::bwf4n-1742928672221-96b425c68d30"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ]
+          }
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/pricing",
+          "status": 200,
+          "success": true,
+          "headers": {
+            "accept-ranges": [
+              "bytes"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "age": [
+              "0"
+            ],
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-disposition": [
+              "inline; filename=\"index.html\""
+            ],
+            "content-encoding": [
+              "br"
+            ],
+            "content-length": [
+              "759"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Tue, 25 Mar 2025 18:51:12 GMT"
+            ],
+            "etag": [
+              "\"12207a535d94b44bb84d4648ac6886f3\""
+            ],
+            "last-modified": [
+              "Tue, 25 Mar 2025 18:51:12 GMT"
+            ],
+            "permissions-policy": [
+              "camera=(), microphone=(), geolocation=()"
+            ],
+            "referrer-policy": [
+              "strict-origin-when-cross-origin"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=31536000; includeSubDomains; preload"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-vercel-cache": [
+              "HIT"
+            ],
+            "x-vercel-id": [
+              "arn1::2k2ng-1742928672911-5d7ce18d5f6c"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ]
+          }
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/convert",
+          "status": 200,
+          "success": true,
+          "headers": {
+            "accept-ranges": [
+              "bytes"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "age": [
+              "0"
+            ],
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-disposition": [
+              "inline; filename=\"index.html\""
+            ],
+            "content-encoding": [
+              "br"
+            ],
+            "content-length": [
+              "759"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Tue, 25 Mar 2025 18:51:13 GMT"
+            ],
+            "etag": [
+              "\"12207a535d94b44bb84d4648ac6886f3\""
+            ],
+            "last-modified": [
+              "Tue, 25 Mar 2025 18:51:12 GMT"
+            ],
+            "permissions-policy": [
+              "camera=(), microphone=(), geolocation=()"
+            ],
+            "referrer-policy": [
+              "strict-origin-when-cross-origin"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=31536000; includeSubDomains; preload"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-vercel-cache": [
+              "HIT"
+            ],
+            "x-vercel-id": [
+              "arn1::j5lv6-1742928673319-8b123eaa14f0"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ]
+          }
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/about",
+          "status": 200,
+          "success": true,
+          "headers": {
+            "accept-ranges": [
+              "bytes"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "age": [
+              "0"
+            ],
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-disposition": [
+              "inline; filename=\"index.html\""
+            ],
+            "content-encoding": [
+              "br"
+            ],
+            "content-length": [
+              "759"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Tue, 25 Mar 2025 18:51:13 GMT"
+            ],
+            "etag": [
+              "\"12207a535d94b44bb84d4648ac6886f3\""
+            ],
+            "last-modified": [
+              "Tue, 25 Mar 2025 18:51:12 GMT"
+            ],
+            "permissions-policy": [
+              "camera=(), microphone=(), geolocation=()"
+            ],
+            "referrer-policy": [
+              "strict-origin-when-cross-origin"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=31536000; includeSubDomains; preload"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-vercel-cache": [
+              "HIT"
+            ],
+            "x-vercel-id": [
+              "arn1::bwf6k-1742928673533-d084337df110"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ]
+          }
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/health",
+          "status": 200,
+          "success": true,
+          "headers": {
+            "accept-ranges": [
+              "bytes"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "age": [
+              "1"
+            ],
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-disposition": [
+              "inline; filename=\"index.html\""
+            ],
+            "content-encoding": [
+              "br"
+            ],
+            "content-length": [
+              "759"
+            ],
+            "content-type": [
+              "text/html; charset=utf-8"
+            ],
+            "date": [
+              "Tue, 25 Mar 2025 18:51:13 GMT"
+            ],
+            "etag": [
+              "\"12207a535d94b44bb84d4648ac6886f3\""
+            ],
+            "last-modified": [
+              "Tue, 25 Mar 2025 18:51:12 GMT"
+            ],
+            "permissions-policy": [
+              "camera=(), microphone=(), geolocation=()"
+            ],
+            "referrer-policy": [
+              "strict-origin-when-cross-origin"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=31536000; includeSubDomains; preload"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "x-frame-options": [
+              "DENY"
+            ],
+            "x-vercel-cache": [
+              "HIT"
+            ],
+            "x-vercel-id": [
+              "arn1::tq6mk-1742928673734-399d56aa3828"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ]
+          }
+        }
+      ],
+      "success": true
+    },
+    "securityHeaders": {
+      "headers": {
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "Content-Security-Policy": null,
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+      },
+      "success": true
+    },
+    "healthCheck": {
+      "success": true
+    },
+    "seoFiles": {
+      "robotsTxt": false,
+      "sitemapXml": false,
+      "success": false
+    }
+  },
+  "approved": true
+}

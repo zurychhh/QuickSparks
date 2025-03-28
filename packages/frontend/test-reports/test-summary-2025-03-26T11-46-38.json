@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-03-26T11-46-38",
+  "categories": {
+    "functional": {
+      "status": "failed",
+      "error": "Command failed: npm run test:functional\n(node:69932) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:69935) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:69933) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:69934) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:69936) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K⚠️ Could not verify any backend URL. Using default...\n\u001b[1A\u001b[2K[chromium] › tests/playwright/cross-browser.spec.ts:207:3 › PDFSpark Cross-Browser Compatibility Tests › File upload works consistently across browsers\n⚠️ Could not verify any backend URL. Using default...\n\u001b[1A\u001b[2K(node:69960) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:69967) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:69968) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K(node:69981) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n\u001b[1A\u001b[2K[chromium] › tests/playwright/cross-browser.spec.ts:107:3 › PDFSpark Cross-Browser Compatibility Tests › Core UI functionality works across browsers\nError in chromium browser: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n"
+    },
+    "performance": {
+      "status": "passed"
+    },
+    "uiux": {
+      "status": "failed",
+      "error": "Command failed: npm run backstop:reference\n"
+    },
+    "crossBrowser": {
+      "status": "failed",
+      "error": "Command failed: npx playwright test --config=playwright.config.js --project=chromium --reporter=list\nError: playwright.config.js: config.reporter[0] must be a tuple [name, optionalArgument]\n    at errorWithFile (/Users/user/conversion-microservices/packages/frontend/node_modules/playwright/lib/util.js:178:10)\n    at /Users/user/conversion-microservices/packages/frontend/node_modules/playwright/lib/common/configLoader.js:191:135\n    at Array.forEach (<anonymous>)\n    at validateConfig (/Users/user/conversion-microservices/packages/frontend/node_modules/playwright/lib/common/configLoader.js:190:23)\n    at loadConfig (/Users/user/conversion-microservices/packages/frontend/node_modules/playwright/lib/common/configLoader.js:105:3)\n    at loadConfigFromFileRestartIfNeeded (/Users/user/conversion-microservices/packages/frontend/node_modules/playwright/lib/common/configLoader.js:289:10)\n    at runTests (/Users/user/conversion-microservices/packages/frontend/node_modules/playwright/lib/program.js:170:18)\n    at t.<anonymous> (/Users/user/conversion-microservices/packages/frontend/node_modules/playwright/lib/program.js:55:7)\n"
+    },
+    "api": {
+      "status": "passed"
+    },
+    "dataValidation": {
+      "status": "passed"
+    },
+    "deployment": {
+      "status": "skipped",
+      "message": "Docker prerequisites not met"
+    },
+    "seo": {
+      "status": "passed"
+    }
+  },
+  "startTime": "2025-03-26T11:46:38.919Z",
+  "endTime": "2025-03-26T11:48:02.354Z",
+  "overallStatus": "failed"
+}

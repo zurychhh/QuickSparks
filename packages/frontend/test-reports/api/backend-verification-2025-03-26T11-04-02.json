@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-03-26T11-04-02",
+  "healthEndpoint": {
+    "available": true,
+    "status": 404,
+    "isJson": false,
+    "isHtml": false,
+    "data": null,
+    "responseText": ""
+  },
+  "statusEndpoint": {
+    "available": true,
+    "status": 404,
+    "isJson": false,
+    "isHtml": false,
+    "data": null,
+    "responseText": ""
+  },
+  "backendAvailable": true,
+  "conclusion": "Real backend detected"
+}
