@@ -585,4 +585,45 @@ export const testCors = async (): Promise<boolean> => {
   }
 };
 
+/**
+ * Check API health status
+ * Simple non-authenticated endpoint to verify API connectivity
+ */
+export const checkApiHealth = async (): Promise<{
+  isHealthy: boolean;
+  message?: string;
+  details?: any;
+}> => {
+  try {
+    const response = await api.get('/health');
+    console.log('API health check successful:', response.data);
+    return {
+      isHealthy: true,
+      message: 'API is healthy',
+      details: response.data
+    };
+  } catch (error) {
+    console.error('API health check failed:', error);
+    
+    let errorMessage = 'API health check failed';
+    let details = null;
+    
+    if (error.response) {
+      errorMessage = `API returned error status: ${error.response.status}`;
+      details = error.response.data;
+    } else if (error.request) {
+      errorMessage = 'No response received from API';
+      details = { requestSent: true, responseReceived: false };
+    } else {
+      errorMessage = `Error making request: ${error.message}`;
+    }
+    
+    return {
+      isHealthy: false,
+      message: errorMessage,
+      details
+    };
+  }
+};
+
 export default api;

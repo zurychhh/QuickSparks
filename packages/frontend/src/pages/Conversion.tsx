@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import DOMPurify from 'dompurify';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   uploadFile,
   createCancelToken,
@@ -18,6 +17,13 @@ import FilePreview from '../components/ui/FilePreview';
 import ConversionSteps, { ConversionStep } from '../components/ui/ConversionSteps';
 import ConversionOptions from '../components/ui/ConversionOptions';
 import CorsTest from '../components/CorsTest';
+import { sanitize, isSafeUrl } from '../utils/sanitize';
+import { validateFileBeforeUpload, getAcceptedFileTypes } from '../utils/fileValidation';
+import { saveConversionState, getConversionState, clearConversionState } from '../utils/stateManagement';
+import { createPollingStrategy } from '../utils/pollingStrategy';
+import { fetchWithRetry } from '../utils/fetchWithRetry';
+import ApiHealthMonitor from '../components/ApiHealthMonitor';
+
 // Fallback for FileViewer if the actual component isn't available
 const FileViewer = ({
   fileUrl,
@@ -27,28 +33,35 @@ const FileViewer = ({
   fileName: string;
   mimeType?: string;
 }) => {
+  // Validate URL safety before rendering
+  const isUrlSafe = isSafeUrl(fileUrl);
+  
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
       <div className="bg-gray-50 border-b p-3 sm:p-4">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-medium text-gray-900">File Preview</h3>
-          <a
-            href={fileUrl}
-            className="text-primary-600 text-sm font-medium hover:text-primary-700 flex items-center p-2 rounded-md"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Download file"
-          >
-            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
-            </svg>
-            <span className="hidden sm:inline">Download</span>
-          </a>
+          {isUrlSafe ? (
+            <a
+              href={fileUrl}
+              className="text-primary-600 text-sm font-medium hover:text-primary-700 flex items-center p-2 rounded-md"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Download file"
+            >
+              <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              <span className="hidden sm:inline">Download</span>
+            </a>
+          ) : (
+            <span className="text-red-500 text-sm p-2">Invalid URL</span>
+          )}
         </div>
       </div>
       <div className="p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center min-h-[200px] sm:min-h-[250px] md:min-h-[300px] bg-white">
@@ -68,28 +81,34 @@ const FileViewer = ({
           </svg>
         </div>
         <h4 className="text-base font-medium text-gray-900 mb-2 text-center">
-          {fileName ? DOMPurify.sanitize(fileName) : 'Your file'}
+          {sanitize(fileName) || 'Your file'}
         </h4>
         <p className="text-sm text-gray-500 mb-4 text-center px-2">
           Click the download button to save your converted file.
         </p>
-        <a
-          href={fileUrl}
-          className="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 border border-transparent text-base sm:text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transform hover:scale-105 transition-transform duration-200"
-          download
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-            />
-          </svg>
-          Download File
-        </a>
+        {isUrlSafe ? (
+          <a
+            href={fileUrl}
+            className="inline-flex items-center px-5 py-3 sm:px-4 sm:py-2 border border-transparent text-base sm:text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transform hover:scale-105 transition-transform duration-200"
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            Download File
+          </a>
+        ) : (
+          <div className="text-red-500 text-sm">
+            Link unavailable - Security validation failed
+          </div>
+        )}
       </div>
     </div>
   );
@@ -109,6 +128,7 @@ interface ConversionOptionsType {
 const ConversionPage: React.FC = (): React.ReactElement => {
   const { conversionId } = useParams<{ conversionId?: string }>();
   const feedbackContext = useFeedback();
+  const navigate = useNavigate();
   const errorHandler = useErrorHandler('ConversionPage', { 
     captureExceptions: true,
     showFeedback: true
@@ -153,6 +173,27 @@ const ConversionPage: React.FC = (): React.ReactElement => {
       setCurrentStep('download');
     }
   }, [selectedFile, uploadStatus]);
+  
+  // Load saved state on component mount - handle page refresh recovery
+  useEffect(() => {
+    // Only attempt to restore if no conversionId is provided in URL and no file is selected
+    if (!conversionId && !selectedFile) {
+      const savedState = getConversionState();
+      
+      if (savedState && savedState.conversionId) {
+        // Ask user if they want to resume
+        const resume = window.confirm(`Would you like to resume your previous ${savedState.conversionType} conversion?`);
+        
+        if (resume) {
+          // Set conversion ID and redirect to that state
+          navigate(`/convert/${savedState.conversionId}`);
+        } else {
+          // Clear saved state
+          clearConversionState();
+        }
+      }
+    }
+  }, [conversionId, selectedFile, navigate]);
 
   // Load existing conversion if ID is provided in URL
   useEffect(() => {
@@ -271,17 +312,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
     };
   }, [conversionId]);
 
-  // Determine accepted file types based on conversion type
-  const getAcceptedFileTypes = (): string[] => {
-    if (conversionType === 'pdf-to-docx') {
-      return ['application/pdf'];
-    } else {
-      return [
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/msword',
-      ];
-    }
-  };
+  // We now use the imported getAcceptedFileTypes function
 
   // Handle file selection
   const handleFileAccepted = (file: File): void => {
@@ -324,22 +355,159 @@ const ConversionPage: React.FC = (): React.ReactElement => {
     setCurrentStep('select');
     setUploadStatus('idle');
     setUploadProgress(null);
+    
+    // Clear the saved conversion state
+    clearConversionState();
 
     // Show feedback for file removal
     feedbackContext.showFeedback('info', 'File removed. Select a new file to convert.', 3000);
   };
 
-  // Ref to store the status polling interval
-  const statusPollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Create polling strategy with exponential backoff
+  const pollingStrategyRef = useRef(createPollingStrategy({
+    initialDelay: 2000,     // Start with 2 seconds
+    maxDelay: 10000,        // Cap at 10 seconds
+    backoffFactor: 1.5,     // Increase by 50% each time
+    minDelay: 1000          // Never go below 1 second
+  }));
   
-  // Cleanup function for status polling
+  // Reference for status polling timeout
+  const statusPollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Track API health state
+  const [isApiHealthy, setIsApiHealthy] = useState(true);
+  
+  // Define a robust status checking function with retry capabilities
+  const checkConversionStatus = async (conversionId: string) => {
+    // If API is not healthy, don't attempt to check status
+    if (!isApiHealthy) {
+      return;
+    }
+    
+    try {
+      // Use fetchWithRetry for better resilience
+      const statusResponse = await fetchWithRetry(
+        () => getConversionStatus(conversionId),
+        {
+          maxRetries: 3,
+          baseDelay: 1000,
+          shouldRetry: (error) => {
+            // Don't retry 404s (non-existent conversion) but retry other errors
+            return !error.response || error.response.status !== 404;
+          }
+        }
+      );
+      
+      const status = statusResponse.data.status;
+      
+      if (status === 'completed') {
+        // Clear the polling
+        pollingStrategyRef.current.cancel();
+        
+        // Hide the loading feedback
+        feedbackContext.hideFeedback();
+        
+        // Get download token - this may fail with 402 if payment is required
+        try {
+          const tokenResponse = await getDownloadToken(statusResponse.data.resultFile.id);
+          const downloadUrl = tokenResponse.data.downloadUrl;
+          
+          setConvertedFileUrl(downloadUrl);
+          setUploadStatus('success');
+          setIsConverting(false);
+          setCurrentStep('download');
+          
+          // Show success feedback
+          feedbackContext.showFeedback(
+            'success',
+            'Conversion completed successfully!',
+            5000,
+          );
+        } catch (err) {
+          // Handle payment required case
+          if (
+            err &&
+            typeof err === 'object' &&
+            'response' in err &&
+            err.response &&
+            typeof err.response === 'object' &&
+            'status' in err.response &&
+            err.response.status === 402
+          ) {
+            setUploadStatus('success');
+            setIsConverting(false);
+            setCurrentStep('download');
+            
+            // Show payment required feedback
+            feedbackContext.showFeedback(
+              'info',
+              'Your file is ready for download after payment',
+              5000,
+            );
+          } else {
+            throw err;
+          }
+        }
+      } else if (status === 'failed') {
+        // Clear the polling
+        pollingStrategyRef.current.cancel();
+        
+        const errorMsg = `Conversion failed: ${statusResponse.data.error || 'Unknown error'}`;
+        setError(errorMsg);
+        setUploadStatus('error');
+        setIsConverting(false);
+        
+        // Hide the loading feedback and show error
+        feedbackContext.hideFeedback();
+        feedbackContext.showFeedback('error', errorMsg, 5000);
+      } else {
+        // Still processing, schedule next check with exponential backoff
+        statusPollingTimeoutRef.current = pollingStrategyRef.current.scheduleNext(
+          () => checkConversionStatus(conversionId)
+        );
+      }
+    } catch (err) {
+      console.error('Status check error:', err);
+      
+      // If API is healthy but we got an error, it's likely a specific conversion issue
+      if (isApiHealthy) {
+        const errorMsg = 'Failed to check conversion status. Please try again.';
+        setError(errorMsg);
+        setUploadStatus('error');
+        setIsConverting(false);
+        
+        // Hide the loading feedback and show error
+        feedbackContext.hideFeedback();
+        feedbackContext.showFeedback('error', errorMsg, 5000);
+      }
+      
+      // We'll retry if the API becomes healthy again (via health monitor)
+    }
+  };
+  
+  // Handle API health status changes
+  const handleApiHealthChange = (healthy: boolean) => {
+    setIsApiHealthy(healthy);
+    
+    // If API becomes healthy again and we have an active conversion, restart polling
+    if (healthy && currentConversionId && uploadStatus === 'processing') {
+      // Reset the polling strategy to start fresh
+      pollingStrategyRef.current.reset();
+      
+      // Start polling again if we have an active conversion
+      checkConversionStatus(currentConversionId);
+    }
+  };
+  
+  // Cleanup function for polling
   useEffect(() => {
-    // Cleanup function to handle unmounting
     return () => {
-      if (statusPollingIntervalRef.current) {
-        console.log('Cleaning up status polling interval');
-        clearInterval(statusPollingIntervalRef.current);
-        statusPollingIntervalRef.current = null;
+      // Cancel any active polling
+      pollingStrategyRef.current.cancel();
+      
+      if (statusPollingTimeoutRef.current) {
+        clearTimeout(statusPollingTimeoutRef.current);
+        statusPollingTimeoutRef.current = null;
       }
     };
   }, []);
@@ -347,6 +515,13 @@ const ConversionPage: React.FC = (): React.ReactElement => {
   // Handle conversion
   const handleConvert = async (): Promise<void> => {
     if (!selectedFile) return;
+    
+    // Validate file before starting conversion
+    const validationError = validateFileBeforeUpload(selectedFile, conversionType);
+    if (validationError) {
+      feedbackContext.showFeedback('error', validationError, 3000);
+      return;
+    }
 
     // Using feedbackContext from component level
     setIsConverting(true);
@@ -410,100 +585,18 @@ const ConversionPage: React.FC = (): React.ReactElement => {
           if (conversionId) {
             // Save the conversion ID for later use
             setCurrentConversionId(conversionId);
+            
+            // Save conversion state for recovery
+            saveConversionState({
+              conversionId,
+              fileName: selectedFile?.name,
+              fileSize: selectedFile?.size,
+              conversionType: conversionOptions.conversionType
+            });
 
-            // Start polling for conversion status
-            statusPollingIntervalRef.current = setInterval(async () => {
-              try {
-                const statusResponse = await getConversionStatus(conversionId);
-                const status = statusResponse.data.status;
-
-                if (status === 'completed') {
-                  // Clear the interval
-                  if (statusPollingIntervalRef.current) {
-                    clearInterval(statusPollingIntervalRef.current);
-                    statusPollingIntervalRef.current = null;
-                  }
-
-                  // Hide the loading feedback
-                  feedbackContext.hideFeedback();
-
-                  // Get download token - this may fail with 402 if payment is required
-                  try {
-                    const tokenResponse = await getDownloadToken(statusResponse.data.resultFile.id);
-                    const downloadUrl = tokenResponse.data.downloadUrl;
-
-                    setConvertedFileUrl(downloadUrl);
-                    setUploadStatus('success');
-                    setIsConverting(false);
-                    setCurrentStep('download');
-
-                    // Show success feedback
-                    feedbackContext.showFeedback(
-                      'success',
-                      'Conversion completed successfully!',
-                      5000,
-                    );
-                  } catch (err) {
-                    // Handle payment required case
-                    if (
-                      err &&
-                      typeof err === 'object' &&
-                      'response' in err &&
-                      err.response &&
-                      typeof err.response === 'object' &&
-                      'status' in err.response &&
-                      err.response.status === 402
-                    ) {
-                      setUploadStatus('success');
-                      setIsConverting(false);
-                      setCurrentStep('download');
-
-                      // Show payment required feedback
-                      feedbackContext.showFeedback(
-                        'info',
-                        'Your file is ready for download after payment',
-                        5000,
-                      );
-                    } else {
-                      throw err;
-                    }
-                  }
-                } else if (status === 'failed') {
-                  // Clear the interval
-                  if (statusPollingIntervalRef.current) {
-                    clearInterval(statusPollingIntervalRef.current);
-                    statusPollingIntervalRef.current = null;
-                  }
-                  
-                  const errorMsg = `Conversion failed: ${statusResponse.data.error || 'Unknown error'}`;
-                  setError(errorMsg);
-                  setUploadStatus('error');
-                  setIsConverting(false);
-
-                  // Hide the loading feedback and show error
-                  feedbackContext.hideFeedback();
-                  feedbackContext.showFeedback('error', errorMsg, 5000);
-                }
-                // Keep polling if status is 'pending' or 'processing'
-              } catch (err) {
-                console.error('Status check error:', err);
-                
-                // Clear the interval
-                if (statusPollingIntervalRef.current) {
-                  clearInterval(statusPollingIntervalRef.current);
-                  statusPollingIntervalRef.current = null;
-                }
-                
-                const errorMsg = 'Failed to check conversion status. Please try again.';
-                setError(errorMsg);
-                setUploadStatus('error');
-                setIsConverting(false);
-
-                // Hide the loading feedback and show error
-                feedbackContext.hideFeedback();
-                feedbackContext.showFeedback('error', errorMsg, 5000);
-              }
-            }, 2000); // Poll every 2 seconds
+            // Start polling with our improved polling strategy
+            pollingStrategyRef.current.reset();
+            checkConversionStatus(conversionId);
           } else {
             const errorMsg = 'Invalid server response. Please try again.';
             setError(errorMsg);
@@ -567,6 +660,13 @@ const ConversionPage: React.FC = (): React.ReactElement => {
 
   return (
     <div className="py-8 md:py-12">
+      {/* API Health Monitor */}
+      <ApiHealthMonitor 
+        onStatusChange={handleApiHealthChange}
+        checkInterval={30000} // Check every 30 seconds
+        showMessage={true}
+      />
+      
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8 md:mb-12">
@@ -577,6 +677,28 @@ const ConversionPage: React.FC = (): React.ReactElement => {
               Get high-quality document conversion with our state-of-the-art technology.
             </p>
           </div>
+          
+          {/* API health warning (if needed) */}
+          {!isApiHealthy && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Service Connection Issue</h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <p>
+                      We're having trouble connecting to our conversion service.
+                      You may experience delays or errors. Please try again later.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* CORS test component */}
           {process.env.NODE_ENV !== 'production' && <CorsTest />}
@@ -713,7 +835,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
                     <div className="mb-6">
                       <UploadProgress
                         progress={uploadProgress.percentage}
-                        fileName={selectedFile?.name ? DOMPurify.sanitize(selectedFile.name) : undefined}
+                        fileName={sanitize(selectedFile?.name)}
                         fileSize={selectedFile?.size}
                         status={uploadStatus}
                         error={errorHandler.error?.message}
@@ -835,7 +957,7 @@ const ConversionPage: React.FC = (): React.ReactElement => {
 
                       <FileViewer
                         fileUrl={convertedFileUrl}
-                        fileName={selectedFile?.name ? DOMPurify.sanitize(selectedFile.name) : 'Your Converted File'}
+                        fileName={sanitize(selectedFile?.name) || 'Your Converted File'}
                       />
 
                       {/* Payment section if needed */}
