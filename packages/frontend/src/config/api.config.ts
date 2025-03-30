@@ -2,11 +2,17 @@
 
 const isProd = process.env.NODE_ENV === 'production' || import.meta.env.PROD;
 
+// Import the load balancer (will be used in production)
+import { getNextServer } from '../utils/apiLoadBalancer';
+
 // Bazowe URL do API
 const getBaseUrl = () => {
-  // W produkcji używamy względnej ścieżki, która będzie obsługiwana przez proxy Vercel
+  // In production, we can use either:
+  // 1. Vercel's proxy (which will route through vercel.json rules)
+  // 2. Direct connection to backend servers via load balancer
   if (isProd) {
-    return '/api';
+    const useProxy = import.meta.env.VITE_USE_PROXY === 'true';
+    return useProxy ? '/pdfspark/api' : getNextServer();
   }
   // W środowisku deweloperskim łączymy się bezpośrednio z backendem
   return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -14,9 +20,17 @@ const getBaseUrl = () => {
 
 // Get WebSocket URL based on environment
 const getWebSocketUrl = () => {
-  // In production, use a relative path that will be handled by Vercel proxy
+  // In production
   if (isProd) {
-    return '/api/ws';
+    const useProxy = import.meta.env.VITE_USE_PROXY === 'true';
+    if (useProxy) {
+      // Use Vercel's proxy with the subpath
+      return '/pdfspark/socket.io';
+    } else {
+      // Use the load balancer server but change the protocol to ws
+      const apiServer = getNextServer();
+      return apiServer.replace('http://', 'ws://').replace('/api', '/socket.io');
+    }
   }
   // In development environment, connect directly to the backend WebSocket endpoint
   return import.meta.env.VITE_WS_URL || 'ws://localhost:5000/api/ws';
