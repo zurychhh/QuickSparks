@@ -18,6 +18,7 @@ WORKDIR /app
 
 # Install dependencies first to leverage Docker cache
 COPY package*.json ./
+# Use npm install instead of npm ci to update package-lock.json
 RUN npm install
 
 # Copy source code
@@ -44,7 +45,8 @@ WORKDIR /app
 
 # Install only production dependencies
 COPY package*.json ./
-RUN npm install --only=production
+# Use regular install with production flag instead of --only=production
+RUN npm install --production
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist

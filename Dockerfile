@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 
 FROM base as builder
-RUN npm ci
+RUN npm install
 COPY . .
 
 FROM base as gateway
