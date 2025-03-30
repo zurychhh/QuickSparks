@@ -46,6 +46,12 @@ const vercelJsonPath = path.join(DIST_DIR, 'vercel.json');
 const vercelJson = JSON.parse(fs.readFileSync(vercelJsonPath, 'utf8'));
 
 // Better root handling - ensure root redirects to /pdfspark
+// Initialize redirects array if it doesn't exist
+if (!vercelJson.redirects) {
+  vercelJson.redirects = [];
+}
+
+// Add root redirect if it doesn't exist
 if (!vercelJson.redirects.some(r => r.source === '/' && r.destination === '/pdfspark')) {
   vercelJson.redirects.unshift({
     source: '/',
