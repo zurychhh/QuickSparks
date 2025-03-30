@@ -15,6 +15,7 @@ const getBaseUrl = () => {
     return useProxy ? '/pdfspark/api' : getNextServer();
   }
   // W środowisku deweloperskim łączymy się bezpośrednio z backendem
+  // Always use HTTPS in production, HTTP only for local development
   return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 };
 
@@ -27,9 +28,13 @@ const getWebSocketUrl = () => {
       // Use Vercel's proxy with the subpath
       return '/pdfspark/socket.io';
     } else {
-      // Use the load balancer server but change the protocol to ws
+      // Use the load balancer server but change the protocol to wss (secure websocket)
       const apiServer = getNextServer();
-      return apiServer.replace('http://', 'ws://').replace('/api', '/socket.io');
+      // Use secure WebSockets (wss://) when using HTTPS, otherwise use ws://
+      return apiServer
+        .replace('https://', 'wss://')
+        .replace('http://', 'ws://')
+        .replace('/api', '/socket.io');
     }
   }
   // In development environment, connect directly to the backend WebSocket endpoint
