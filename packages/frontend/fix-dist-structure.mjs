@@ -40,74 +40,36 @@ fs.readdirSync(DIST_DIR).forEach(file => {
   }
 });
 
-// Update vercel.json to include the proper redirects
-console.log('Updating vercel.json...');
-const vercelJsonPath = path.join(DIST_DIR, 'vercel.json');
-const vercelJson = JSON.parse(fs.readFileSync(vercelJsonPath, 'utf8'));
+// Use our pre-configured vercel.json instead of modifying the existing one
+console.log('Using simple vercel.json configuration...');
+const sourceVercelPath = path.join(PACKAGE_ROOT, 'simple-vercel.json');
+const destVercelPath = path.join(DIST_DIR, 'vercel.json');
 
-// Better root handling - ensure root redirects to /pdfspark
-// Initialize redirects array if it doesn't exist
-if (!vercelJson.redirects) {
-  vercelJson.redirects = [];
-}
-
-// Add root redirect if it doesn't exist
-if (!vercelJson.redirects.some(r => r.source === '/' && r.destination === '/pdfspark')) {
-  vercelJson.redirects.unshift({
-    source: '/',
-    destination: '/pdfspark',
-    permanent: true
-  });
-}
-
-// We need to modify the configuration to use either routes OR rewrites/redirects
-// Vercel doesn't allow both, so if routes exists, we'll enhance it instead
-if (vercelJson.routes) {
-  console.log('Using routes for SPA configuration...');
-  
-  // Add route for SPA routing if not already present
-  if (!vercelJson.routes.some(r => r.src === '/pdfspark/(.*)' && r.dest === '/pdfspark/index.html')) {
-    vercelJson.routes.push({
-      src: '/pdfspark/(.*)',
-      dest: '/pdfspark/index.html'
-    });
-  }
-  
-  // Add root redirect to pdfspark if not already present
-  if (!vercelJson.routes.some(r => r.src === '/' && r.dest === '/pdfspark/')) {
-    // Add before the filesystem handler or catch-all route
-    const filesystemIndex = vercelJson.routes.findIndex(r => r.handle === 'filesystem');
-    const catchAllIndex = vercelJson.routes.findIndex(r => r.src === '/(.*)');
-    
-    const insertIndex = Math.max(0, filesystemIndex, catchAllIndex);
-    
-    vercelJson.routes.splice(insertIndex, 0, {
-      src: '/',
-      status: 307,
-      headers: { Location: '/pdfspark/' }
-    });
-  }
-  
-  // Remove the redirects property to avoid conflicts
-  delete vercelJson.redirects;
+if (fs.existsSync(sourceVercelPath)) {
+  // Copy our simple-vercel.json to dist/vercel.json
+  fs.copyFileSync(sourceVercelPath, destVercelPath);
+  console.log('✅ Copied simple-vercel.json to dist/vercel.json');
 } else {
-  console.log('Using rewrites/redirects for SPA configuration...');
+  console.log('⚠️ simple-vercel.json not found, creating basic configuration');
   
-  // Add a better catch-all redirect for SPA handling
-  vercelJson.rewrites = [
-    {
-      source: "/pdfspark",
-      destination: "/pdfspark/index.html"
-    },
-    {
-      source: "/pdfspark/(.*)",
-      destination: "/pdfspark/index.html"
-    }
-  ];
-};
-
-// Write updated vercel.json
-fs.writeFileSync(vercelJsonPath, JSON.stringify(vercelJson, null, 2));
+  // Create a basic vercel.json with minimal configuration
+  const basicVercelConfig = {
+    "version": 2,
+    "public": true,
+    "routes": [
+      {
+        "src": "/",
+        "status": 307,
+        "headers": { "Location": "/pdfspark/" }
+      },
+      { "handle": "filesystem" },
+      { "src": "/pdfspark/(.*)", "dest": "/pdfspark/index.html" }
+    ]
+  };
+  
+  // Write basic vercel.json configuration
+  fs.writeFileSync(destVercelPath, JSON.stringify(basicVercelConfig, null, 2));
+}
 
 // Create an index.html in the root that redirects to /pdfspark
 console.log('Creating root index.html with redirect...');
