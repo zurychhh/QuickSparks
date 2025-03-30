@@ -70,16 +70,106 @@ api.interceptors.request.use(
   }
 );
 
+// Constants for retry configuration
+const MAX_RETRIES = 3;
+const RETRY_DELAY_BASE = 1000; // Base delay of 1 second
+
+// Get global store for API error notifications
+// We import this way to avoid circular dependencies
+let apiErrorStore: any;
+try {
+  // Dynamically import the store to use for error notifications
+  import('../store/subscriptionStore').then(module => {
+    apiErrorStore = module.usePaymentStore;
+  }).catch(err => {
+    console.error('Failed to import API error store:', err);
+  });
+} catch (e) {
+  console.warn('Error store import failed, error notifications may not work');
+}
+
+// Function to set API error message
+const setApiError = (message: string) => {
+  if (apiErrorStore) {
+    apiErrorStore.setState({ error: message });
+  } else {
+    console.error('API Error:', message);
+  }
+};
+
+// Function to calculate exponential backoff delay
+const getRetryDelay = (retryCount: number): number => {
+  // Exponential backoff with jitter: 2^n * base_delay + random_jitter
+  const exponentialPart = Math.pow(2, retryCount) * RETRY_DELAY_BASE;
+  const jitter = Math.random() * 500; // Random jitter of up to 500ms
+  return exponentialPart + jitter;
+};
+
 // Interceptor to handle response
 api.interceptors.response.use(
   (response) => {
     logDebug('Received response:', response);
     console.log(`API Response: ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`);
+    
+    // Clear any API error messages on successful response
+    if (apiErrorStore) {
+      apiErrorStore.setState({ error: null });
+    }
+    
     return response;
   },
-  (error) => {
+  async (error) => {
     logDebug('Response error:', error);
     console.error('API Error:', error.message);
+    
+    // Original request that failed
+    const originalRequest = error.config;
+    
+    // If no response was received and it's not already being retried
+    if (!error.response && !originalRequest._retry) {
+      // Check if we should retry this request
+      const shouldRetry = !originalRequest._retryCount || originalRequest._retryCount < MAX_RETRIES;
+      
+      if (shouldRetry) {
+        // Increment retry count
+        originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+        originalRequest._retry = true;
+        
+        // Show user-friendly message
+        setApiError(`Connection to server failed. Retrying... (${originalRequest._retryCount}/${MAX_RETRIES})`);
+        
+        // Calculate delay for exponential backoff
+        const retryDelay = getRetryDelay(originalRequest._retryCount);
+        console.log(`Retrying request after ${retryDelay}ms (attempt ${originalRequest._retryCount}/${MAX_RETRIES})`);
+        
+        // Use the load balancer to try a different server
+        try {
+          // Import load balancer utilities
+          const { markServerUnhealthy, getNextServer } = await import('../utils/apiLoadBalancer');
+          
+          // Mark the current server as unhealthy
+          if (originalRequest.baseURL) {
+            markServerUnhealthy(originalRequest.baseURL);
+          }
+          
+          // Update to use a different server
+          originalRequest.baseURL = getNextServer();
+        } catch (e) {
+          console.error('Failed to update server for retry:', e);
+        }
+        
+        // Wait for the backoff delay
+        return new Promise(resolve => {
+          setTimeout(() => {
+            console.log(`Executing retry ${originalRequest._retryCount}/${MAX_RETRIES}`);
+            resolve(api(originalRequest));
+          }, retryDelay);
+        });
+      } else {
+        // We've exceeded max retries, show final error
+        setApiError('Unable to connect to server after multiple attempts. Please check your internet connection and try again later.');
+      }
+    }
     
     // Log error to Sentry
     captureException(error);
@@ -124,6 +214,24 @@ api.interceptors.response.use(
         // Server Error - Log server error information
         console.error('500 Server Error Details:');
         console.error('- Error Message:', error.response.data.message || 'No specific error message');
+        
+        // Consider retrying server errors
+        if (!originalRequest._retry && (!originalRequest._retryCount || originalRequest._retryCount < MAX_RETRIES)) {
+          originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+          originalRequest._retry = true;
+          
+          // Different delay strategy for server errors - more delay
+          const retryDelay = getRetryDelay(originalRequest._retryCount) * 1.5;
+          
+          setApiError(`Server error occurred. Retrying... (${originalRequest._retryCount}/${MAX_RETRIES})`);
+          
+          return new Promise(resolve => {
+            setTimeout(() => {
+              console.log(`Retrying after server error (attempt ${originalRequest._retryCount}/${MAX_RETRIES})`);
+              resolve(api(originalRequest));
+            }, retryDelay);
+          });
+        }
       }
     } else if (error.request) {
       // Request was made but no response received
@@ -319,6 +427,145 @@ export const getConversionStatus = async (conversionId: string): Promise<any> =>
     throw error;
   }
 };
+
+/**
+ * ConversionStatusPoller class - Fallback for WebSockets
+ * Polls the conversion status endpoint with exponential backoff
+ */
+export class ConversionStatusPoller {
+  private conversionId: string;
+  private intervalId: number | null = null;
+  private retryCount = 0;
+  private maxRetries = 100; // High number for long-running conversions
+  private initialInterval = 2000; // 2 seconds
+  private onUpdate: (data: any) => void;
+  private onError: (error: any) => void;
+  private onComplete: (data: any) => void;
+  private lastStatus: string | null = null;
+  private consecutiveErrors = 0;
+  private maxConsecutiveErrors = 5; // After 5 consecutive errors, stop polling
+  
+  /**
+   * Constructor
+   */
+  constructor(
+    conversionId: string,
+    onUpdate: (data: any) => void,
+    onError: (error: any) => void,
+    onComplete: (data: any) => void
+  ) {
+    this.conversionId = conversionId;
+    this.onUpdate = onUpdate;
+    this.onError = onError;
+    this.onComplete = onComplete;
+  }
+  
+  /**
+   * Start polling
+   */
+  start(): void {
+    if (this.intervalId !== null) {
+      this.stop(); // Clear existing interval if any
+    }
+    
+    console.log(`Starting status polling for conversion: ${this.conversionId}`);
+    
+    // Do an immediate check
+    this.checkStatus();
+    
+    // Then set up the interval for subsequent checks
+    this.retryCount = 0;
+    this.scheduleNextCheck();
+  }
+  
+  /**
+   * Stop polling
+   */
+  stop(): void {
+    if (this.intervalId !== null) {
+      clearTimeout(this.intervalId);
+      this.intervalId = null;
+      console.log(`Stopped status polling for conversion: ${this.conversionId}`);
+    }
+  }
+  
+  /**
+   * Schedule the next status check with exponential backoff
+   */
+  private scheduleNextCheck(): void {
+    if (this.retryCount >= this.maxRetries) {
+      console.warn(`Max retries (${this.maxRetries}) reached for conversion: ${this.conversionId}`);
+      this.stop();
+      return;
+    }
+    
+    // Calculate the next interval using exponential backoff
+    // Formula: base * 2^n, capped at 30 seconds
+    const nextInterval = Math.min(
+      this.initialInterval * Math.pow(1.5, this.retryCount),
+      30000 // Maximum 30 seconds
+    );
+    
+    console.log(`Scheduling next status check in ${Math.round(nextInterval / 1000)}s for conversion: ${this.conversionId}`);
+    
+    this.intervalId = window.setTimeout(() => {
+      this.checkStatus();
+    }, nextInterval);
+    
+    this.retryCount++;
+  }
+  
+  /**
+   * Check the current status
+   */
+  private async checkStatus(): Promise<void> {
+    try {
+      const response = await getConversionStatus(this.conversionId);
+      this.consecutiveErrors = 0; // Reset error counter on success
+      
+      if (response && response.data) {
+        const data = response.data;
+        
+        // Update only if status has changed
+        if (this.lastStatus !== data.status) {
+          console.log(`Status changed for ${this.conversionId}: ${this.lastStatus} -> ${data.status}`);
+          this.lastStatus = data.status;
+          this.onUpdate(data);
+        }
+        
+        // Check if conversion is complete
+        if (['completed', 'failed', 'error'].includes(data.status)) {
+          console.log(`Conversion ${this.conversionId} has reached final status: ${data.status}`);
+          this.stop();
+          this.onComplete(data);
+          return;
+        }
+        
+        // Continue polling for in-progress statuses
+        this.scheduleNextCheck();
+      } else {
+        console.warn(`No data in status response for conversion: ${this.conversionId}`);
+        this.scheduleNextCheck();
+      }
+    } catch (error) {
+      this.consecutiveErrors++;
+      console.error(`Error checking status (attempt ${this.consecutiveErrors}):`, error);
+      
+      // Call error handler
+      this.onError(error);
+      
+      // Stop polling if too many consecutive errors
+      if (this.consecutiveErrors >= this.maxConsecutiveErrors) {
+        console.error(`Too many consecutive errors (${this.consecutiveErrors}), stopping poller for ${this.conversionId}`);
+        this.stop();
+        return;
+      }
+      
+      // Otherwise continue polling
+      this.scheduleNextCheck();
+    }
+  }
+}
 
 /**
  * Get user's conversion history

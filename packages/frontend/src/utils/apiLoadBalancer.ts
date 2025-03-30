@@ -7,9 +7,9 @@
 
 // Define the real server endpoints
 const API_SERVERS = [
-  'http://18.156.158.53:5000/api',
-  'http://18.156.42.200:5000/api',
-  'http://52.59.103.54:5000/api'
+  'https://18.156.158.53:5000/api',
+  'https://18.156.42.200:5000/api',
+  'https://52.59.103.54:5000/api'
 ];
 
 // Health status of each server
@@ -69,7 +69,8 @@ export const markServerHealthy = (serverUrl: string): void => {
 export const checkAllServers = async (): Promise<void> => {
   await Promise.all(API_SERVERS.map(async (server) => {
     try {
-      const response = await fetch(`${server}/health`, {
+      const healthEndpoint = server.replace('/api', '/api/health');
+      const response = await fetch(healthEndpoint, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',

@@ -5,9 +5,9 @@
     {
       "src": "/pdfspark/api/conversions/upload(/?.*)",
       "methods": ["OPTIONS", "POST"],
-      "dest": "http://18.156.158.53:5000/api/conversions/upload$1",
+      "dest": "https://18.156.158.53:5000/api/conversions/upload$1",
       "headers": {
-        "Access-Control-Allow-Origin": "${VERCEL_URL}",
+        "Access-Control-Allow-Origin": "https://dist-fzl7hps6a-zurychhhs-projects.vercel.app",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Content-Length, Authorization, Accept, Origin, Content-Disposition",
         "Access-Control-Allow-Credentials": "true",
@@ -16,9 +16,9 @@
     },
     {
       "src": "/pdfspark/api/(.*)",
-      "dest": "http://18.156.42.200:5000/api/$1",
+      "dest": "https://18.156.42.200:5000/api/$1",
       "headers": {
-        "Access-Control-Allow-Origin": "${VERCEL_URL}",
+        "Access-Control-Allow-Origin": "https://dist-fzl7hps6a-zurychhhs-projects.vercel.app",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept, Origin, Content-Disposition",
         "Access-Control-Allow-Credentials": "true",
@@ -27,9 +27,9 @@
     },
     {
       "src": "/pdfspark/socket.io/(.*)",
-      "dest": "http://52.59.103.54:5000/socket.io/$1",
+      "dest": "https://52.59.103.54:5000/socket.io/$1",
       "headers": {
-        "Access-Control-Allow-Origin": "${VERCEL_URL}",
+        "Access-Control-Allow-Origin": "https://dist-fzl7hps6a-zurychhhs-projects.vercel.app",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept, Origin",
         "Access-Control-Allow-Credentials": "true"

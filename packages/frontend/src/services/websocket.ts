@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { captureException } from '@utils/sentry';
+import { ConversionStatusPoller } from './api';
 
 // WebSocket connection status
 export enum WebSocketStatus {
@@ -7,7 +8,8 @@ export enum WebSocketStatus {
   CONNECTED = 'connected',
   DISCONNECTED = 'disconnected',
   RECONNECTING = 'reconnecting',
-  ERROR = 'error'
+  ERROR = 'error',
+  FALLBACK = 'fallback' // New status for when using fallback polling
 }
 
 // WebSocket message types
@@ -40,6 +42,8 @@ export function useWebSocket(url: string, authToken: string) {
   const resetAttemptsTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastBackoffDelayRef = useRef<number>(RECONNECT_CONFIG.INITIAL_DELAY);
   const manualDisconnectRef = useRef<boolean>(false);
+  const fallbackPollerRef = useRef<ConversionStatusPoller | null>(null);
+  const monitoredConversionIdRef = useRef<string | null>(null);
   
   // Calculate exponential backoff delay
   const getBackoffDelay = useCallback(() => {
@@ -226,6 +230,12 @@ export function useWebSocket(url: string, authToken: string) {
       setStatus(WebSocketStatus.ERROR);
       setError(new Error('Maximum reconnection attempts reached'));
       captureException(new Error('Maximum WebSocket reconnection attempts reached'));
+      
+      // If we're monitoring a conversion, switch to fallback polling
+      if (monitoredConversionIdRef.current) {
+        console.log(`Switching to fallback polling for conversion: ${monitoredConversionIdRef.current}`);
+        startFallbackPolling(monitoredConversionIdRef.current);
+      }
     }
   }, [connect, getBackoffDelay]);
   
@@ -326,6 +336,167 @@ export function useWebSocket(url: string, authToken: string) {
     };
   }, []);
   
+  // Start fallback polling for a conversion
+  const startFallbackPolling = useCallback((conversionId: string) => {
+    // Stop any existing poller
+    if (fallbackPollerRef.current) {
+      fallbackPollerRef.current.stop();
+      fallbackPollerRef.current = null;
+    }
+    
+    console.log(`Creating fallback poller for conversion: ${conversionId}`);
+    setStatus(WebSocketStatus.FALLBACK);
+    
+    // Create and start a new poller
+    fallbackPollerRef.current = new ConversionStatusPoller(
+      conversionId,
+      // onUpdate - notify all status update listeners
+      (data) => {
+        const message: WebSocketMessage = {
+          type: 'conversion:status',
+          data: {
+            conversionId,
+            status: data.status,
+            progress: data.progress || 0,
+            ...data
+          }
+        };
+        
+        console.log(`Fallback poller received status update: ${data.status}`);
+        
+        // Update internal state
+        setLastMessage(message);
+        setMessageHistory((prev) => [...prev, message]);
+        
+        // Notify status listeners
+        const listeners = messageListenersRef.current.get('conversion:status');
+        listeners?.forEach((listener) => {
+          try {
+            listener(message.data);
+          } catch (error) {
+            captureException(error);
+          }
+        });
+      },
+      // onError - log but keep polling
+      (error) => {
+        console.error('Fallback poller error:', error);
+        captureException(error);
+      },
+      // onComplete - stop monitoring and notify
+      (data) => {
+        console.log(`Conversion completed with status: ${data.status}`);
+        
+        // Create completion message
+        const message: WebSocketMessage = {
+          type: 'conversion:complete',
+          data: {
+            conversionId,
+            status: data.status,
+            ...data
+          }
+        };
+        
+        // Update internal state
+        setLastMessage(message);
+        setMessageHistory((prev) => [...prev, message]);
+        
+        // Notify completion listeners
+        const listeners = messageListenersRef.current.get('conversion:complete');
+        listeners?.forEach((listener) => {
+          try {
+            listener(message.data);
+          } catch (error) {
+            captureException(error);
+          }
+        });
+        
+        // Clear monitored conversion
+        monitoredConversionIdRef.current = null;
+      }
+    );
+    
+    // Start polling
+    fallbackPollerRef.current.start();
+  }, []);
+  
+  // Stop the fallback poller
+  const stopFallbackPolling = useCallback(() => {
+    if (fallbackPollerRef.current) {
+      console.log('Stopping fallback poller');
+      fallbackPollerRef.current.stop();
+      fallbackPollerRef.current = null;
+      
+      // If WebSocket was in FALLBACK status and we're stopping the poller,
+      // set to DISCONNECTED unless Socket is actually connected
+      if (status === WebSocketStatus.FALLBACK) {
+        setStatus(
+          socketRef.current?.readyState === WebSocket.OPEN 
+            ? WebSocketStatus.CONNECTED 
+            : WebSocketStatus.DISCONNECTED
+        );
+      }
+    }
+    
+    // Clear monitored conversion
+    monitoredConversionIdRef.current = null;
+  }, [status]);
+  
+  // Monitor a specific conversion - automatically falls back to polling if WebSocket fails
+  const monitorConversion = useCallback((conversionId: string) => {
+    console.log(`Setting up monitoring for conversion: ${conversionId}`);
+    monitoredConversionIdRef.current = conversionId;
+    
+    // If WebSocket is in ERROR state, immediately use fallback polling
+    if (status === WebSocketStatus.ERROR) {
+      console.log('WebSocket in ERROR state, using fallback polling immediately');
+      startFallbackPolling(conversionId);
+      return;
+    }
+    
+    // If WebSocket is not connected, try connecting first
+    if (status !== WebSocketStatus.CONNECTED && status !== WebSocketStatus.CONNECTING) {
+      console.log('WebSocket not connected, trying to connect before monitoring');
+      connect();
+    }
+    
+    // Send subscription message if socket is open
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      send({
+        type: 'subscribe',
+        data: { conversionId }
+      });
+      console.log(`Subscribed to conversion updates for: ${conversionId}`);
+    } else {
+      console.log('Socket not ready for subscription, will use fallback polling');
+      startFallbackPolling(conversionId);
+    }
+  }, [status, connect, send, startFallbackPolling]);
+  
+  // Stop monitoring a conversion
+  const stopMonitoringConversion = useCallback(() => {
+    const conversionId = monitoredConversionIdRef.current;
+    
+    if (conversionId) {
+      console.log(`Stopping monitoring for conversion: ${conversionId}`);
+      
+      // Unsubscribe from WebSocket updates if connected
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        send({
+          type: 'unsubscribe',
+          data: { conversionId }
+        });
+        console.log(`Unsubscribed from conversion updates for: ${conversionId}`);
+      }
+      
+      // Stop any fallback polling
+      stopFallbackPolling();
+      
+      // Clear the monitored conversion ID
+      monitoredConversionIdRef.current = null;
+    }
+  }, [send, stopFallbackPolling]);
+  
   return {
     status,
     lastMessage,
@@ -338,7 +509,14 @@ export function useWebSocket(url: string, authToken: string) {
     addMessageListener,
     clearMessageHistory,
     reconnectAttempt: reconnectAttemptRef.current,
-    maxReconnectAttempts: RECONNECT_CONFIG.MAX_ATTEMPTS
+    maxReconnectAttempts: RECONNECT_CONFIG.MAX_ATTEMPTS,
+    // New methods for conversion monitoring
+    monitorConversion,
+    stopMonitoringConversion,
+    startFallbackPolling,
+    stopFallbackPolling,
+    isFallbackMode: status === WebSocketStatus.FALLBACK,
+    currentConversionId: monitoredConversionIdRef.current
   };
 }
 
