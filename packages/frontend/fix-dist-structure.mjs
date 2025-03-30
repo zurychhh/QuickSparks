@@ -60,22 +60,51 @@ if (!vercelJson.redirects.some(r => r.source === '/' && r.destination === '/pdfs
   });
 }
 
-// Add a better catch-all redirect for SPA handling
-vercelJson.rewrites = [
-  {
-    source: "/pdfspark",
-    destination: "/pdfspark/index.html"
-  },
-  {
-    source: "/pdfspark/(.*)",
-    destination: "/pdfspark/$1"
-  },
-  // Add a special rewrite for SPA routing
-  {
-    source: "/pdfspark/:path*",
-    destination: "/pdfspark/index.html"
+// We need to modify the configuration to use either routes OR rewrites/redirects
+// Vercel doesn't allow both, so if routes exists, we'll enhance it instead
+if (vercelJson.routes) {
+  console.log('Using routes for SPA configuration...');
+  
+  // Add route for SPA routing if not already present
+  if (!vercelJson.routes.some(r => r.src === '/pdfspark/(.*)' && r.dest === '/pdfspark/index.html')) {
+    vercelJson.routes.push({
+      src: '/pdfspark/(.*)',
+      dest: '/pdfspark/index.html'
+    });
   }
-];
+  
+  // Add root redirect to pdfspark if not already present
+  if (!vercelJson.routes.some(r => r.src === '/' && r.dest === '/pdfspark/')) {
+    // Add before the filesystem handler or catch-all route
+    const filesystemIndex = vercelJson.routes.findIndex(r => r.handle === 'filesystem');
+    const catchAllIndex = vercelJson.routes.findIndex(r => r.src === '/(.*)');
+    
+    const insertIndex = Math.max(0, filesystemIndex, catchAllIndex);
+    
+    vercelJson.routes.splice(insertIndex, 0, {
+      src: '/',
+      status: 307,
+      headers: { Location: '/pdfspark/' }
+    });
+  }
+  
+  // Remove the redirects property to avoid conflicts
+  delete vercelJson.redirects;
+} else {
+  console.log('Using rewrites/redirects for SPA configuration...');
+  
+  // Add a better catch-all redirect for SPA handling
+  vercelJson.rewrites = [
+    {
+      source: "/pdfspark",
+      destination: "/pdfspark/index.html"
+    },
+    {
+      source: "/pdfspark/(.*)",
+      destination: "/pdfspark/index.html"
+    }
+  ];
+};
 
 // Write updated vercel.json
 fs.writeFileSync(vercelJsonPath, JSON.stringify(vercelJson, null, 2));
