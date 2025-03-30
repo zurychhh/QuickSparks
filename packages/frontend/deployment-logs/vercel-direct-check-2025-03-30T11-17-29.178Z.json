@@ -1,0 +1,37 @@
+{
+  "/": {
+    "status": 308,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  },
+  "/pdfspark": {
+    "status": 308,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  },
+  "/pdfspark/": {
+    "status": 308,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  },
+  "/pdfspark/convert": {
+    "status": 308,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  },
+  "/pdfspark/product": {
+    "status": 308,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  },
+  "/pdfspark/pricing": {
+    "status": 308,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  },
+  "/pdfspark/about": {
+    "status": 308,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  }
+}
