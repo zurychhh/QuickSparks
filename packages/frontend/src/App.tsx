@@ -12,6 +12,8 @@ import AccountPage from '@pages/Account';
 import Layout from '@components/layout/Layout';
 import useAnalytics from '@hooks/useAnalytics';
 
+// Main App component with routing
+// Note: BrowserRouter with basename="/pdfspark" is configured in main.tsx
 function App(): React.ReactElement {
   return (
     <Routes>
