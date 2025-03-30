@@ -3,7 +3,7 @@
   "public": true,
   "routes": [
     {
-      "src": "/api/conversions/upload(/?.*)",
+      "src": "/pdfspark/api/conversions/upload(/?.*)",
       "methods": ["OPTIONS", "POST"],
       "dest": "https://pdfspark-conversion-service.onrender.com/api/conversions/upload$1",
       "headers": {
@@ -15,7 +15,7 @@
       }
     },
     {
-      "src": "/api/(.*)",
+      "src": "/pdfspark/api/(.*)",
       "dest": "https://pdfspark-conversion-service.onrender.com/api/$1",
       "headers": {
         "Access-Control-Allow-Origin": "${VERCEL_URL}",
@@ -26,7 +26,7 @@
       }
     },
     {
-      "src": "/socket.io/(.*)",
+      "src": "/pdfspark/socket.io/(.*)",
       "dest": "https://pdfspark-conversion-service.onrender.com/socket.io/$1",
       "headers": {
         "Access-Control-Allow-Origin": "${VERCEL_URL}",
@@ -34,6 +34,14 @@
         "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept, Origin",
         "Access-Control-Allow-Credentials": "true"
       }
+    },
+    {
+      "src": "/pdfspark/(.*)",
+      "dest": "/pdfspark/index.html"
+    },
+    {
+      "src": "/pdfspark",
+      "dest": "/pdfspark/index.html"
     },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }

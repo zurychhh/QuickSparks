@@ -6,8 +6,8 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   
-  // Use absolute path base instead of relative path
-  base: '/',
+  // Use subdirectory path for production deployment
+  base: '/pdfspark/',
   
   resolve: {
     alias: {
