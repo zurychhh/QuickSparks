@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { captureException } from '@utils/sentry';
+import remoteLogger from '../utils/remoteLogger';
 import { usePaymentStore } from '../store/subscriptionStore';
 
 // Create environment-aware base URLs
@@ -37,6 +38,9 @@ const setApiError = (message: string) => {
   } else {
     console.error('API Error:', message);
   }
+  
+  // Also log to remote logger
+  remoteLogger.error(`API Error: ${message}`);
 };
 
 // Create API instances for different services

@@ -5,6 +5,7 @@ import thumbnailRoutes from './thumbnail.routes';
 import downloadRoutes from './download.routes';
 import paymentRoutes from './payment.routes';
 import authRoutes from './auth.routes';
+import debugRoutes from './debug.routes';
 import rateLimiter from '../middleware/rateLimiter';
 import { validateCsrfToken } from '../middleware/csrf';
 
@@ -45,5 +46,25 @@ router.use('/downloads', downloadRoutes);
 
 // Payment routes - uses standard api limiter
 router.use('/payments', paymentRoutes);
+
+// Debug routes - only available in non-production environments
+if (process.env.NODE_ENV !== 'production') {
+  console.log('Debug routes enabled for remote logging');
+  router.use('/debug', debugRoutes);
+} else {
+  // In production, still enable the routes but with stricter security
+  console.log('Debug routes enabled with production security');
+  // Apply special middleware for production to check for debug secret
+  router.use('/debug', (req, res, next) => {
+    const debugSecret = process.env.DEBUG_SECRET;
+    if (!debugSecret || req.headers['x-debug-secret'] !== debugSecret) {
+      return res.status(404).json({
+        success: false,
+        message: 'Not found'
+      });
+    }
+    next();
+  }, debugRoutes);
+}
 
 export default router;
