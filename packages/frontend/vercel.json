@@ -1,48 +1,73 @@
 {
   "version": 2,
   "public": true,
+  "rewrites": [
+    { 
+      "source": "/api/health", 
+      "destination": "http://18.156.42.200:5000/api/health" 
+    },
+    { 
+      "source": "/api/conversion/:path*", 
+      "destination": "http://52.59.103.54:5000/api/:path*" 
+    },
+    { 
+      "source": "/api/storage/:path*", 
+      "destination": "http://18.156.158.53:5000/api/:path*" 
+    },
+    {
+      "source": "/api/conversions/:path*",
+      "destination": "http://52.59.103.54:5000/api/conversions/:path*"
+    },
+    {
+      "source": "/api/downloads/:path*",
+      "destination": "http://18.156.158.53:5000/api/downloads/:path*"
+    },
+    {
+      "source": "/api/thumbnails/:path*",
+      "destination": "http://18.156.158.53:5000/api/thumbnails/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "http://18.156.42.200:5000/api/:path*"
+    },
+    {
+      "source": "/ws",
+      "destination": "http://18.156.42.200:5000/ws"
+    },
+    {
+      "source": "/pdfspark/api/health",
+      "destination": "http://18.156.42.200:5000/api/health"
+    },
+    {
+      "source": "/pdfspark/api/conversions/:path*",
+      "destination": "http://52.59.103.54:5000/api/conversions/:path*"
+    },
+    {
+      "source": "/pdfspark/api/downloads/:path*",
+      "destination": "http://18.156.158.53:5000/api/downloads/:path*"
+    },
+    {
+      "source": "/pdfspark/api/thumbnails/:path*",
+      "destination": "http://18.156.158.53:5000/api/thumbnails/:path*"
+    },
+    {
+      "source": "/pdfspark/api/:path*",
+      "destination": "http://18.156.42.200:5000/api/:path*"
+    },
+    {
+      "source": "/pdfspark/ws",
+      "destination": "http://18.156.42.200:5000/ws"
+    },
+    {
+      "source": "/pdfspark/(.*)",
+      "destination": "/pdfspark/index.html"
+    },
+    {
+      "source": "/pdfspark",
+      "destination": "/pdfspark/index.html"
+    }
+  ],
   "routes": [
-    {
-      "src": "/pdfspark/api/conversions/upload(/?.*)",
-      "methods": ["OPTIONS", "POST"],
-      "dest": "https://pdfspark-conversion-service.onrender.com/api/conversions/upload$1",
-      "headers": {
-        "Access-Control-Allow-Origin": "https://dist-fzl7hps6a-zurychhhs-projects.vercel.app",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Content-Length, Authorization, Accept, Origin, Content-Disposition",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Max-Age": "86400"
-      }
-    },
-    {
-      "src": "/pdfspark/api/(.*)",
-      "dest": "https://pdfspark-conversion-service.onrender.com/api/$1",
-      "headers": {
-        "Access-Control-Allow-Origin": "https://dist-fzl7hps6a-zurychhhs-projects.vercel.app",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept, Origin, Content-Disposition",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Expose-Headers": "Content-Disposition"
-      }
-    },
-    {
-      "src": "/pdfspark/socket.io/(.*)",
-      "dest": "https://pdfspark-conversion-service.onrender.com/socket.io/$1",
-      "headers": {
-        "Access-Control-Allow-Origin": "https://dist-fzl7hps6a-zurychhhs-projects.vercel.app",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization, Accept, Origin",
-        "Access-Control-Allow-Credentials": "true"
-      }
-    },
-    {
-      "src": "/pdfspark/(.*)",
-      "dest": "/pdfspark/index.html"
-    },
-    {
-      "src": "/pdfspark",
-      "dest": "/pdfspark/index.html"
-    },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
@@ -59,7 +84,12 @@
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https:; img-src 'self' data: https:; connect-src 'self' https://pdfspark-conversion-service.onrender.com https://api.quicksparks.dev https://*.vercel.app wss: https:; frame-ancestors 'none';" }
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https:; img-src 'self' data: https:; connect-src 'self' http://18.156.42.200:5000 http://52.59.103.54:5000 http://18.156.158.53:5000 https://pdfspark-conversion-service.onrender.com https://api.quicksparks.dev https://*.vercel.app wss: ws: http: https:; frame-ancestors 'none';" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, Content-Disposition" },
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Expose-Headers", "value": "Content-Disposition" }
       ]
     },
     {

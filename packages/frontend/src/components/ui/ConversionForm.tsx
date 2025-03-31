@@ -6,7 +6,8 @@ import FilePreview from './FilePreview';
 import ConversionSteps, { ConversionStep } from './ConversionSteps';
 import ConversionOptions from './ConversionOptions';
 import PaymentRequiredDownload from './PaymentRequiredDownload';
-import apiService, { UploadProgress as UploadProgressType } from '../../services/apiService';
+// Use the proxy API service instead of the direct service
+import proxyApiService, { UploadProgress as UploadProgressType } from '../../services/proxyApiService';
 import { sanitize, isSafeUrl } from '../../utils/sanitize';
 import { validateFileBeforeUpload, getAcceptedFileTypes } from '../../utils/fileValidation';
 import { usePaymentStore } from '../../store/subscriptionStore';
@@ -139,7 +140,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
   // Check conversion status
   const checkConversionStatus = async (id: string) => {
     try {
-      const response = await apiService.getConversionStatus(id);
+      const response = await proxyApiService.getConversionStatus(id);
       
       if (response?.data) {
         const status = response.data.status;
@@ -174,7 +175,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
   // Handle conversion complete
   const handleConversionComplete = async (id: string) => {
     try {
-      const downloadResponse = await apiService.getDownloadToken(id);
+      const downloadResponse = await proxyApiService.getDownloadToken(id);
       
       if (downloadResponse?.data) {
         // Check if payment is required
@@ -218,18 +219,18 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
     clearError();
     
     // Create cancel token
-    cancelTokenRef.current = apiService.createCancelToken();
+    cancelTokenRef.current = proxyApiService.createCancelToken();
     
     try {
       // First check API health
-      const healthStatus = await apiService.checkHealth();
+      const healthStatus = await proxyApiService.checkHealth();
       
       if (!healthStatus.isHealthy) {
         throw new Error('Conversion service is currently unavailable. Please try again later.');
       }
       
       // Do the upload
-      await apiService.uploadFileForConversion({
+      await proxyApiService.uploadFileForConversion({
         file,
         additionalData: {
           conversionType,

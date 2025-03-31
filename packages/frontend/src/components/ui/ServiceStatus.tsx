@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import apiService from '../../services/apiService';
+import proxyApiService from '../../services/proxyApiService';
 
 /**
  * ServiceStatus component that displays the current health status of the API services
@@ -14,7 +14,7 @@ const ServiceStatus: React.FC = () => {
   const checkServices = async () => {
     setStatus('checking');
     try {
-      const healthData = await apiService.checkHealth();
+      const healthData = await proxyApiService.checkHealth();
       
       if (healthData.status) {
         setStatus(healthData.status as any);
