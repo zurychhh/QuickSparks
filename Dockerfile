@@ -14,18 +14,24 @@ COPY --from=builder /app/shared /app/shared
 CMD ["node", "gateway/server.js"]
 
 FROM base as pdf-service
+WORKDIR /app/services/pdf-service
+COPY services/pdf-service/package*.json ./
 RUN npm ci --production
 COPY --from=builder /app/services/pdf-service /app/services/pdf-service
 COPY --from=builder /app/shared /app/shared
 CMD ["node", "services/pdf-service/index.js"]
 
 FROM base as image-service
+WORKDIR /app/services/image-service
+COPY services/image-service/package*.json ./
 RUN npm ci --production
 COPY --from=builder /app/services/image-service /app/services/image-service
 COPY --from=builder /app/shared /app/shared
 CMD ["node", "services/image-service/index.js"]
 
 FROM base as qr-service
+WORKDIR /app/services/qr-service
+COPY services/qr-service/package*.json ./
 RUN npm ci --production
 COPY --from=builder /app/services/qr-service /app/services/qr-service
 COPY --from=builder /app/shared /app/shared
