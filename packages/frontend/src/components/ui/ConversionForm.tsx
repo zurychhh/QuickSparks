@@ -71,9 +71,14 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
       cancelTokenRef.current = null;
     }
     
-    // Stop status polling
+    // Clear any timeout for status polling
     if (statusPollerRef.current) {
-      statusPollerRef.current.stop();
+      // Handle both direct timeouts and poller objects
+      if (typeof statusPollerRef.current === 'number') {
+        clearTimeout(statusPollerRef.current);
+      } else if (typeof statusPollerRef.current.stop === 'function') {
+        statusPollerRef.current.stop();
+      }
       statusPollerRef.current = null;
     }
     
@@ -82,6 +87,9 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
       socketRef.current.close();
       socketRef.current = null;
     }
+    
+    // Log cleanup
+    console.log('Cleaned up conversion resources');
   };
   
   // Clean up on unmount
@@ -137,8 +145,8 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
     }
   };
   
-  // Check conversion status
-  const checkConversionStatus = async (id: string) => {
+  // Check conversion status with exponential backoff
+  const checkConversionStatus = async (id: string, pollCount = 0) => {
     try {
       const response = await proxyApiService.getConversionStatus(id);
       
@@ -155,20 +163,48 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
         if (status === 'completed') {
           // Get download URL if conversion is complete
           handleConversionComplete(id);
+          return; // Stop polling
         } else if (status === 'failed' || status === 'error') {
           setApiError(response.data.message || 'Conversion failed. Please try again.');
           setIsConverting(false);
           setCurrentStep('select');
+          return; // Stop polling
         } else if (status === 'processing' || status === 'pending') {
-          // Continue polling for updates if still in progress
-          setTimeout(() => checkConversionStatus(id), 2000);
+          // Calculate next poll delay with exponential backoff
+          const baseDelay = 2000; // 2 seconds base
+          const maxDelay = 10000; // 10 seconds max
+          
+          // Calculate exponential backoff with a cap
+          let nextDelay = Math.min(
+            baseDelay * Math.pow(1.5, pollCount), 
+            maxDelay
+          );
+          
+          // Add some randomness to prevent thundering herd problem (±20%)
+          const jitter = nextDelay * (0.8 + Math.random() * 0.4);
+          nextDelay = Math.floor(jitter);
+          
+          // Schedule next check
+          console.log(`Scheduling next status check in ${Math.round(nextDelay / 1000)}s for conversion: ${id}`);
+          
+          // Use timeout with ref to allow cleanup on unmount
+          statusPollerRef.current = window.setTimeout(() => {
+            checkConversionStatus(id, pollCount + 1);
+          }, nextDelay);
         }
       }
     } catch (error) {
       handleError(error, 'Error checking conversion status');
       
-      // Continue polling despite errors, with some backoff
-      setTimeout(() => checkConversionStatus(id), 5000);
+      // Continue polling despite errors, with longer backoff
+      const errorBackoff = Math.min(5000 * Math.pow(1.5, pollCount), 30000);
+      
+      console.log(`Error during status check. Retrying in ${Math.round(errorBackoff / 1000)}s`);
+      
+      // Schedule retry after error
+      statusPollerRef.current = window.setTimeout(() => {
+        checkConversionStatus(id, pollCount + 1);
+      }, errorBackoff);
     }
   };
   

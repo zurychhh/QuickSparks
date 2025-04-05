@@ -36,7 +36,9 @@ app.use((err, req, res, next) => {
 });
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+  const http = require('http');
+  
   const healthStatus = {
     status: 'healthy',
     service: 'gateway',
@@ -48,10 +50,77 @@ app.get('/health', (req, res) => {
       image: { url: IMAGE_SERVICE_URL, status: 'unknown' },
       qr: { url: QR_SERVICE_URL, status: 'unknown' },
       auth: { url: AUTH_SERVICE_URL, status: 'unknown' }
+    },
+    env: {
+      nodeEnv: process.env.NODE_ENV || 'development',
+      port: PORT,
+      host: process.env.HOST || 'localhost'
     }
   };
   
-  // Return basic health information immediately
+  // Include service status check if detailed param is provided
+  if (req.query.detailed === 'true') {
+    // Function to check if a service is reachable
+    const checkServiceHealth = (url) => {
+      return new Promise((resolve) => {
+        const serviceUrl = new URL(url);
+        const options = {
+          hostname: serviceUrl.hostname,
+          port: serviceUrl.port,
+          path: '/health',
+          method: 'GET',
+          timeout: 2000, // 2 second timeout
+        };
+        
+        const req = http.request(options, (res) => {
+          if (res.statusCode === 200) {
+            resolve({ status: 'healthy', statusCode: res.statusCode });
+          } else {
+            resolve({ status: 'unhealthy', statusCode: res.statusCode });
+          }
+        });
+        
+        req.on('error', (error) => {
+          resolve({ status: 'unreachable', error: error.message });
+        });
+        
+        req.on('timeout', () => {
+          req.destroy();
+          resolve({ status: 'timeout', error: 'Request timed out' });
+        });
+        
+        req.end();
+      });
+    };
+    
+    // Check all services
+    const [pdfHealth, imageHealth, qrHealth, authHealth] = await Promise.all([
+      checkServiceHealth(PDF_SERVICE_URL),
+      checkServiceHealth(IMAGE_SERVICE_URL),
+      checkServiceHealth(QR_SERVICE_URL),
+      checkServiceHealth(AUTH_SERVICE_URL)
+    ]);
+    
+    // Update health status
+    healthStatus.services.pdf.health = pdfHealth;
+    healthStatus.services.image.health = imageHealth;
+    healthStatus.services.qr.health = qrHealth;
+    healthStatus.services.auth.health = authHealth;
+    
+    // Update overall status
+    const serviceStatuses = [pdfHealth, imageHealth, qrHealth, authHealth];
+    if (serviceStatuses.some(s => s.status === 'unreachable')) {
+      healthStatus.status = 'degraded';
+      healthStatus.message = 'One or more services are unreachable';
+    }
+  }
+  
+  // Add CORS headers for frontend access
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  
+  // Return health information
   res.json(healthStatus);
 });
 

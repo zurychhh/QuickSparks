@@ -178,33 +178,50 @@ export interface FileUploadOptions {
  * API service that uses Vercel's proxy to avoid CORS and mixed content issues
  */
 const proxyApiService = {
-  // Check API health
-  checkHealth: async (): Promise<{
+  // Check API health with optional detailed information
+  checkHealth: async (detailed: boolean = false): Promise<{
     isHealthy: boolean;
     status?: string;
-    services?: Record<string, string>;
+    services?: Record<string, any>;
     message?: string;
+    data?: any;
   }> => {
     try {
-      const response = await api.get('/health');
+      // Request detailed health check if specified
+      const url = detailed ? '/health?detailed=true' : '/health';
+      const response = await api.get(url);
       
       if (response.data) {
+        // Map status 'healthy' to 'operational' for UI consistency
+        const status = response.data.status === 'healthy' ? 'operational' : response.data.status;
+        
         return {
-          isHealthy: response.data.status === 'operational',
-          status: response.data.status,
+          isHealthy: ['operational', 'healthy'].includes(status),
+          status: status,
           services: response.data.services,
-          message: 'API is operational'
+          message: status === 'degraded' ? 'Some services are experiencing issues' : 'API is operational',
+          data: response.data
         };
       }
       return { isHealthy: true };
     } catch (error) {
       console.error('Health check failed:', error);
-      remoteLogger.error('Health check failed', error);
+      remoteLogger.error('Health check failed', {
+        error: error.message,
+        response: error.response?.data,
+        detailed: detailed
+      });
       
       return { 
         isHealthy: false,
         status: 'error',
-        message: 'Unable to connect to server'
+        message: 'Unable to connect to server',
+        services: {
+          gateway: 'unreachable',
+          pdf: 'unknown',
+          image: 'unknown',
+          qr: 'unknown'
+        }
       };
     }
   },

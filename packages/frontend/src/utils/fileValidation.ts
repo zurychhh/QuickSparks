@@ -5,43 +5,73 @@ type ConversionType = 'pdf-to-docx' | 'docx-to-pdf';
  * @param file - The file to validate
  * @param conversionType - The type of conversion being performed
  * @returns null if valid, error message string if invalid
+ * @throws Error with validation message if validation fails
  */
 export const validateFileBeforeUpload = (
   file: File | null, 
   conversionType: ConversionType
 ): string | null => {
   // Basic existence check
-  if (!file) return "No file selected";
+  if (!file) throw new Error("No file selected");
   
-  // Size validation
-  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-  if (file.size > MAX_FILE_SIZE) {
-    return `File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`;
+  // Size validation with configurable limits
+  const minSize = 1; // 1 byte
+  const maxSize = import.meta.env.VITE_MAX_FILE_SIZE 
+    ? parseInt(import.meta.env.VITE_MAX_FILE_SIZE) * 1024 * 1024
+    : 50 * 1024 * 1024; // 50MB default
+  
+  if (file.size < minSize) {
+    throw new Error("File is empty. Please select a valid file.");
+  }
+  
+  if (file.size > maxSize) {
+    throw new Error(`File too large. Maximum size is ${Math.round(maxSize / (1024 * 1024))}MB`);
   }
   
   // File name validation
+  if (!file.name || file.name.trim().length === 0) {
+    throw new Error("File name is missing or invalid");
+  }
+  
   if (file.name.length > 255) {
-    return "File name too long";
+    throw new Error("File name too long (maximum 255 characters)");
+  }
+  
+  // Check for potentially unsafe file name characters
+  const unsafeChars = /[<>:"/\\|?*\x00-\x1F]/g;
+  if (unsafeChars.test(file.name)) {
+    throw new Error("File name contains invalid characters");
   }
   
   // Type validation based on conversion type
   const acceptedTypes = getAcceptedFileTypes(conversionType);
   const fileExtension = file.name.split('.').pop()?.toLowerCase();
   
+  // First check MIME type
   if (!acceptedTypes.includes(file.type)) {
     if (conversionType === 'pdf-to-docx') {
-      return "Invalid file type. Please select a PDF file.";
+      throw new Error("Invalid file type. Please select a PDF file.");
     } else {
-      return "Invalid file type. Please select a Word document (DOCX).";
+      throw new Error("Invalid file type. Please select a Word document (DOCX).");
     }
   }
   
-  // Perform extension validation as a fallback
+  // Then validate extension as a fallback (guard against MIME type spoofing)
   if (conversionType === 'pdf-to-docx' && fileExtension !== 'pdf') {
-    return "Invalid file. Please select a PDF file with .pdf extension.";
+    throw new Error("Invalid file. Please select a PDF file with .pdf extension.");
   } else if (conversionType === 'docx-to-pdf' && 
              !['docx', 'doc'].includes(fileExtension || '')) {
-    return "Invalid file. Please select a Word document with .docx or .doc extension.";
+    throw new Error("Invalid file. Please select a Word document with .docx or .doc extension.");
+  }
+  
+  // Check for empty extension
+  if (!fileExtension) {
+    throw new Error("File must have an extension");
+  }
+  
+  // Additional file integrity check based on file size for PDFs
+  if (conversionType === 'pdf-to-docx' && file.size < 1024) {
+    throw new Error("The PDF file appears to be too small to be valid");
   }
   
   // File is valid

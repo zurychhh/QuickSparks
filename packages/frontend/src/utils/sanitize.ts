@@ -31,20 +31,50 @@ export const isSafeUrl = (url: string): boolean => {
   
   try {
     const urlObj = new URL(url);
+    
+    // Read trusted domains from environment if available
+    const envTrustedDomains = import.meta.env.VITE_TRUSTED_DOMAINS 
+      ? import.meta.env.VITE_TRUSTED_DOMAINS.split(',').map((d: string) => d.trim())
+      : [];
+    
+    // Default trusted domains with environment domains
     const trustedDomains = [
       // Add your own domains or subdomains
       'pdfspark.app',
       'pdfspark-conversion-service.onrender.com',
+      'pdfspark-api.onrender.com',
       'assets.pdfspark.app',
+      // Current domain from window.location for same-origin URLs
+      window.location.hostname,
       // Add localhost for development
-      'localhost'
+      'localhost',
+      // Add environment-configured domains
+      ...envTrustedDomains
     ];
     
-    return trustedDomains.some(domain => 
+    // Protocol check - only allow https (except for localhost/development)
+    const isSecureProtocol = urlObj.protocol === 'https:' || 
+      (urlObj.protocol === 'http:' && 
+        (urlObj.hostname === 'localhost' || urlObj.hostname.startsWith('127.0.0.1')));
+    
+    if (!isSecureProtocol) {
+      console.warn(`Unsafe protocol in URL: ${url}`);
+      return false;
+    }
+    
+    // Domain check - must be in trusted domains
+    const isTrustedDomain = trustedDomains.some(domain => 
       urlObj.hostname === domain || 
       urlObj.hostname.endsWith(`.${domain}`)
     );
+    
+    if (!isTrustedDomain) {
+      console.warn(`Untrusted domain in URL: ${url}`);
+    }
+    
+    return isTrustedDomain;
   } catch (e) {
+    console.error(`Invalid URL format: ${url}`, e);
     return false;
   }
 };
