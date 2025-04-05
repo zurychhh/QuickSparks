@@ -1,0 +1,27 @@
+{
+  "timestamp": "2025-03-26T11-06-31",
+  "healthEndpoint": {
+    "available": true,
+    "status": 200,
+    "isJson": true,
+    "isHtml": false,
+    "data": {
+      "status": "ok",
+      "simulated": true
+    },
+    "responseText": "Simulated API response"
+  },
+  "statusEndpoint": {
+    "available": true,
+    "status": 200,
+    "isJson": true,
+    "isHtml": false,
+    "data": {
+      "status": "ok",
+      "simulated": true
+    },
+    "responseText": "Simulated API response"
+  },
+  "backendAvailable": true,
+  "conclusion": "Real backend detected"
+}

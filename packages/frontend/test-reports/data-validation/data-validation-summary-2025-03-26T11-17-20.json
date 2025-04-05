@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-03-26T11:17:20.239Z",
+  "fileValidation": {
+    "total": 5,
+    "passed": 2,
+    "failed": 3,
+    "passRate": 40
+  },
+  "conversionValidation": {
+    "total": 5,
+    "passed": 4,
+    "failed": 1,
+    "passRate": 80
+  },
+  "overallPassRate": 60
+}

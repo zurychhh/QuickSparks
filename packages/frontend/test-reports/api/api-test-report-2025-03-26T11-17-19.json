@@ -1,0 +1,1792 @@
+{
+  "collection": {
+    "item": [
+      {
+        "id": "4d91be8a-dedc-4ecb-871a-9384667d6af5",
+        "name": "API Availability Check",
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "66c84d08-5cde-471e-9612-d3841073d9fe",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Server is responding\", function () {",
+                "    pm.expect(pm.response.code).to.be.oneOf([200, 404, 301, 302]);",
+                "});",
+                "",
+                "pm.test(\"Response exists\", function () {",
+                "    pm.expect(pm.response.text()).to.not.be.empty;",
+                "});"
+              ],
+              "_lastExecutionId": "cf32c51b-271d-4e7d-a61a-8b82d1661d0a"
+            }
+          }
+        ]
+      },
+      {
+        "id": "bdcc1ebb-dde4-49c5-a1fc-35495415a487",
+        "name": "Health Check",
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "pdfspark",
+              "api",
+              "health"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "c634af21-4e9f-41fe-b69b-e5a0af7c05c2",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is valid\", function () {",
+                "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                "});",
+                "",
+                "if (pm.response.code === 200 && pm.response.headers.get('Content-Type').includes('application/json')) {",
+                "    pm.test(\"Response contains status field\", function () {",
+                "        const jsonData = pm.response.json();",
+                "        pm.expect(jsonData).to.have.property('status');",
+                "    });",
+                "}"
+              ],
+              "_lastExecutionId": "10f9c358-b6ac-4d2f-b162-ec7826ee40d6"
+            }
+          }
+        ]
+      },
+      {
+        "id": "79ae3446-4d69-49b6-bc2e-f952bc9902a0",
+        "name": "Get Conversion Status",
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "pdfspark",
+              "api",
+              "conversion",
+              "status"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [
+              {
+                "key": "id",
+                "value": "test123"
+              }
+            ],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "f0c33fe5-583f-42a4-a8a9-a04ac0def247",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Response status code is valid\", function () {",
+                "    pm.expect(pm.response.code).to.be.oneOf([200, 404, 400]);",
+                "});",
+                "",
+                "if (pm.response.code === 200 && pm.response.headers.get('Content-Type').includes('application/json')) {",
+                "    pm.test(\"Response has conversion data\", function () {",
+                "        const jsonData = pm.response.json();",
+                "        pm.expect(jsonData).to.have.property('status');",
+                "    });",
+                "}"
+              ],
+              "_lastExecutionId": "5e8dddbd-b5f5-4ce3-ab07-b98cd9a3e029"
+            }
+          }
+        ]
+      },
+      {
+        "id": "0380e80d-cbe9-410f-b684-add2ef6042f3",
+        "name": "PDF to DOCX Conversion",
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "pdfspark",
+              "api",
+              "convert"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "POST",
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "file",
+                "type": "file",
+                "src": "/Users/user/conversion-microservices/packages/frontend/public/sample-test.pdf"
+              },
+              {
+                "key": "conversion_type",
+                "value": "pdf_to_docx",
+                "type": "text"
+              }
+            ]
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "e7baf8b8-aea2-441c-b058-d488a5b5785b",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Response status code is valid\", function () {",
+                "    pm.expect(pm.response.code).to.be.oneOf([200, 202, 400, 404, 415]);",
+                "});",
+                "",
+                "if (pm.response.code === 200 || pm.response.code === 202) {",
+                "    if (pm.response.headers.get('Content-Type').includes('application/json')) {",
+                "        pm.test(\"Response contains job ID\", function () {",
+                "            const jsonData = pm.response.json();",
+                "            pm.expect(jsonData).to.have.property('id');",
+                "        });",
+                "    }",
+                "}"
+              ],
+              "_lastExecutionId": "b5208ad5-c614-4a0f-b3fb-9092607a026e"
+            }
+          }
+        ]
+      },
+      {
+        "id": "3d22bd58-4dd7-4a51-9210-a35bd7afdc5e",
+        "name": "DOCX to PDF Conversion",
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "pdfspark",
+              "api",
+              "convert"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "POST",
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "file",
+                "type": "file",
+                "src": "/Users/user/conversion-microservices/packages/frontend/public/sample-test.docx"
+              },
+              {
+                "key": "conversion_type",
+                "value": "docx_to_pdf",
+                "type": "text"
+              }
+            ]
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "5b78bcb5-ef8a-45c9-a9e8-36a053dada36",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Response status code is valid\", function () {",
+                "    pm.expect(pm.response.code).to.be.oneOf([200, 202, 400, 404, 415]);",
+                "});",
+                "",
+                "if (pm.response.code === 200 || pm.response.code === 202) {",
+                "    if (pm.response.headers.get('Content-Type').includes('application/json')) {",
+                "        pm.test(\"Response contains job ID\", function () {",
+                "            const jsonData = pm.response.json();",
+                "            pm.expect(jsonData).to.have.property('id');",
+                "        });",
+                "    }",
+                "}"
+              ],
+              "_lastExecutionId": "c3e245a6-cfd3-476a-afbe-c5cfaa0ea2df"
+            }
+          }
+        ]
+      }
+    ],
+    "event": [],
+    "variable": [],
+    "info": {
+      "_postman_id": "ecafb77e-08f5-41f0-b784-df1aec6399c6",
+      "name": "PDFSpark API Tests",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    }
+  },
+  "environment": {
+    "id": "50feb4c9-41ab-40ec-9d0a-1e64782c5308",
+    "values": []
+  },
+  "globals": {
+    "id": "a00598fa-8e54-4ef0-9168-29564cef8e91",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 10,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 3,
+      "responseMin": 1,
+      "responseMax": 8,
+      "responseSd": 2.7568097504180447,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1742987839988,
+      "completed": 1742987840068
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 5,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "14ee2318-3e71-468b-940a-a695469113fc",
+          "httpRequestId": "945ca8e3-6488-4f6e-b884-a00dfc70dacc"
+        },
+        "item": {
+          "id": "4d91be8a-dedc-4ecb-871a-9384667d6af5",
+          "name": "API Availability Check",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "3000",
+              "path": [
+                ""
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "66c84d08-5cde-471e-9612-d3841073d9fe",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Server is responding\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404, 301, 302]);",
+                  "});",
+                  "",
+                  "pm.test(\"Response exists\", function () {",
+                  "    pm.expect(pm.response.text()).to.not.be.empty;",
+                  "});"
+                ],
+                "_lastExecutionId": "cf32c51b-271d-4e7d-a61a-8b82d1661d0a"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              ""
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "55d19359-cf46-4919-96c8-d0aa9a1dd44f",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "f3f6cdef-0646-4636-a35d-e8a2c1b8c70f",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Origin, X-Requested-With, Content-Type, Accept"
+            },
+            {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "95"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"5f-XESjlA8XAHJVxqBoXgEC+jj2upg\""
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 26 Mar 2025 11:17:20 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              60,
+              104,
+              116,
+              109,
+              108,
+              62,
+              60,
+              98,
+              111,
+              100,
+              121,
+              62,
+              60,
+              104,
+              49,
+              62,
+              80,
+              68,
+              70,
+              83,
+              112,
+              97,
+              114,
+              107,
+              32,
+              77,
+              111,
+              99,
+              107,
+              32,
+              83,
+              101,
+              114,
+              118,
+              101,
+              114,
+              60,
+              47,
+              104,
+              49,
+              62,
+              60,
+              112,
+              62,
+              84,
+              104,
+              105,
+              115,
+              32,
+              105,
+              115,
+              32,
+              97,
+              32,
+              109,
+              111,
+              99,
+              107,
+              32,
+              115,
+              101,
+              114,
+              118,
+              101,
+              114,
+              32,
+              102,
+              111,
+              114,
+              32,
+              116,
+              101,
+              115,
+              116,
+              105,
+              110,
+              103,
+              60,
+              47,
+              112,
+              62,
+              60,
+              47,
+              98,
+              111,
+              100,
+              121,
+              62,
+              60,
+              47,
+              104,
+              116,
+              109,
+              108,
+              62
+            ]
+          },
+          "cookie": [],
+          "responseTime": 8,
+          "responseSize": 95
+        },
+        "id": "4d91be8a-dedc-4ecb-871a-9384667d6af5",
+        "assertions": [
+          {
+            "assertion": "Server is responding",
+            "skipped": false
+          },
+          {
+            "assertion": "Response exists",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "c7b054db-cc9a-4d38-8606-51d117147901",
+          "length": 5,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "3104128d-c502-4e3c-9650-f5b4bcf1386d"
+        },
+        "item": {
+          "id": "bdcc1ebb-dde4-49c5-a1fc-35495415a487",
+          "name": "Health Check",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "3000",
+              "path": [
+                "pdfspark",
+                "api",
+                "health"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "c634af21-4e9f-41fe-b69b-e5a0af7c05c2",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is valid\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200 && pm.response.headers.get('Content-Type').includes('application/json')) {",
+                  "    pm.test(\"Response contains status field\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('status');",
+                  "    });",
+                  "}"
+                ],
+                "_lastExecutionId": "10f9c358-b6ac-4d2f-b162-ec7826ee40d6"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "pdfspark",
+              "api",
+              "health"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "a32aa982-dd97-4af9-ba92-a229a281ef13",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "4be6210c-36f5-49c3-ac00-118aacdfac18",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Origin, X-Requested-With, Content-Type, Accept"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "33"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"21-xvrraPqyKis9ESs/lLusJOftkm8\""
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 26 Mar 2025 11:17:20 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              111,
+              107,
+              34,
+              44,
+              34,
+              118,
+              101,
+              114,
+              115,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              49,
+              46,
+              48,
+              46,
+              48,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 1,
+          "responseSize": 33
+        },
+        "id": "bdcc1ebb-dde4-49c5-a1fc-35495415a487",
+        "assertions": [
+          {
+            "assertion": "Status code is valid",
+            "skipped": false
+          },
+          {
+            "assertion": "Response contains status field",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "0c7a799d-7f7f-4c65-983a-5dd84ab3023a",
+          "length": 5,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "e184eec4-248b-47bb-a649-21b0d1793937"
+        },
+        "item": {
+          "id": "79ae3446-4d69-49b6-bc2e-f952bc9902a0",
+          "name": "Get Conversion Status",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "3000",
+              "path": [
+                "pdfspark",
+                "api",
+                "conversion",
+                "status"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "test123"
+                }
+              ],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f0c33fe5-583f-42a4-a8a9-a04ac0def247",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response status code is valid\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404, 400]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200 && pm.response.headers.get('Content-Type').includes('application/json')) {",
+                  "    pm.test(\"Response has conversion data\", function () {",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('status');",
+                  "    });",
+                  "}"
+                ],
+                "_lastExecutionId": "5e8dddbd-b5f5-4ce3-ab07-b98cd9a3e029"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "pdfspark",
+              "api",
+              "conversion",
+              "status"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [
+              {
+                "key": "id",
+                "value": "test123"
+              }
+            ],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "5f63efee-8372-43cf-948f-fff0796d9bcd",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "781d2980-971a-4fda-9f5e-13c637bacc4f",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Origin, X-Requested-With, Content-Type, Accept"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "132"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"84-mr/Ch58cBTwmEyy8+JvRF6Ju/+E\""
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 26 Mar 2025 11:17:20 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              116,
+              101,
+              115,
+              116,
+              49,
+              50,
+              51,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              99,
+              111,
+              109,
+              112,
+              108,
+              101,
+              116,
+              101,
+              100,
+              34,
+              44,
+              34,
+              112,
+              114,
+              111,
+              103,
+              114,
+              101,
+              115,
+              115,
+              34,
+              58,
+              49,
+              48,
+              48,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              95,
+              97,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              53,
+              45,
+              48,
+              51,
+              45,
+              50,
+              54,
+              84,
+              49,
+              49,
+              58,
+              49,
+              55,
+              58,
+              50,
+              48,
+              46,
+              48,
+              51,
+              52,
+              90,
+              34,
+              44,
+              34,
+              117,
+              112,
+              100,
+              97,
+              116,
+              101,
+              100,
+              95,
+              97,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              53,
+              45,
+              48,
+              51,
+              45,
+              50,
+              54,
+              84,
+              49,
+              49,
+              58,
+              49,
+              55,
+              58,
+              50,
+              48,
+              46,
+              48,
+              51,
+              52,
+              90,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 1,
+          "responseSize": 132
+        },
+        "id": "79ae3446-4d69-49b6-bc2e-f952bc9902a0",
+        "assertions": [
+          {
+            "assertion": "Response status code is valid",
+            "skipped": false
+          },
+          {
+            "assertion": "Response has conversion data",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "61829d25-c7c3-42ad-8488-b4853eb99b4f",
+          "length": 5,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "4806708c-69f9-4c0f-9564-1f5fe83ea124"
+        },
+        "item": {
+          "id": "0380e80d-cbe9-410f-b684-add2ef6042f3",
+          "name": "PDF to DOCX Conversion",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "3000",
+              "path": [
+                "pdfspark",
+                "api",
+                "convert"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/Users/user/conversion-microservices/packages/frontend/public/sample-test.pdf"
+                },
+                {
+                  "key": "conversion_type",
+                  "value": "pdf_to_docx",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "e7baf8b8-aea2-441c-b058-d488a5b5785b",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response status code is valid\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 202, 400, 404, 415]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200 || pm.response.code === 202) {",
+                  "    if (pm.response.headers.get('Content-Type').includes('application/json')) {",
+                  "        pm.test(\"Response contains job ID\", function () {",
+                  "            const jsonData = pm.response.json();",
+                  "            pm.expect(jsonData).to.have.property('id');",
+                  "        });",
+                  "    }",
+                  "}"
+                ],
+                "_lastExecutionId": "b5208ad5-c614-4a0f-b3fb-9092607a026e"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "pdfspark",
+              "api",
+              "convert"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "fe6ecf14-4097-43a5-a864-cfd8e06d880b",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "396",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "file",
+                "type": "file",
+                "src": "/Users/user/conversion-microservices/packages/frontend/public/sample-test.pdf"
+              },
+              {
+                "key": "conversion_type",
+                "value": "pdf_to_docx",
+                "type": "text"
+              }
+            ]
+          }
+        },
+        "response": {
+          "id": "abf6dacf-bc18-4ab5-aec5-f03f190b07d8",
+          "status": "Accepted",
+          "code": 202,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Origin, X-Requested-With, Content-Type, Accept"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "125"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"7d-fyuPotyH8f20lGNkQnLXtsX+KYw\""
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 26 Mar 2025 11:17:20 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              109,
+              111,
+              99,
+              107,
+              45,
+              49,
+              55,
+              52,
+              50,
+              57,
+              56,
+              55,
+              56,
+              52,
+              48,
+              48,
+              52,
+              57,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              112,
+              101,
+              110,
+              100,
+              105,
+              110,
+              103,
+              34,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              67,
+              111,
+              110,
+              118,
+              101,
+              114,
+              115,
+              105,
+              111,
+              110,
+              32,
+              115,
+              116,
+              97,
+              114,
+              116,
+              101,
+              100,
+              34,
+              44,
+              34,
+              102,
+              105,
+              108,
+              101,
+              34,
+              58,
+              123,
+              34,
+              102,
+              105,
+              108,
+              101,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              115,
+              97,
+              109,
+              112,
+              108,
+              101,
+              45,
+              116,
+              101,
+              115,
+              116,
+              46,
+              112,
+              100,
+              102,
+              34,
+              44,
+              34,
+              115,
+              105,
+              122,
+              101,
+              34,
+              58,
+              53,
+              51,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 4,
+          "responseSize": 125
+        },
+        "id": "0380e80d-cbe9-410f-b684-add2ef6042f3",
+        "assertions": [
+          {
+            "assertion": "Response status code is valid",
+            "skipped": false
+          },
+          {
+            "assertion": "Response contains job ID",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "df4252b7-bba9-49eb-812e-e582c4fe195d",
+          "length": 5,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "e3ca39ee-bc5d-4746-a3ed-5c6b6ea76800"
+        },
+        "item": {
+          "id": "3d22bd58-4dd7-4a51-9210-a35bd7afdc5e",
+          "name": "DOCX to PDF Conversion",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "3000",
+              "path": [
+                "pdfspark",
+                "api",
+                "convert"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/Users/user/conversion-microservices/packages/frontend/public/sample-test.docx"
+                },
+                {
+                  "key": "conversion_type",
+                  "value": "docx_to_pdf",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5b78bcb5-ef8a-45c9-a9e8-36a053dada36",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response status code is valid\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 202, 400, 404, 415]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200 || pm.response.code === 202) {",
+                  "    if (pm.response.headers.get('Content-Type').includes('application/json')) {",
+                  "        pm.test(\"Response contains job ID\", function () {",
+                  "            const jsonData = pm.response.json();",
+                  "            pm.expect(jsonData).to.have.property('id');",
+                  "        });",
+                  "    }",
+                  "}"
+                ],
+                "_lastExecutionId": "c3e245a6-cfd3-476a-afbe-c5cfaa0ea2df"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "pdfspark",
+              "api",
+              "convert"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "fbc975f6-5f8f-4db9-81b8-5291eaaca191",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "435",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "file",
+                "type": "file",
+                "src": "/Users/user/conversion-microservices/packages/frontend/public/sample-test.docx"
+              },
+              {
+                "key": "conversion_type",
+                "value": "docx_to_pdf",
+                "type": "text"
+              }
+            ]
+          }
+        },
+        "response": {
+          "id": "fb8fd988-dbc6-4a7f-8b4e-f296f96e2203",
+          "status": "Accepted",
+          "code": 202,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Origin, X-Requested-With, Content-Type, Accept"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "126"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"7e-Fp5+4jWRK/29n+CoerdSMk9075A\""
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 26 Mar 2025 11:17:20 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              109,
+              111,
+              99,
+              107,
+              45,
+              49,
+              55,
+              52,
+              50,
+              57,
+              56,
+              55,
+              56,
+              52,
+              48,
+              48,
+              54,
+              49,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              112,
+              101,
+              110,
+              100,
+              105,
+              110,
+              103,
+              34,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              67,
+              111,
+              110,
+              118,
+              101,
+              114,
+              115,
+              105,
+              111,
+              110,
+              32,
+              115,
+              116,
+              97,
+              114,
+              116,
+              101,
+              100,
+              34,
+              44,
+              34,
+              102,
+              105,
+              108,
+              101,
+              34,
+              58,
+              123,
+              34,
+              102,
+              105,
+              108,
+              101,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              115,
+              97,
+              109,
+              112,
+              108,
+              101,
+              45,
+              116,
+              101,
+              115,
+              116,
+              46,
+              100,
+              111,
+              99,
+              120,
+              34,
+              44,
+              34,
+              115,
+              105,
+              122,
+              101,
+              34,
+              58,
+              51,
+              53,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 1,
+          "responseSize": 126
+        },
+        "id": "3d22bd58-4dd7-4a51-9210-a35bd7afdc5e",
+        "assertions": [
+          {
+            "assertion": "Response status code is valid",
+            "skipped": false
+          },
+          {
+            "assertion": "Response contains job ID",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 511
+    },
+    "failures": [],
+    "error": null
+  }
+}

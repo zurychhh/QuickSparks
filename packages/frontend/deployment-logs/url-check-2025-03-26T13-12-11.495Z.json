@@ -1,0 +1,32 @@
+{
+  "vercelUrl": "https://dist-g9f43bnr9-zurychhhs-projects.vercel.app",
+  "timestamp": "2025-03-26T13:12:11.496Z",
+  "results": {
+    "": {
+      "fullUrl": "https://dist-g9f43bnr9-zurychhhs-projects.vercel.app",
+      "statusCode": 200,
+      "success": true
+    },
+    "/convert": {
+      "fullUrl": "https://dist-g9f43bnr9-zurychhhs-projects.vercel.app/convert",
+      "statusCode": 404,
+      "success": false
+    },
+    "/pricing": {
+      "fullUrl": "https://dist-g9f43bnr9-zurychhhs-projects.vercel.app/pricing",
+      "statusCode": 404,
+      "success": false
+    },
+    "/about": {
+      "fullUrl": "https://dist-g9f43bnr9-zurychhhs-projects.vercel.app/about",
+      "statusCode": 404,
+      "success": false
+    },
+    "/product": {
+      "fullUrl": "https://dist-g9f43bnr9-zurychhhs-projects.vercel.app/product",
+      "statusCode": 404,
+      "success": false
+    }
+  },
+  "allSuccessful": false
+}

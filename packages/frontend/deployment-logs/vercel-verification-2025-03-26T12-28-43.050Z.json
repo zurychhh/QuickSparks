@@ -1,0 +1,121 @@
+{
+  "timestamp": "2025-03-26T12:28:43.394Z",
+  "baseUrl": "https://dist-ayibqzbqq-zurychhhs-projects.vercel.app",
+  "results": {
+    "routes": {
+      "results": [
+        {
+          "url": "https://dist-ayibqzbqq-zurychhhs-projects.vercel.app/",
+          "status": 200,
+          "headers": {
+            "accept-ranges": "bytes",
+            "access-control-allow-origin": "*",
+            "age": "2125",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-disposition": "inline",
+            "content-length": "1573",
+            "content-type": "text/html; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 12:28:43 GMT",
+            "etag": "\"4854e767966e7f4e13bce39f0288645d\"",
+            "last-modified": "Wed, 26 Mar 2025 11:53:18 GMT",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-robots-tag": "noindex",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "arn1::wcz8d-1742992123199-c8d18af13ffa"
+          },
+          "data": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <!-- Google tag (gtag.js) -->\n    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-5QXBPJFCLS\"></script>\n    <script>\n      window.dataLayer = window.dataLayer || [];\n      function gtag(){dataLayer.push(arguments);}\n      gtag('js', new Date());\n\n      gtag('config', 'G-5QXBPJFCLS');\n    </script>\n    \n    <meta charset=\"UTF-8\" />\n    <link rel=\"icon\" type=\"image/svg+xml\" href=\"/pdfspark/favicon.svg\" />\n    <meta name=\"viewport\" cont...",
+          "success": true,
+          "isHtml": true
+        },
+        {
+          "url": "https://dist-ayibqzbqq-zurychhhs-projects.vercel.app/pdfspark",
+          "status": 404,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-length": "79",
+            "content-type": "text/plain; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 12:28:43 GMT",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-robots-tag": "noindex",
+            "x-vercel-error": "NOT_FOUND",
+            "x-vercel-id": "arn1::wcz8d-1742992123251-bd3ae0eac952"
+          },
+          "data": "The page could not be found\n\nNOT_FOUND\n\narn1::wcz8d-1742992123251-bd3ae0eac952\n",
+          "success": false
+        },
+        {
+          "url": "https://dist-ayibqzbqq-zurychhhs-projects.vercel.app/pdfspark/convert",
+          "status": 404,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-length": "79",
+            "content-type": "text/plain; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 12:28:43 GMT",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-robots-tag": "noindex",
+            "x-vercel-error": "NOT_FOUND",
+            "x-vercel-id": "arn1::wcz8d-1742992123288-c46082aa35a9"
+          },
+          "data": "The page could not be found\n\nNOT_FOUND\n\narn1::wcz8d-1742992123288-c46082aa35a9\n",
+          "success": false
+        },
+        {
+          "url": "https://dist-ayibqzbqq-zurychhhs-projects.vercel.app/pdfspark/product",
+          "status": 404,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-length": "79",
+            "content-type": "text/plain; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 12:28:43 GMT",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-robots-tag": "noindex",
+            "x-vercel-error": "NOT_FOUND",
+            "x-vercel-id": "arn1::wcz8d-1742992123324-6acef29d6c2f"
+          },
+          "data": "The page could not be found\n\nNOT_FOUND\n\narn1::wcz8d-1742992123324-6acef29d6c2f\n",
+          "success": false
+        },
+        {
+          "url": "https://dist-ayibqzbqq-zurychhhs-projects.vercel.app/pdfspark/pricing",
+          "status": 404,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-length": "79",
+            "content-type": "text/plain; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 12:28:43 GMT",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-robots-tag": "noindex",
+            "x-vercel-error": "NOT_FOUND",
+            "x-vercel-id": "arn1::wcz8d-1742992123361-7487a86b3763"
+          },
+          "data": "The page could not be found\n\nNOT_FOUND\n\narn1::wcz8d-1742992123361-7487a86b3763\n",
+          "success": false
+        },
+        {
+          "url": "https://dist-ayibqzbqq-zurychhhs-projects.vercel.app/pdfspark/about",
+          "status": 404,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-length": "79",
+            "content-type": "text/plain; charset=utf-8",
+            "date": "Wed, 26 Mar 2025 12:28:43 GMT",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "x-robots-tag": "noindex",
+            "x-vercel-error": "NOT_FOUND",
+            "x-vercel-id": "arn1::wcz8d-1742992123398-6dd06d6f4692"
+          },
+          "data": "The page could not be found\n\nNOT_FOUND\n\narn1::wcz8d-1742992123398-6dd06d6f4692\n",
+          "success": false
+        }
+      ],
+      "success": true
+    }
+  },
+  "approved": true
+}

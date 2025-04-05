@@ -1,0 +1,255 @@
+{
+  "timestamp": "2025-03-30T11:04:33.582Z",
+  "baseUrl": "https://quicksparks.dev/pdfspark",
+  "results": {
+    "routes": {
+      "results": [
+        {
+          "url": "https://quicksparks.dev/pdfspark/",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:31 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::prkwc-1743332671829-4d0f8754ac83",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/convert",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:32 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/convert",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/convert",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::lnwmj-1743332672022-c8bc0fc75cfb",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/product",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:32 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/product",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/product",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::82ndt-1743332672208-5c2ec347c96b",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/pricing",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:32 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/pricing",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/pricing",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::ctrhb-1743332672386-3e5990914ea4",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/about",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:32 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/about",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/about",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::hcsbt-1743332672580-a07118cbd3a6",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/health",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:32 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/health",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/health",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::tdp65-1743332672765-3866419819da",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        }
+      ],
+      "success": false
+    },
+    "assets": {
+      "results": [
+        {
+          "url": "https://quicksparks.dev/pdfspark/assets/index-C3bLptlz.css",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:32 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/assets/index-C3bLptlz.css",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/assets/index-C3bLptlz.css",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::tdp65-1743332672802-9eaaff36ff53",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/assets/index-COef_Mgr.js",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:32 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/assets/index-COef_Mgr.js",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/assets/index-COef_Mgr.js",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::tdp65-1743332672837-a77e56e95de8",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/assets/react-BKU87Gzz.js",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:33 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/assets/react-BKU87Gzz.js",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/assets/react-BKU87Gzz.js",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::hsmkb-1743332673224-dc3da444acaa",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/assets/router-B_sUl22Z.js",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:33 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/assets/router-B_sUl22Z.js",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/assets/router-B_sUl22Z.js",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::5b65z-1743332673346-4c24d7b33b50",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/assets/zustand-CzsH10Ka.js",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:33 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/assets/zustand-CzsH10Ka.js",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/assets/zustand-CzsH10Ka.js",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::5b65z-1743332673384-d73acde4068e",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/favicon.svg",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:33 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/favicon.svg",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/favicon.svg",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::hsmkb-1743332673467-7fe9c7c35e80",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/logo.svg",
+          "status": 308,
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-type": "text/plain",
+            "date": "Sun, 30 Mar 2025 11:04:33 GMT",
+            "location": "https://www.quicksparks.dev/pdfspark/logo.svg",
+            "refresh": "0;url=https://www.quicksparks.dev/pdfspark/logo.svg",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000",
+            "x-vercel-id": "arn1::hf8hd-1743332673520-7ce8c774e2ba",
+            "transfer-encoding": "chunked"
+          },
+          "data": "Redirecting...\n",
+          "success": false
+        }
+      ],
+      "success": false
+    },
+    "securityHeaders": {
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000",
+        "Content-Security-Policy": null,
+        "X-Content-Type-Options": null,
+        "X-Frame-Options": null,
+        "X-XSS-Protection": null,
+        "Referrer-Policy": null,
+        "Permissions-Policy": null
+      },
+      "success": true
+    },
+    "requiredFiles": {
+      "robotsTxt": false,
+      "sitemapXml": false,
+      "success": false
+    }
+  },
+  "approved": false
+}

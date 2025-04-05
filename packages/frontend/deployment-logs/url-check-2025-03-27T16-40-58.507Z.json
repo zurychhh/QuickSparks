@@ -1,0 +1,32 @@
+{
+  "vercelUrl": "https://dist-ne6yn1kjh-zurychhhs-projects.vercel.app/pdfspark",
+  "timestamp": "2025-03-27T16:40:58.509Z",
+  "results": {
+    "": {
+      "fullUrl": "https://dist-ne6yn1kjh-zurychhhs-projects.vercel.app/pdfspark",
+      "statusCode": 404,
+      "success": false
+    },
+    "/convert": {
+      "fullUrl": "https://dist-ne6yn1kjh-zurychhhs-projects.vercel.app/pdfspark/convert",
+      "statusCode": 404,
+      "success": false
+    },
+    "/pricing": {
+      "fullUrl": "https://dist-ne6yn1kjh-zurychhhs-projects.vercel.app/pdfspark/pricing",
+      "statusCode": 404,
+      "success": false
+    },
+    "/about": {
+      "fullUrl": "https://dist-ne6yn1kjh-zurychhhs-projects.vercel.app/pdfspark/about",
+      "statusCode": 404,
+      "success": false
+    },
+    "/product": {
+      "fullUrl": "https://dist-ne6yn1kjh-zurychhhs-projects.vercel.app/pdfspark/product",
+      "statusCode": 404,
+      "success": false
+    }
+  },
+  "allSuccessful": false
+}

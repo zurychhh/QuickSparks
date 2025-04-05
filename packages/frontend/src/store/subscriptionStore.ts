@@ -170,6 +170,22 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
   
   clearError: () => {
     set({ error: null });
+  },
+  
+  // New action to set API errors
+  setApiError: (message: string) => {
+    set({ 
+      error: message,
+      isLoading: false
+    });
+    
+    // Auto-clear error after 10 seconds
+    setTimeout(() => {
+      // Only clear if it's still the same error
+      // This prevents clearing new errors that might have appeared
+      usePaymentStore.getState().error === message && 
+        usePaymentStore.setState({ error: null });
+    }, 10000);
   }
 }));
 

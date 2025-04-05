@@ -1,0 +1,17 @@
+{
+  "/": {
+    "success": false,
+    "statusCode": 404,
+    "finalUrl": "https://dist-j0ztdygd3-zurychhhs-projects.vercel.app/pdfspark"
+  },
+  "/pdfspark": {
+    "success": false,
+    "statusCode": 404,
+    "finalUrl": "https://dist-j0ztdygd3-zurychhhs-projects.vercel.app/pdfspark"
+  },
+  "/pdfspark/": {
+    "success": false,
+    "statusCode": 404,
+    "finalUrl": "https://dist-j0ztdygd3-zurychhhs-projects.vercel.app/pdfspark/"
+  }
+}

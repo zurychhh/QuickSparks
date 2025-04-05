@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  pdfspark-frontend:
+    build:
+      context: ../../
+      dockerfile: tests/deployment/Dockerfile
+    ports:
+      - "8080:3000"
+    environment:
+      - NODE_ENV=test
+      - PORT=3000
+      - BASE_PATH=/pdfspark
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/pdfspark/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - pdfspark-test-network
+
+  test-runner:
+    image: node:22-alpine
+    volumes:
+      - ../../:/app
+    working_dir: /app
+    command: >
+      sh -c "
+        echo 'Waiting for frontend service to be ready...' &&
+        sleep 10 &&
+        echo 'Running basic health check...' &&
+        wget -qO- http://pdfspark-frontend:3000/pdfspark/ | grep -q 'PDFSpark' &&
+        echo 'Health check passed!' &&
+        echo '{\"status\":\"success\",\"message\":\"Deployment test passed\",\"timestamp\":\"'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'\"}'
+      "
+    depends_on:
+      pdfspark-frontend:
+        condition: service_healthy
+    networks:
+      - pdfspark-test-network
+
+networks:
+  pdfspark-test-network:
+    driver: bridge

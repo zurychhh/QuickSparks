@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /pdfspark/
+Disallow: /pdfspark/account/
+Disallow: /pdfspark/checkout/
+
+Sitemap: https://quicksparks.dev/sitemap.xml

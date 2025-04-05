@@ -1,0 +1,32 @@
+{
+  "vercelUrl": "https://www.quicksparks.dev",
+  "timestamp": "2025-03-27T16:41:12.093Z",
+  "results": {
+    "": {
+      "fullUrl": "https://www.quicksparks.dev",
+      "statusCode": 200,
+      "success": true
+    },
+    "/convert": {
+      "fullUrl": "https://www.quicksparks.dev/convert",
+      "statusCode": 404,
+      "success": false
+    },
+    "/pricing": {
+      "fullUrl": "https://www.quicksparks.dev/pricing",
+      "statusCode": 404,
+      "success": false
+    },
+    "/about": {
+      "fullUrl": "https://www.quicksparks.dev/about",
+      "statusCode": 404,
+      "success": false
+    },
+    "/product": {
+      "fullUrl": "https://www.quicksparks.dev/product",
+      "statusCode": 404,
+      "success": false
+    }
+  },
+  "allSuccessful": false
+}

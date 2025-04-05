@@ -1,77 +1,103 @@
 version: '3.8'
 
 services:
-  gateway:
-    build:
-      context: .
-      dockerfile: gateway/Dockerfile
+  mongodb:
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
     ports:
-      - "3000:3000"
+      - "27017:27017"
     environment:
-      - PORT=3000
-      - PDF_SERVICE_URL=http://pdf-service:3001
-      - IMAGE_SERVICE_URL=http://image-service:3002
-      - QR_SERVICE_URL=http://qr-service:3003
-      - AUTH_SERVICE_URL=http://auth-service:3004
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
+    networks:
+      - pdfspark-network
+
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - pdfspark-network
+
+  api:
+    build:
+      context: ./packages/services/api
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - MONGO_URI=mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-password}@mongodb:27017/pdfspark?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-development_jwt_secret_key}
+      - FILE_ENCRYPTION_SECRET=${FILE_ENCRYPTION_SECRET:-development_file_encryption_key}
+      - UPLOAD_DIR=/app/uploads
+      - ALLOWED_ORIGINS=http://localhost:3000,https://pdfspark.app
+    volumes:
+      - api_uploads:/app/uploads
+      - api_output:/app/output
     depends_on:
-      - pdf-service
-      - image-service
-      - qr-service
-      - auth-service
-    volumes:
-      - ./gateway:/app/src
-      - /app/node_modules
-    restart: unless-stopped
+      - mongodb
+      - redis
+    networks:
+      - pdfspark-network
 
-  pdf-service:
+  conversion-service:
     build:
-      context: .
-      dockerfile: packages/pdf-service/Dockerfile
+      context: ./packages/conversion-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5001:5001"
     environment:
-      - PDF_SERVICE_PORT=3001
+      - NODE_ENV=production
+      - PORT=5001
+      - MONGO_URI=mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-password}@mongodb:27017/pdfspark?authSource=admin
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-development_jwt_secret_key}
+      - FILE_ENCRYPTION_SECRET=${FILE_ENCRYPTION_SECRET:-development_file_encryption_key}
+      - UPLOADS_DIR=/app/uploads
+      - OUTPUTS_DIR=/app/outputs
+      - API_URL=http://api:8000
     volumes:
-      - ./packages/pdf-service:/app/src
-      - pdf-uploads:/app/uploads
-      - /app/node_modules
-    restart: unless-stopped
+      - conversion_uploads:/app/uploads
+      - conversion_outputs:/app/outputs
+    depends_on:
+      - mongodb
+      - redis
+      - api
+    networks:
+      - pdfspark-network
 
-  image-service:
+  frontend:
     build:
-      context: .
-      dockerfile: packages/image-service/Dockerfile
+      context: ./packages/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
     environment:
-      - IMAGE_SERVICE_PORT=3002
-    volumes:
-      - ./packages/image-service:/app/src
-      - image-uploads:/app/uploads
-      - /app/node_modules
-    restart: unless-stopped
+      - REACT_APP_API_URL=http://localhost:8000/api
+    networks:
+      - pdfspark-network
+    depends_on:
+      - api
 
-  qr-service:
-    build:
-      context: .
-      dockerfile: packages/qr-service/Dockerfile
-    environment:
-      - QR_SERVICE_PORT=3003
-    volumes:
-      - ./packages/qr-service:/app/src
-      - qr-uploads:/app/uploads
-      - /app/node_modules
-    restart: unless-stopped
-
-  auth-service:
-    build:
-      context: .
-      dockerfile: packages/auth-service/Dockerfile
-    environment:
-      - AUTH_SERVICE_PORT=3004
-      - JWT_SECRET=your-secret-key
-    volumes:
-      - ./packages/auth-service:/app/src
-      - /app/node_modules
-    restart: unless-stopped
+networks:
+  pdfspark-network:
+    driver: bridge
 
 volumes:
-  pdf-uploads:
-  image-uploads:
-  qr-uploads:
+  mongodb_data:
+  redis_data:
+  api_uploads:
+  api_output:
+  conversion_uploads:
+  conversion_outputs:
