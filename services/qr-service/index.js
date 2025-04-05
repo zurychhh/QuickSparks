@@ -1,5 +1,5 @@
 const express = require('express');
-//const QRCode = require('qrcode');
+const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
 
@@ -12,12 +12,68 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// CORS configuration
+app.use((req, res, next) => {
+  const allowedOrigins = process.env.ALLOWED_ORIGINS ? 
+    process.env.ALLOWED_ORIGINS.split(',') : 
+    ['http://localhost:3000', 'https://pdfspark.app'];
+    
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin) || !origin) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+  }
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
+
 // Middleware
 app.use(express.json());
 
 // Routes
 app.get('/status', (req, res) => {
   res.json({ status: 'online', service: 'qr-service' });
+});
+
+// Health check endpoint with detailed information
+app.get('/health', (req, res) => {
+  try {
+    // Check if uploads directory is writable
+    const testFile = path.join(uploadsDir, `test-${Date.now()}.txt`);
+    fs.writeFileSync(testFile, 'health check');
+    fs.unlinkSync(testFile);
+    
+    // Try to verify QRCode library is working
+    const isQRCodeWorking = typeof QRCode.toDataURL === 'function';
+    
+    res.json({
+      status: 'healthy',
+      service: 'qr-service',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      dependencies: {
+        qrcode: isQRCodeWorking ? 'available' : 'unavailable'
+      },
+      storage: {
+        writable: true
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      service: 'qr-service',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 app.post('/generate', async (req, res) => {

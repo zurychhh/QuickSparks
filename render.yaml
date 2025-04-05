@@ -31,7 +31,7 @@ services:
       - key: UPLOAD_DIR
         value: /opt/render/project/src/packages/services/api/uploads
       - key: ALLOWED_ORIGINS
-        value: https://pdfspark.app,https://www.pdfspark.app
+        value: https://pdfspark.app,https://www.pdfspark.app,https://pdfspark.vercel.app,https://pdfspark-git-main.vercel.app,http://localhost:3000
 
   - type: web
     name: pdfspark-conversion
