@@ -5,11 +5,10 @@
  * to distribute load and provide fallback in case of server failure.
  */
 
-// Define the real server endpoints - always use HTTPS in production
+// Define the real server endpoints - always use relative path in production
+// to prevent mixed content issues when page is served over HTTPS
 const API_SERVERS = [
-  'https://18.156.158.53:5000/api',
-  'https://18.156.42.200:5000/api',
-  'https://52.59.103.54:5000/api'
+  '/api' // Use Vercel proxy in production to avoid mixed content warnings
 ];
 
 // Health status of each server
@@ -24,20 +23,12 @@ API_SERVERS.forEach(server => {
 let currentServerIndex = 0;
 
 /**
- * Gets the next available healthy server in round-robin fashion
- * @returns URL of the next server endpoint
+ * Gets the API endpoint path (always use proxy in production)
+ * @returns URL of the API endpoint
  */
 export const getNextServer = (): string => {
-  const healthyServers = API_SERVERS.filter(server => serverStatus[server]);
-  
-  // If no healthy servers, return the first one (better than nothing)
-  if (healthyServers.length === 0) {
-    return API_SERVERS[0];
-  }
-  
-  // Rotate between healthy servers
-  currentServerIndex = (currentServerIndex + 1) % healthyServers.length;
-  return healthyServers[currentServerIndex];
+  // In production, always use relative path to avoid mixed content issues
+  return '/api';
 };
 
 /**
@@ -63,61 +54,34 @@ export const markServerHealthy = (serverUrl: string): void => {
 };
 
 /**
- * Check health of all servers using safer approach to prevent mixed content issues
- * @returns Promise resolving when all servers have been checked
+ * Check health of API server using relative path to prevent mixed content issues
+ * @returns Promise resolving when server has been checked
  */
 export const checkAllServers = async (): Promise<void> => {
-  // In production on HTTPS pages, use the proxy instead of direct server checks
-  // to avoid mixed content warnings
-  if (window.location.protocol === 'https:') {
-    // Use the API proxy endpoint for health checks
-    try {
-      const response = await fetch('/api/health', {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
-        // Short timeout to quickly identify unresponsive servers
-        signal: AbortSignal.timeout(5000)
-      });
-      
-      // If the proxy is healthy, assume all servers are healthy
-      if (response.ok) {
-        API_SERVERS.forEach(server => markServerHealthy(server));
-      }
-    } catch (error) {
-      console.error('Health check via proxy failed:', error);
-    }
-    return;
-  }
-  
-  // For non-HTTPS environments, check each server directly
-  await Promise.all(API_SERVERS.map(async (server) => {
-    try {
-      // Ensure we're using HTTPS for production health checks
-      const healthEndpoint = server.includes('http://') 
-        ? server.replace('http://', 'https://').replace('/api', '/api/health')
-        : server.replace('/api', '/api/health');
-        
-      const response = await fetch(healthEndpoint, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
-        // Short timeout to quickly identify unresponsive servers
-        signal: AbortSignal.timeout(5000) 
-      });
-      
-      if (response.ok) {
-        markServerHealthy(server);
-      } else {
-        markServerUnhealthy(server);
-      }
-    } catch (error) {
+  // Use the API proxy endpoint for health checks
+  try {
+    const server = API_SERVERS[0]; // We only have one server in production
+    const healthEndpoint = `${server}/health`;
+    
+    const response = await fetch(healthEndpoint, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      // Short timeout to quickly identify unresponsive servers
+      signal: AbortSignal.timeout(5000)
+    });
+    
+    if (response.ok) {
+      markServerHealthy(server);
+    } else {
       markServerUnhealthy(server);
-      console.error(`Health check failed for ${server}:`, error);
     }
-  }));
+  } catch (error) {
+    // Mark server as unhealthy
+    markServerUnhealthy(API_SERVERS[0]);
+    console.error('Health check failed:', error);
+  }
 };
 
 /**
