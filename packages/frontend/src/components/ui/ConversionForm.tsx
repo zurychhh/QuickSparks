@@ -30,11 +30,18 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
   const navigate = useNavigate();
   
   // Error handling
-  const { handleError } = useErrorHandler();
+  const { handleError: baseHandleError } = useErrorHandler();
   const { setApiError, clearError } = usePaymentStore(state => ({
     setApiError: state.setApiError,
     clearError: state.clearError
   }));
+  
+  // Wrapper to handle errors and update both global and local state
+  const handleError = useCallback((error: any, errorContext?: string) => {
+    const errorInfo = baseHandleError(error, errorContext);
+    setError(errorInfo.message); // Update local error state
+    return errorInfo;
+  }, [baseHandleError]);
   
   // Component state
   const [file, setFile] = useState<File | null>(null);
@@ -54,6 +61,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
   const [conversionStatus, setConversionStatus] = useState<string | null>(null);
   const [conversionProgress, setConversionProgress] = useState<number>(0);
   const [isPaymentRequired, setIsPaymentRequired] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null); // Add missing error state
   
   // Refs
   const cancelTokenRef = useRef<any>(null);
@@ -126,6 +134,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
     setConvertedFileUrl(null);
     setCurrentStep('select');
     clearError();
+    setError(null);
     
     // Cancel any ongoing operations
     cleanup();
@@ -140,6 +149,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
       } catch (error) {
         // Show validation error
         setApiError(error.message);
+        setError(error.message);
         setFile(null);
       }
     }
@@ -166,6 +176,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
           return; // Stop polling
         } else if (status === 'failed' || status === 'error') {
           setApiError(response.data.message || 'Conversion failed. Please try again.');
+          setError(response.data.message || 'Conversion failed. Please try again.');
           setIsConverting(false);
           setCurrentStep('select');
           return; // Stop polling
@@ -245,6 +256,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
   const handleConvert = async () => {
     if (!file) {
       setApiError('Please select a file first.');
+      setError('Please select a file first.');
       return;
     }
     
@@ -253,6 +265,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
     setUploadProgress(null);
     setCurrentStep('uploading');
     clearError();
+    setError(null);
     
     // Create cancel token
     cancelTokenRef.current = proxyApiService.createCancelToken();
@@ -341,6 +354,7 @@ const ConversionForm: React.FC<ConversionFormProps> = ({
     setIsPaymentRequired(false);
     setCurrentStep('select');
     clearError();
+    setError(null);
     
     // Clean up any ongoing operations
     cleanup();
