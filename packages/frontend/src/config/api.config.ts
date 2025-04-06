@@ -11,8 +11,8 @@ const getBaseUrl = () => {
   // 1. Vercel's proxy (which will route through vercel.json rules)
   // 2. Direct connection to backend servers via load balancer
   if (isProd) {
-    const useProxy = import.meta.env.VITE_USE_PROXY === 'true';
-    return useProxy ? '/pdfspark/api' : getNextServer();
+    // Always use relative path for API to prevent mixed content issues
+    return '/api';
   }
   // W środowisku deweloperskim łączymy się bezpośrednio z backendem
   // Always use HTTPS in production, HTTP only for local development
@@ -23,19 +23,8 @@ const getBaseUrl = () => {
 const getWebSocketUrl = () => {
   // In production
   if (isProd) {
-    const useProxy = import.meta.env.VITE_USE_PROXY === 'true';
-    if (useProxy) {
-      // Use Vercel's proxy with the subpath
-      return '/pdfspark/socket.io';
-    } else {
-      // Use the load balancer server but change the protocol to wss (secure websocket)
-      const apiServer = getNextServer();
-      // Use secure WebSockets (wss://) when using HTTPS, otherwise use ws://
-      return apiServer
-        .replace('https://', 'wss://')
-        .replace('http://', 'ws://')
-        .replace('/api', '/socket.io');
-    }
+    // Always use relative WebSocket URL to prevent mixed content issues
+    return '/socket.io';
   }
   // In development environment, connect directly to the backend WebSocket endpoint
   return import.meta.env.VITE_WS_URL || 'ws://localhost:5000/api/ws';

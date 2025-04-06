@@ -5,7 +5,7 @@
  * to distribute load and provide fallback in case of server failure.
  */
 
-// Define the real server endpoints
+// Define the real server endpoints - always use HTTPS in production
 const API_SERVERS = [
   'https://18.156.158.53:5000/api',
   'https://18.156.42.200:5000/api',
@@ -63,13 +63,42 @@ export const markServerHealthy = (serverUrl: string): void => {
 };
 
 /**
- * Check health of all servers
+ * Check health of all servers using safer approach to prevent mixed content issues
  * @returns Promise resolving when all servers have been checked
  */
 export const checkAllServers = async (): Promise<void> => {
+  // In production on HTTPS pages, use the proxy instead of direct server checks
+  // to avoid mixed content warnings
+  if (window.location.protocol === 'https:') {
+    // Use the API proxy endpoint for health checks
+    try {
+      const response = await fetch('/api/health', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+        // Short timeout to quickly identify unresponsive servers
+        signal: AbortSignal.timeout(5000)
+      });
+      
+      // If the proxy is healthy, assume all servers are healthy
+      if (response.ok) {
+        API_SERVERS.forEach(server => markServerHealthy(server));
+      }
+    } catch (error) {
+      console.error('Health check via proxy failed:', error);
+    }
+    return;
+  }
+  
+  // For non-HTTPS environments, check each server directly
   await Promise.all(API_SERVERS.map(async (server) => {
     try {
-      const healthEndpoint = server.replace('/api', '/api/health');
+      // Ensure we're using HTTPS for production health checks
+      const healthEndpoint = server.includes('http://') 
+        ? server.replace('http://', 'https://').replace('/api', '/api/health')
+        : server.replace('/api', '/api/health');
+        
       const response = await fetch(healthEndpoint, {
         method: 'GET',
         headers: {
@@ -86,6 +115,7 @@ export const checkAllServers = async (): Promise<void> => {
       }
     } catch (error) {
       markServerUnhealthy(server);
+      console.error(`Health check failed for ${server}:`, error);
     }
   }));
 };
