@@ -2,9 +2,29 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+// Custom plugin to inject Google verification tag
+const injectGoogleVerification = () => {
+  return {
+    name: 'vite-plugin-inject-google-verification',
+    transformIndexHtml(html) {
+      // Check if tag already exists
+      if (html.includes('google-site-verification')) return html;
+      
+      // Inject the meta tag after the viewport meta tag
+      return html.replace(
+        /<meta name="viewport".*?>/,
+        '$&\n    <meta name="google-site-verification" content="WIKscPK-LpMMM63OZiE66Gsg1K0LXmXSt5z6wP4AqwQ" />'
+      );
+    }
+  };
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    injectGoogleVerification(),
+  ],
   
   // Use root path for production deployment to fix path issues
   base: '/',
