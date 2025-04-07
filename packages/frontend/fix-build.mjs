@@ -8,6 +8,25 @@ const __dirname = path.dirname(__filename);
 // This script runs at build time to ensure all required files exist
 console.log('🔍 Running pre-build verification and fix script...');
 
+// Ensure Google verification is present in index.html
+const indexPath = path.join(__dirname, 'index.html');
+if (fs.existsSync(indexPath)) {
+  console.log('Checking index.html for Google verification...');
+  let indexContent = fs.readFileSync(indexPath, 'utf8');
+  
+  if (!indexContent.includes('google-site-verification')) {
+    console.log('Adding Google verification meta tag...');
+    indexContent = indexContent.replace(
+      /<meta name="viewport".*?>/,
+      '$&\n    <meta name="google-site-verification" content="WIKscPK-LpMMM63OZiE66Gsg1K0LXmXSt5z6wP4AqwQ" />'
+    );
+    fs.writeFileSync(indexPath, indexContent);
+    console.log('✅ Google verification meta tag added');
+  } else {
+    console.log('✅ Google verification meta tag already present');
+  }
+}
+
 // Verify and fix directory structure
 const componentsUIDir = path.join(__dirname, 'src', 'components', 'ui');
 if (!fs.existsSync(componentsUIDir)) {
@@ -126,12 +145,28 @@ if (!fs.existsSync(publicDir)) {
   fs.mkdirSync(publicDir, { recursive: true });
 }
 
+// Ensure Google Search Console verification files are in multiple locations
+const verificationLocations = [
+  path.join(publicDir, 'googlefaa9d441c86b843b.html'),
+  path.join(__dirname, 'googlefaa9d441c86b843b.html')
+];
+
+// Create verification file in each location
+for (const verificationPath of verificationLocations) {
+  if (!fs.existsSync(verificationPath)) {
+    console.log(`Creating Google verification file at: ${verificationPath}`);
+    fs.writeFileSync(verificationPath, 'google-site-verification: googlefaa9d441c86b843b.html');
+    console.log(`✅ Created Google verification file at: ${verificationPath}`);
+  }
+}
+
 const buildInfoPath = path.join(publicDir, 'build-info.json');
 fs.writeFileSync(buildInfoPath, JSON.stringify({
   buildTimestamp: new Date().toISOString(),
   nodeVersion: process.version,
   filesFixed: fs.existsSync(fileViewerPath) ? ['FileViewer.tsx'] : [],
-  packagesAdded: needsPackageUpdate ? ['Dependencies updated'] : []
+  packagesAdded: needsPackageUpdate ? ['Dependencies updated'] : [],
+  verificationAdded: true
 }, null, 2));
 
 console.log('✅ Pre-build verification complete. Build can proceed.');
