@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,15 @@ const distDir = path.join(__dirname, 'dist');
 if (!fs.existsSync(distDir)) {
   console.error('❌ dist directory does not exist!');
   process.exit(1);
+}
+
+// Log the directory structure for debugging
+console.log('📂 dist directory structure:');
+try {
+  const dirList = execSync(`find ${distDir} -type f -name "*.html" | sort`).toString();
+  console.log(dirList);
+} catch (error) {
+  console.error('Error listing directory:', error);
 }
 
 // Create verification files in all possible locations
