@@ -6,6 +6,7 @@
   "rewrites": [
     { "source": "/privacy-policy", "destination": "/legal/paintmate-privacy.html" },
     { "source": "/paintmate-privacy", "destination": "/legal/paintmate-privacy.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/googlefaa9d441c86b843b.html", "destination": "/googlefaa9d441c86b843b.html" },
     { "source": "/pdfspark/googlefaa9d441c86b843b.html", "destination": "/googlefaa9d441c86b843b.html" },
     { "source": "/google-verification.html", "destination": "/google-verification.html" },
