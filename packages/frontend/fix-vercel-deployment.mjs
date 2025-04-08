@@ -100,12 +100,14 @@ async function fixDeployment() {
     // Remove any existing base tag since we're using HashRouter now
     indexHtml = indexHtml.replace(/<base href="[^"]*"[^>]*>/g, '');
     
-    // IMPORTANT: Add Google verification meta tag at the beginning of the head
-    console.log('Adding Google verification meta tag (CRITICAL)...');
-    indexHtml = indexHtml.replace(
-      /<head[^>]*>/,
-      '$&\n    <meta name="google-site-verification" content="WIKscPK-LpMMM63OZiE66Gsg1K0LXmXSt5z6wP4AqwQ" />'
-    );
+    // Ensure Google verification meta tag is present
+    if (!indexHtml.includes('google-site-verification')) {
+      console.log('Adding Google verification meta tag...');
+      indexHtml = indexHtml.replace(
+        /<meta name="viewport".*?>/,
+        '$&\n    <meta name="google-site-verification" content="WIKscPK-LpMMM63OZiE66Gsg1K0LXmXSt5z6wP4AqwQ" />'
+      );
+    }
     
     // Update paths to be relative
     indexHtml = indexHtml.replace(/href="\/pdfspark\//g, 'href="./');
