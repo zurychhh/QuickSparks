@@ -6,9 +6,7 @@
   "routes": [
     { "src": "/googlefaa9d441c86b843b.html", "dest": "/googlefaa9d441c86b843b.html" },
     { "src": "/pdfspark/googlefaa9d441c86b843b.html", "dest": "/googlefaa9d441c86b843b.html" },
-    { "src": "/google-verification.html", "dest": "/google-verification.html" },
-    { "src": "/privacy-policy", "dest": "/documents/privacy-policy.html" },
-    { "src": "/paintmate-privacy", "dest": "/documents/privacy-policy.html" }
+    { "src": "/google-verification.html", "dest": "/google-verification.html" }
   ],
   "rewrites": [
     {
