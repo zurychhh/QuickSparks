@@ -153,19 +153,12 @@ const verificationLocations = [
 
 // Create verification file in each location
 for (const verificationPath of verificationLocations) {
-  console.log(`Creating Google verification file at: ${verificationPath}`);
-  fs.writeFileSync(verificationPath, 'google-site-verification: googlefaa9d441c86b843b.html');
-  console.log(`✅ Created Google verification file at: ${verificationPath}`);
+  if (!fs.existsSync(verificationPath)) {
+    console.log(`Creating Google verification file at: ${verificationPath}`);
+    fs.writeFileSync(verificationPath, 'google-site-verification: googlefaa9d441c86b843b.html');
+    console.log(`✅ Created Google verification file at: ${verificationPath}`);
+  }
 }
-
-// Also ensure it will be in the root of the dist directory after build
-const distDir = path.join(__dirname, 'dist');
-if (!fs.existsSync(distDir)) {
-  fs.mkdirSync(distDir, { recursive: true });
-}
-const distVerificationFile = path.join(distDir, 'googlefaa9d441c86b843b.html');
-fs.writeFileSync(distVerificationFile, 'google-site-verification: googlefaa9d441c86b843b.html');
-console.log(`✅ Created Google verification file at dist root for post-build: ${distVerificationFile}`);
 
 const buildInfoPath = path.join(publicDir, 'build-info.json');
 fs.writeFileSync(buildInfoPath, JSON.stringify({
@@ -175,14 +168,5 @@ fs.writeFileSync(buildInfoPath, JSON.stringify({
   packagesAdded: needsPackageUpdate ? ['Dependencies updated'] : [],
   verificationAdded: true
 }, null, 2));
-
-// Finally, create a very visible log entry that will hopefully catch your attention in build logs
-console.log('\n\n');
-console.log('=====================================================================');
-console.log('🔴 GOOGLE VERIFICATION FILES CREATED IN THE FOLLOWING LOCATIONS:');
-console.log('   - public/googlefaa9d441c86b843b.html');
-console.log('   - googlefaa9d441c86b843b.html');
-console.log('=====================================================================');
-console.log('\n\n');
 
 console.log('✅ Pre-build verification complete. Build can proceed.');

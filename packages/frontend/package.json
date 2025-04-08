@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npx vite build",
-    "build:vercel": "node fix-build.mjs && npx vite build && node post-build-verification.mjs",
+    "build:vercel": "node fix-build.mjs && npx vite build",
     "direct-deploy": "node direct-deploy.mjs",
     "vercel-deploy": "./direct-deploy.sh",
     "vercel-standalone": "node vercel-standalone.mjs",
