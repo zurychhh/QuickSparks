@@ -26,8 +26,8 @@ export default defineConfig({
     injectGoogleVerification(),
   ],
   
-  // Use /pdfspark/ path for deployment
-  base: '/pdfspark/',
+  // Use root path for production deployment to fix path issues
+  base: '/',
   
   resolve: {
     alias: {

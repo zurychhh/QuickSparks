@@ -96,54 +96,6 @@ async function deploy() {
     );
     console.log('✅ Created package.json in dist');
     
-    // Ensure Google Search Console verification files are present
-    
-    // First, ensure the public directory exists in the dist folder
-    const distPublicDir = path.join(__dirname, 'dist', 'public');
-    if (!fs.existsSync(distPublicDir)) {
-      fs.mkdirSync(distPublicDir, { recursive: true });
-    }
-    
-    // Create the Google verification file
-    const googleVerificationFile = path.join(distPublicDir, 'googlefaa9d441c86b843b.html');
-    fs.writeFileSync(googleVerificationFile, 'google-site-verification: googlefaa9d441c86b843b.html');
-    console.log('✅ Created Google verification file in dist/public');
-    
-    // Also copy to root of dist
-    fs.writeFileSync(
-      path.join(__dirname, 'dist', 'googlefaa9d441c86b843b.html'),
-      'google-site-verification: googlefaa9d441c86b843b.html'
-    );
-    console.log('✅ Created Google verification file in dist root');
-    
-    // Also copy to pdfspark subfolder
-    const pdfsparkDir = path.join(__dirname, 'dist', 'pdfspark');
-    if (fs.existsSync(pdfsparkDir)) {
-      fs.writeFileSync(
-        path.join(pdfsparkDir, 'googlefaa9d441c86b843b.html'),
-        'google-site-verification: googlefaa9d441c86b843b.html'
-      );
-      console.log('✅ Created Google verification file in dist/pdfspark');
-    }
-    
-    // Now check if the meta tag is in the built index.html
-    const builtIndexPath = path.join(__dirname, 'dist', 'pdfspark', 'index.html');
-    if (fs.existsSync(builtIndexPath)) {
-      let builtIndexContent = fs.readFileSync(builtIndexPath, 'utf8');
-      
-      if (!builtIndexContent.includes('google-site-verification')) {
-        console.log('Adding Google verification meta tag to built index.html...');
-        builtIndexContent = builtIndexContent.replace(
-          /<meta name="viewport".*?>/,
-          '$&\n    <meta name="google-site-verification" content="WIKscPK-LpMMM63OZiE66Gsg1K0LXmXSt5z6wP4AqwQ" />'
-        );
-        fs.writeFileSync(builtIndexPath, builtIndexContent);
-        console.log('✅ Added Google verification meta tag to built index.html');
-      } else {
-        console.log('✅ Google verification meta tag already present in built index.html');
-      }
-    }
-    
     // Step 4: Deploy to Vercel
     console.log('\nStep 4: Deploying to Vercel...');
     try {
