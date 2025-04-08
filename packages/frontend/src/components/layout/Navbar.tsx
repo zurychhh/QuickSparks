@@ -58,25 +58,72 @@ const Navbar = (): React.ReactElement => {
   const { subscription, fetchSubscription } = useSubscriptionStore();
 
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('authToken');
-    setIsLoggedIn(!!token);
+    // Use the auth status endpoint to check if user is authenticated
+    // The cookie is automatically included in the request
+    const checkAuthStatus = async () => {
+      try {
+        // Call the auth status endpoint
+        const response = await fetch('/api/auth/status', {
+          method: 'GET',
+          credentials: 'include', // Important: include cookies
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        // Parse response
+        if (response.ok) {
+          const data = await response.json();
+          const authenticated = data.authenticated === true;
+          setIsLoggedIn(authenticated);
+          
+          // If authenticated, fetch subscription 
+          if (authenticated) {
+            fetchSubscription();
+          }
+        } else {
+          // If response is not OK, user is not authenticated
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Error checking authentication status:', error);
+        setIsLoggedIn(false);
+      }
+    };
     
-    // If logged in, fetch subscription
-    if (token) {
-      fetchSubscription();
-    }
+    checkAuthStatus();
   }, [fetchSubscription]);
 
   const toggleMenu = (): void => {
     setIsMenuOpen(!isMenuOpen);
   };
   
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    window.location.href = '/';
+  const handleLogout = async () => {
+    try {
+      // Call logout API endpoint to clear the HttpOnly cookie
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        // Update local state
+        setIsLoggedIn(false);
+        
+        // Reset CSRF token (in case it's stored somewhere)
+        // This is handled by the API service, no need to do anything here
+        
+        // Redirect to home page
+        window.location.href = '/';
+      } else {
+        console.error('Logout failed:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (

@@ -2,9 +2,10 @@ name: Deploy API
 
 on:
   push:
-    branches: [main]
+    branches: [main, production]
     paths:
       - 'packages/services/api/**'
+      - 'packages/conversion-service/**'
       - '.github/workflows/deploy-api.yml'
   workflow_dispatch:
 
@@ -37,13 +38,10 @@ jobs:
       - name: Build API
         run: pnpm --filter @pdfspark/api build
       
-      # In a real project, you would deploy to your cloud provider here
-      # For example, using Railway, Render, or a custom server
-      - name: Deploy to Railway
+      # Deploy to Render
+      - name: Deploy to Render
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
-          # This is a placeholder for the actual deployment command
-          echo "Deploying to Railway..."
-          # npm install -g @railway/cli
-          # railway up --service api
+          echo "Deploying API to Render..."
+          curl -X POST $RENDER_DEPLOY_HOOK

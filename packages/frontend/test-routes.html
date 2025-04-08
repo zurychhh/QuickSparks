@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDFSpark Route Tester</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #0070f3;
+    }
+    .route-test {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #eaeaea;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>PDFSpark Route Tester</h1>
+  <p>This tool helps test routes for the PDFSpark application.</p>
+  
+  <div class="route-test">
+    <h2>Test Direct Page Access</h2>
+    <button onclick="testDirectAccess('/pdfspark/')">Home</button>
+    <button onclick="testDirectAccess('/pdfspark/pricing')">Pricing</button>
+    <button onclick="testDirectAccess('/pdfspark/convert')">Convert</button>
+    <button onclick="testDirectAccess('/pdfspark/product')">Product</button>
+    <div id="directResult" class="result"></div>
+  </div>
+  
+  <div class="route-test">
+    <h2>Test Page Availability</h2>
+    <button onclick="checkResourceExists('/pdfspark/index.html')">Main Index</button>
+    <button onclick="checkResourceExists('/pdfspark/pricing.html')">Pricing Page</button>
+    <button onclick="checkResourceExists('/pdfspark/assets/index-CYjaYynn.js')">Main JS</button>
+    <button onclick="checkResourceExists('/pdfspark/assets/index-Cc4Bn2E8.css')">Main CSS</button>
+    <div id="resourceResult" class="result"></div>
+  </div>
+  
+  <div class="route-test">
+    <h2>Display Current URL Information</h2>
+    <button onclick="showUrlInfo()">Show URL Info</button>
+    <div id="urlResult" class="result"></div>
+  </div>
+  
+  <script>
+    // Test direct access to a route
+    function testDirectAccess(url) {
+      const resultElement = document.getElementById('directResult');
+      resultElement.innerHTML = `Testing access to ${url}...`;
+      
+      fetch(url)
+        .then(response => {
+          if (response.ok) {
+            return response.text().then(html => {
+              const size = new Blob([html]).size;
+              resultElement.innerHTML = `✅ Route ${url} is accessible. Response size: ${size} bytes.`;
+            });
+          } else {
+            resultElement.innerHTML = `❌ Route ${url} returned ${response.status}: ${response.statusText}`;
+          }
+        })
+        .catch(error => {
+          resultElement.innerHTML = `❌ Error accessing ${url}: ${error.message}`;
+        });
+    }
+    
+    // Check if a resource exists
+    function checkResourceExists(url) {
+      const resultElement = document.getElementById('resourceResult');
+      resultElement.innerHTML = `Checking resource ${url}...`;
+      
+      fetch(url, {method: 'HEAD'})
+        .then(response => {
+          if (response.ok) {
+            resultElement.innerHTML = `✅ Resource ${url} exists.`;
+          } else {
+            resultElement.innerHTML = `❌ Resource ${url} returned ${response.status}: ${response.statusText}`;
+          }
+        })
+        .catch(error => {
+          resultElement.innerHTML = `❌ Error checking ${url}: ${error.message}`;
+        });
+    }
+    
+    // Show current URL information
+    function showUrlInfo() {
+      const resultElement = document.getElementById('urlResult');
+      const info = {
+        href: window.location.href,
+        host: window.location.host,
+        hostname: window.location.hostname,
+        pathname: window.location.pathname,
+        protocol: window.location.protocol,
+        origin: window.location.origin,
+        search: window.location.search,
+        hash: window.location.hash
+      };
+      
+      resultElement.innerHTML = '<pre>' + JSON.stringify(info, null, 2) + '</pre>';
+    }
+    
+    // Show URL info on load
+    window.onload = showUrlInfo;
+  </script>
+</body>
+</html>

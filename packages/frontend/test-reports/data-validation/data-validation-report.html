@@ -1,0 +1,41 @@
+
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>PDFSpark Data Validation Test Results</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1, h2 { color: #333; }
+          .summary { margin: 20px 0; padding: 15px; background-color: #f5f5f5; border-radius: 5px; }
+          .pass-rate { font-weight: bold; }
+          .good { color: green; }
+          .warning { color: orange; }
+          .bad { color: red; }
+          .backend-info { background-color: #e6f7ff; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        </style>
+      </head>
+      <body>
+        <h1>PDFSpark Data Validation Test Results</h1>
+        <p>Timestamp: 2025-03-26T11:47:32.839Z</p>
+        
+        <div class="backend-info">
+          <h2>Backend Connection</h2>
+          <p><strong>Used Real Backend:</strong> Yes ✅</p>
+          <p><strong>Backend URL:</strong> http://localhost:3000/pdfspark/api/conversion/status?id=test123</p>
+        </div>
+        
+        <div class="summary">
+          <h2>Summary</h2>
+          <p>File Validation: 5/5 tests passed 
+             (<span class="good">100.00%</span>)
+          </p>
+          <p>Conversion Validation: 5/6 tests passed
+             (<span class="good">83.33%</span>)
+          </p>
+          <p>Overall Pass Rate: <span class="good">90.91%</span></p>
+        </div>
+        
+        <p>See the JSON files in the test reports directory for detailed test results.</p>
+      </body>
+    </html>
+    

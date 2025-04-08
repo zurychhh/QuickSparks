@@ -1,5 +1,5 @@
 import { Job } from 'bullmq';
-import fs from 'fs';
+import fs, { promises as fsPromises } from 'fs';
 import path from 'path';
 import { ConversionJob, ConversionResult, ConversionType } from '../types/conversion';
 import pdfToDocxService from '../services/pdfToDocxService';
@@ -8,6 +8,7 @@ import logger from '../utils/logger';
 import Conversion from '../models/conversion.model';
 import File from '../models/file.model';
 import fileStorage from '../utils/fileStorage';
+import FileEncryption from '../utils/encryption/FileEncryption';
 
 /**
  * Process a conversion job
@@ -20,7 +21,7 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
   logger.info(`Processing ${conversionType} job`, { 
     jobId: job.id, 
     conversionId,
-    sourceFilePath
+    sourceFilePath,
   });
   
   try {
@@ -28,14 +29,14 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
     await Conversion.findByIdAndUpdate(conversionId, { 
       status: 'processing',
       processingStartedAt: new Date(),
-      jobId: job.id
+      jobId: job.id,
     });
     
     // Ensure output directory exists
     const outputDir = path.dirname(outputFilePath);
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
+    await fsPromises.mkdir(outputDir, { recursive: true }).catch(() => {
+      // Directory already exists, ignore error
+    });
     
     // Conversion result
     let result: ConversionResult;
@@ -46,14 +47,14 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
         sourceFilePath,
         outputFilePath,
         quality,
-        preserveFormatting
+        preserveFormatting,
       );
     } else if (conversionType === 'docx-to-pdf') {
       result = await docxToPdfService.convertDocxToPdf(
         sourceFilePath,
         outputFilePath,
         quality,
-        preserveFormatting
+        preserveFormatting,
       );
     } else {
       throw new Error(`Unsupported conversion type: ${conversionType}`);
@@ -61,7 +62,7 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
     
     if (result.success) {
       // Get output file information
-      const stats = fs.statSync(outputFilePath);
+      const stats = await fsPromises.stat(outputFilePath);
       
       // Determine output file MIME type
       const outputMimeType = conversionType === 'pdf-to-docx' 
@@ -76,15 +77,24 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
       // Calculate file expiration date based on user tier from job data
       const expiresAt = fileStorage.calculateFileExpiration(job.data.userTier);
       
-      // Encrypt the output file
-      const encryptionMetadata = await fileStorage.saveFileSecurely(
+      // Use smart encryption for the output file
+      // This automatically chooses between streaming and buffer approach based on file size
+      const encryptionMetadata = await FileEncryption.smartEncrypt(
+        outputFilePath,
         outputFilePath + '.enc',
-        fs.readFileSync(outputFilePath),
-        userId
+        5 * 1024 * 1024, // 5MB threshold
       );
       
+      // Convert encryption result to metadata format expected by the database
+      const metadata = {
+        encryptionMethod: 'aes-256-gcm',
+        hasIv: true,
+        hasAuthTag: true,
+        keyIdentifier: encryptionMetadata.salt.substring(0, 8), // Use first 8 bytes of salt as key ID
+      };
+      
       // Delete the unencrypted file
-      fs.unlinkSync(outputFilePath);
+      await fsPromises.unlink(outputFilePath);
       
       // Create a file record for the output file
       const outputFile = await File.create({
@@ -96,8 +106,8 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
         path: outputFilePath + '.enc',
         expiresAt,
         isDeleted: false,
-        encryptionMethod: encryptionMetadata.encryptionMethod,
-        keyIdentifier: encryptionMetadata.keyIdentifier
+        encryptionMethod: metadata.encryptionMethod,
+        keyIdentifier: metadata.keyIdentifier,
       });
       
       // Update conversion record with completion info
@@ -106,14 +116,14 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
         resultFileId: outputFile._id,
         completedAt: new Date(),
         processingEndedAt: new Date(),
-        pageCount: result.pageCount
+        pageCount: result.pageCount,
       });
       
       logger.info(`Conversion completed successfully`, {
         jobId: job.id,
         conversionId,
         outputFile: outputFile._id,
-        conversionTime: result.conversionTime
+        conversionTime: result.conversionTime,
       });
       
       // Return success result
@@ -121,26 +131,26 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
         success: true,
         outputPath: outputFile.path,
         conversionTime: result.conversionTime,
-        pageCount: result.pageCount
+        pageCount: result.pageCount,
       };
     } else {
       // Handle conversion failure
       await Conversion.findByIdAndUpdate(conversionId, {
         status: 'failed',
         error: result.error,
-        processingEndedAt: new Date()
+        processingEndedAt: new Date(),
       });
       
       logger.error(`Conversion failed`, {
         jobId: job.id,
         conversionId,
-        error: result.error
+        error: result.error,
       });
       
       return {
         success: false,
         error: result.error,
-        conversionTime: result.conversionTime
+        conversionTime: result.conversionTime,
       };
     }
   } catch (error) {
@@ -150,22 +160,22 @@ export async function processConversionJob(job: Job<ConversionJob>): Promise<Con
     await Conversion.findByIdAndUpdate(conversionId, {
       status: 'failed',
       error: errorMessage,
-      processingEndedAt: new Date()
+      processingEndedAt: new Date(),
     });
     
     logger.error(`Conversion job failed with exception`, {
       jobId: job.id,
       conversionId,
-      error
+      error,
     });
     
     return {
       success: false,
-      error: errorMessage
+      error: errorMessage,
     };
   }
 }
 
 export default {
-  processConversionJob
+  processConversionJob,
 };

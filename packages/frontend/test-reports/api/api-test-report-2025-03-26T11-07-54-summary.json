@@ -1,0 +1,9 @@
+{
+  "timestamp": "2025-03-26T11-07-54",
+  "backendType": "Mock API Server",
+  "totalRequests": 5,
+  "failedRequests": 0,
+  "totalAssertions": 10,
+  "failedAssertions": 0,
+  "totalTime": 82
+}

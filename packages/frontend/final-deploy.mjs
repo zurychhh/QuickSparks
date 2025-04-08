@@ -25,22 +25,11 @@ async function deploy() {
   try {
     console.log('Step 1: Verifying build configuration...');
     
-    // Check if vite.config.ts has base: '/pdfspark/'
-    const viteConfig = fs.readFileSync(path.join(__dirname, 'vite.config.ts'), 'utf8');
-    if (!viteConfig.includes("base: '/pdfspark/'")) {
-      throw new Error('Vite config is missing base: \'/pdfspark/\' configuration');
-    }
-    console.log('✅ Vite configuration verified');
-    
-    // Check if Router has basename="/pdfspark"
-    const appFile = fs.readFileSync(path.join(__dirname, 'src/App.tsx'), 'utf8');
-    if (!appFile.includes('basename="/pdfspark"')) {
-      throw new Error('App.tsx is missing Router basename="/pdfspark" configuration');
-    }
-    console.log('✅ Router configuration verified');
+    // Skip configuration checks - use relative paths instead of /pdfspark/
+    console.log('✅ Using relative path configuration for deployment');
     
     console.log('Step 2: Building application...');
-    await run('npm run build');
+    await run('npm run build:vercel');
     console.log('✅ Build completed successfully');
     
     console.log('Step 3: Preparing Vercel configuration...');
@@ -49,29 +38,39 @@ async function deploy() {
     const vercelConfig = {
       "version": 2,
       "public": true,
-      "redirects": [
-        { 
-          "source": "/", 
-          "destination": "/pdfspark", 
-          "permanent": true 
-        }
-      ],
+      "cleanUrls": true,
       "rewrites": [
-        { "source": "/pdfspark/:path*", "destination": "/pdfspark/index.html" },
-        { "source": "/(.*)", "destination": "/pdfspark/index.html" }
+        { "source": "/pdfspark", "destination": "/index.html" },
+        { "source": "/pdfspark/(.*)", "destination": "/$1" }
       ],
       "headers": [
         {
-          "source": "/pdfspark/:path*",
+          "source": "/(.*)",
           "headers": [
             {
               "key": "Cache-Control",
               "value": "public, max-age=0, must-revalidate"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=31536000; includeSubDomains; preload"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "DENY"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "1; mode=block"
             }
           ]
         },
         {
-          "source": "/pdfspark/assets/:path*",
+          "source": "/assets/(.*)",
           "headers": [
             {
               "key": "Cache-Control",

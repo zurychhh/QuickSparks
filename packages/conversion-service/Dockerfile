@@ -1,9 +1,24 @@
 FROM node:20-slim AS builder
 
+# Install dependencies for PDF processing
+RUN apt-get update && apt-get install -y \
+    g++ \
+    make \
+    python3 \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev \
+    fonts-dejavu \
+    fontconfig && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install dependencies first to leverage Docker cache
 COPY package*.json ./
+# Use npm install instead of npm ci to update package-lock.json
 RUN npm install
 
 # Copy source code
@@ -15,11 +30,23 @@ RUN npm run build
 # Create production image
 FROM node:20-slim
 
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libcairo2 \
+    libpango1.0-0 \
+    libjpeg62-turbo \
+    libgif7 \
+    librsvg2-2 \
+    fonts-dejavu \
+    fontconfig && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install only production dependencies
 COPY package*.json ./
-RUN npm install --only=production
+# Use regular install with production flag instead of --only=production
+RUN npm install --production
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist

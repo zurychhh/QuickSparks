@@ -1,0 +1,27 @@
+{
+  "date": "2025-03-26T10-52-02",
+  "results": [
+    {
+      "url": "http://localhost:3000/pdfspark/",
+      "performance": 55,
+      "accessibility": 95,
+      "bestPractices": 96,
+      "seo": 100,
+      "reportFile": "/Users/user/conversion-microservices/packages/frontend/test-reports/lighthouse/2025-03-26T10-52-02-home.html"
+    },
+    {
+      "url": "http://localhost:3000/pdfspark/convert",
+      "performance": 55,
+      "accessibility": 86,
+      "bestPractices": 96,
+      "seo": 100,
+      "reportFile": "/Users/user/conversion-microservices/packages/frontend/test-reports/lighthouse/2025-03-26T10-52-02-convert.html"
+    }
+  ],
+  "averages": {
+    "performance": 55,
+    "accessibility": 91,
+    "bestPractices": 96,
+    "seo": 100
+  }
+}

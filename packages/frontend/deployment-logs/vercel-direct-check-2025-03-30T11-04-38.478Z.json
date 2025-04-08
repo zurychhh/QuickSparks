@@ -1,0 +1,37 @@
+{
+  "/": {
+    "status": 307,
+    "success": false,
+    "snippet": "Redirecting...\n"
+  },
+  "/pdfspark": {
+    "status": 200,
+    "success": true,
+    "snippet": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <met"
+  },
+  "/pdfspark/": {
+    "status": 200,
+    "success": true,
+    "snippet": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <met"
+  },
+  "/pdfspark/convert": {
+    "status": 200,
+    "success": true,
+    "snippet": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <met"
+  },
+  "/pdfspark/product": {
+    "status": 200,
+    "success": true,
+    "snippet": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <met"
+  },
+  "/pdfspark/pricing": {
+    "status": 200,
+    "success": true,
+    "snippet": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <met"
+  },
+  "/pdfspark/about": {
+    "status": 200,
+    "success": true,
+    "snippet": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <met"
+  }
+}

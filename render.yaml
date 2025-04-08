@@ -1,0 +1,86 @@
+services:
+  - type: web
+    name: pdfspark-api
+    env: node
+    plan: starter
+    buildCommand: cd gateway && npm install
+    startCommand: cd gateway && node server.js
+    healthCheckPath: /health
+    disk:
+      name: uploads
+      mountPath: /opt/render/project/src/gateway/uploads
+      sizeGB: 10
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8000
+      - key: JWT_SECRET
+        sync: false
+      - key: FILE_ENCRYPTION_SECRET
+        sync: false
+      - key: MONGO_URI
+        fromDatabase:
+          name: pdfspark-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: pdfspark-redis
+          property: connectionString
+      - key: UPLOAD_DIR
+        value: /opt/render/project/src/packages/services/api/uploads
+      - key: ALLOWED_ORIGINS
+        value: https://pdfspark.app,https://www.pdfspark.app,https://pdfspark.vercel.app,https://pdfspark-git-main.vercel.app,http://localhost:3000
+
+  - type: web
+    name: pdfspark-conversion
+    env: node
+    plan: starter
+    buildCommand: cd packages/conversion-service && npm install && bash build-production.sh
+    startCommand: cd packages/conversion-service && node dist/index.js
+    autoDeploy: false
+    disk:
+      name: conversion
+      mountPath: /opt/render/project/src/packages/conversion-service/uploads
+      sizeGB: 20
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5001
+      - key: JWT_SECRET
+        sync: false
+      - key: FILE_ENCRYPTION_SECRET
+        sync: false
+      - key: MONGO_URI
+        fromDatabase:
+          name: pdfspark-db
+          property: connectionString
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: pdfspark-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: pdfspark-redis
+          property: port
+      - key: UPLOADS_DIR
+        value: /opt/render/project/src/packages/conversion-service/uploads
+      - key: OUTPUTS_DIR
+        value: /opt/render/project/src/packages/conversion-service/outputs
+      - key: API_URL
+        value: https://pdfspark-api.onrender.com
+
+databases:
+  - name: pdfspark-db
+    databaseName: pdfspark
+    plan: starter
+    ipAllowList: [] # Only allow internal connections
+
+  - name: pdfspark-redis
+    type: redis
+    plan: starter
+    ipAllowList: [] # Only allow internal connections

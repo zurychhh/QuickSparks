@@ -26,6 +26,28 @@ const DEFAULT_LABEL = 'Upload File';
 const DEFAULT_DROPZONE_TEXT = 'Drag & drop a file here, or click to browse';
 const DEFAULT_ERROR_TEXT = 'File upload error';
 
+// Helper function to get file extension from name
+const getFileExtension = (fileName: string): string => {
+  return fileName.split('.').pop()?.toLowerCase() || '';
+};
+
+// Helper function to check if file extension is valid
+const isValidFileExtension = (fileName: string, acceptedTypes: string[]): boolean => {
+  const extension = getFileExtension(fileName);
+  
+  // Map MIME types to extensions
+  const mimeToExtension: Record<string, string[]> = {
+    'application/pdf': ['pdf'],
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['docx'],
+    'application/msword': ['doc'],
+  };
+  
+  // Get all valid extensions for the accepted MIME types
+  const validExtensions = acceptedTypes.flatMap(type => mimeToExtension[type] || []);
+  
+  return validExtensions.includes(extension);
+};
+
 // Helper function to get friendly file type names
 const getFriendlyFileType = (mimeType: string): string => {
   const typeMap: Record<string, string> = {
@@ -59,13 +81,29 @@ const FileUpload: React.FC<FileUploadProps> = ({
       setUploadError(null);
 
       if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        
+        // Double-check file extension matches MIME type
+        if (!isValidFileExtension(file.name, acceptedFileTypes)) {
+          const friendlyTypes = acceptedFileTypes.map(type => getFriendlyFileType(type)).join(', ');
+          const errorMessage = `Invalid file extension. We only accept ${friendlyTypes} files.`;
+          
+          setUploadError(errorMessage);
+          showFeedback('error', errorMessage, 5000);
+          
+          if (onFileRejected) {
+            onFileRejected([{ code: 'file-invalid-extension', message: errorMessage }]);
+          }
+          return;
+        }
+        
         // Show animation effect
         setIsDropSuccess(true);
 
         // Display success feedback
-        showFeedback('success', `File "${acceptedFiles[0].name}" selected successfully`, 3000);
+        showFeedback('success', `File "${file.name}" selected successfully`, 3000);
 
-        onFileAccepted(acceptedFiles[0]);
+        onFileAccepted(file);
       }
 
       if (fileRejections.length > 0) {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="50px" viewBox="0 0 200 50" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" fill-rule="evenodd">
+    <rect fill="#4F46E5" x="0" y="0" width="50" height="50" rx="10"></rect>
+    <path d="M27.5,35 L27.5,30 L22.5,30 L22.5,35 L13,35 L13,15 L37,15 L37,35 L27.5,35 Z M33,19 L17,19 L17,31 L18.5,31 L18.5,26 L31.5,26 L31.5,31 L33,31 L33,19 Z" fill="#FFFFFF" fill-rule="nonzero"></path>
+    <path d="M9,38 L9,12 L11,12 C11.5522847,12 12,12.4477153 12,13 L12,37 C12,37.5522847 11.5522847,38 11,38 L9,38 Z" fill="#FFFFFF" fill-rule="nonzero"></path>
+    <text font-family="Poppins, sans-serif" font-size="24" font-weight="600" fill="#4F46E5" x="60" y="32">
+      QuickSparks
+    </text>
+  </g>
+</svg>

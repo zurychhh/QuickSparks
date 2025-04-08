@@ -1,0 +1,19 @@
+{
+  "lastDeployment": {
+    "timestamp": "2025-03-25T12:59:34.752Z",
+    "version": "1.0.2",
+    "deploymentType": "direct-cli",
+    "status": "deploying"
+  },
+  "features": {
+    "paymentProcessing": true,
+    "fileViewer": true,
+    "pdfConversion": true,
+    "docxConversion": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "lastChecked": "2025-03-25T12:59:34.753Z",
+    "directDeployment": true
+  }
+}

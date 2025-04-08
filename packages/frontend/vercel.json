@@ -1,10 +1,104 @@
 {
+  "version": 2,
+  "public": true,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { 
+      "source": "/api/health", 
+      "destination": "http://18.156.42.200:5000/api/health" 
+    },
+    { 
+      "source": "/api/conversion/:path*", 
+      "destination": "http://52.59.103.54:5000/api/:path*" 
+    },
+    { 
+      "source": "/api/storage/:path*", 
+      "destination": "http://18.156.158.53:5000/api/:path*" 
+    },
+    {
+      "source": "/api/conversions/:path*",
+      "destination": "http://52.59.103.54:5000/api/conversions/:path*"
+    },
+    {
+      "source": "/api/downloads/:path*",
+      "destination": "http://18.156.158.53:5000/api/downloads/:path*"
+    },
+    {
+      "source": "/api/thumbnails/:path*",
+      "destination": "http://18.156.158.53:5000/api/thumbnails/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "http://18.156.42.200:5000/api/:path*"
+    },
+    {
+      "source": "/ws",
+      "destination": "http://18.156.42.200:5000/ws"
+    },
+    {
+      "source": "/pdfspark/api/health",
+      "destination": "http://18.156.42.200:5000/api/health"
+    },
+    {
+      "source": "/pdfspark/api/conversions/:path*",
+      "destination": "http://52.59.103.54:5000/api/conversions/:path*"
+    },
+    {
+      "source": "/pdfspark/api/downloads/:path*",
+      "destination": "http://18.156.158.53:5000/api/downloads/:path*"
+    },
+    {
+      "source": "/pdfspark/api/thumbnails/:path*",
+      "destination": "http://18.156.158.53:5000/api/thumbnails/:path*"
+    },
+    {
+      "source": "/pdfspark/api/:path*",
+      "destination": "http://18.156.42.200:5000/api/:path*"
+    },
+    {
+      "source": "/pdfspark/ws",
+      "destination": "http://18.156.42.200:5000/ws"
+    },
+    {
+      "source": "/pdfspark/(.*)",
+      "destination": "/pdfspark/index.html"
+    },
+    {
+      "source": "/pdfspark",
+      "destination": "/pdfspark/index.html"
+    }
   ],
-  "buildCommand": "pnpm run build:vercel",
-  "devCommand": "pnpm run dev",
-  "installCommand": "pnpm install --no-frozen-lockfile",
-  "outputDirectory": "dist",
-  "framework": "vite"
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https:; img-src 'self' data: https:; connect-src 'self' http://18.156.42.200:5000 http://52.59.103.54:5000 http://18.156.158.53:5000 https://pdfspark-conversion-service.onrender.com https://api.quicksparks.dev https://*.vercel.app wss: ws: http: https:; frame-ancestors 'none';" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, Content-Disposition" },
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Expose-Headers", "value": "Content-Disposition" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/hash-router-monitor.js",
+      "headers": [{ "key": "Content-Type", "value": "text/javascript" }]
+    }
+  ]
 }

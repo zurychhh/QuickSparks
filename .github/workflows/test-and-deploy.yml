@@ -1,0 +1,193 @@
+name: Test and Deploy PDFSpark
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - feature/purchase-flow
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Fix TypeScript errors in conversion service
+        working-directory: ./packages/conversion-service
+        run: |
+          # Apply TypeScript fixes
+          cp src/mongoose-fix.ts src/mongoose-fix.ts.original
+          node ./build-production.sh
+          
+      - name: Build frontend
+        working-directory: ./packages/frontend
+        run: npm run build
+        
+      - name: Setup Chrome for Selenium
+        uses: browser-actions/setup-chrome@v1
+        
+      - name: Install Selenium dependencies
+        run: npm install -g selenium-webdriver
+        
+      - name: Start services for testing
+        working-directory: ./packages/frontend
+        run: |
+          # Start backend services in the background
+          cd ../conversion-service && npm run dev &
+          # Wait for services to start
+          sleep 15
+          # Return to frontend directory
+          cd ../frontend
+          
+      - name: Run Selenium tests
+        working-directory: ./packages/frontend
+        run: |
+          # Run the complete test suite
+          node selenium-tests/complete-test.mjs
+          
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: ./packages/frontend/selenium-tests/test-results
+          
+  deploy-netlify:
+    name: Deploy to Netlify
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feature/purchase-flow'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build frontend
+        working-directory: ./packages/frontend
+        run: npm run build
+        
+      - name: Prepare Netlify deployment
+        working-directory: ./packages/frontend
+        run: node netlify-deploy.mjs
+        
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: './packages/frontend/netlify-deploy'
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5
+        
+  deploy-vercel:
+    name: Deploy to Vercel
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feature/purchase-flow'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build frontend
+        working-directory: ./packages/frontend
+        run: npm run build
+        
+      - name: Prepare WWW fix deployment
+        working-directory: ./packages/frontend
+        run: node fix-www-redirect.mjs
+        
+      - name: Deploy to Vercel (apex domain)
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./packages/frontend/dist
+          vercel-args: '--prod'
+        continue-on-error: true
+        
+      - name: Deploy to Vercel (www subdomain)
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_WWW_PROJECT_ID }}
+          working-directory: ./packages/frontend/www-deploy
+          vercel-args: '--prod'
+        continue-on-error: true
+        
+  verify-deployment:
+    name: Verify Deployment
+    needs: [deploy-netlify, deploy-vercel]
+    if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feature/purchase-flow')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install verification dependencies
+        run: npm install -g lighthouse puppeteer-core
+        
+      - name: Run deployment check
+        working-directory: ./packages/frontend
+        run: node check-deployment-status.mjs
+        
+      - name: Run Lighthouse audit
+        run: |
+          lighthouse https://www.quicksparks.dev/pdfspark/ --output json --output-path=./lighthouse-report.json --chrome-flags="--headless --no-sandbox --disable-gpu"
+        continue-on-error: true
+        
+      - name: Upload verification results
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-verification
+          path: |
+            ./packages/frontend/deployment-logs/comprehensive-check-*.json
+            ./lighthouse-report.json

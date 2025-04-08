@@ -1,0 +1,242 @@
+{
+  "timestamp": "2025-03-26T12:26:14.280Z",
+  "baseUrl": "https://quicksparks.dev/pdfspark",
+  "results": {
+    "routes": {
+      "results": [
+        {
+          "url": "https://quicksparks.dev/pdfspark",
+          "status": 404,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "79"
+            ],
+            "content-type": [
+              "text/plain; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 12:26:11 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000"
+            ],
+            "x-vercel-error": [
+              "NOT_FOUND"
+            ],
+            "x-vercel-id": [
+              "arn1::c5fv4-1742991971667-b8c2a2358618"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/product",
+          "status": 404,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "79"
+            ],
+            "content-type": [
+              "text/plain; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 12:26:11 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000"
+            ],
+            "x-vercel-error": [
+              "NOT_FOUND"
+            ],
+            "x-vercel-id": [
+              "arn1::k2mhl-1742991971906-52175e1aaf33"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/pricing",
+          "status": 404,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "79"
+            ],
+            "content-type": [
+              "text/plain; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 12:26:12 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000"
+            ],
+            "x-vercel-error": [
+              "NOT_FOUND"
+            ],
+            "x-vercel-id": [
+              "arn1::bjgsg-1742991972192-e2adcb3bf51c"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/convert",
+          "status": 404,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "79"
+            ],
+            "content-type": [
+              "text/plain; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 12:26:12 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000"
+            ],
+            "x-vercel-error": [
+              "NOT_FOUND"
+            ],
+            "x-vercel-id": [
+              "arn1::l8thd-1742991972511-7e5613d3a318"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/about",
+          "status": 404,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "79"
+            ],
+            "content-type": [
+              "text/plain; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 12:26:12 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000"
+            ],
+            "x-vercel-error": [
+              "NOT_FOUND"
+            ],
+            "x-vercel-id": [
+              "arn1::2j227-1742991972754-46740fddc698"
+            ]
+          },
+          "contentValid": true
+        },
+        {
+          "url": "https://quicksparks.dev/pdfspark/health",
+          "status": 404,
+          "success": false,
+          "headers": {
+            "cache-control": [
+              "public, max-age=0, must-revalidate"
+            ],
+            "connection": [
+              "close"
+            ],
+            "content-length": [
+              "79"
+            ],
+            "content-type": [
+              "text/plain; charset=utf-8"
+            ],
+            "date": [
+              "Wed, 26 Mar 2025 12:26:12 GMT"
+            ],
+            "server": [
+              "Vercel"
+            ],
+            "strict-transport-security": [
+              "max-age=63072000"
+            ],
+            "x-vercel-error": [
+              "NOT_FOUND"
+            ],
+            "x-vercel-id": [
+              "arn1::4f4z7-1742991972982-1986dec0caf0"
+            ]
+          },
+          "contentValid": true
+        }
+      ],
+      "success": false
+    },
+    "securityHeaders": {
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000",
+        "Content-Security-Policy": null,
+        "X-Content-Type-Options": null,
+        "X-Frame-Options": null,
+        "X-XSS-Protection": null,
+        "Referrer-Policy": null,
+        "Permissions-Policy": null
+      },
+      "success": false
+    },
+    "healthCheck": {
+      "success": false
+    },
+    "seoFiles": {
+      "robotsTxt": true,
+      "sitemapXml": true,
+      "success": true
+    }
+  },
+  "approved": true
+}

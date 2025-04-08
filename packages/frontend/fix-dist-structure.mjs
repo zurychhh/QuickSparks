@@ -40,39 +40,36 @@ fs.readdirSync(DIST_DIR).forEach(file => {
   }
 });
 
-// Update vercel.json to include the proper redirects
-console.log('Updating vercel.json...');
-const vercelJsonPath = path.join(DIST_DIR, 'vercel.json');
-const vercelJson = JSON.parse(fs.readFileSync(vercelJsonPath, 'utf8'));
+// Use our pre-configured vercel.json instead of modifying the existing one
+console.log('Using simple vercel.json configuration...');
+const sourceVercelPath = path.join(PACKAGE_ROOT, 'simple-vercel.json');
+const destVercelPath = path.join(DIST_DIR, 'vercel.json');
 
-// Better root handling - ensure root redirects to /pdfspark
-if (!vercelJson.redirects.some(r => r.source === '/' && r.destination === '/pdfspark')) {
-  vercelJson.redirects.unshift({
-    source: '/',
-    destination: '/pdfspark',
-    permanent: true
-  });
+if (fs.existsSync(sourceVercelPath)) {
+  // Copy our simple-vercel.json to dist/vercel.json
+  fs.copyFileSync(sourceVercelPath, destVercelPath);
+  console.log('✅ Copied simple-vercel.json to dist/vercel.json');
+} else {
+  console.log('⚠️ simple-vercel.json not found, creating basic configuration');
+  
+  // Create a basic vercel.json with minimal configuration
+  const basicVercelConfig = {
+    "version": 2,
+    "public": true,
+    "routes": [
+      {
+        "src": "/",
+        "status": 307,
+        "headers": { "Location": "/pdfspark/" }
+      },
+      { "handle": "filesystem" },
+      { "src": "/pdfspark/(.*)", "dest": "/pdfspark/index.html" }
+    ]
+  };
+  
+  // Write basic vercel.json configuration
+  fs.writeFileSync(destVercelPath, JSON.stringify(basicVercelConfig, null, 2));
 }
-
-// Add a better catch-all redirect for SPA handling
-vercelJson.rewrites = [
-  {
-    source: "/pdfspark",
-    destination: "/pdfspark/index.html"
-  },
-  {
-    source: "/pdfspark/(.*)",
-    destination: "/pdfspark/$1"
-  },
-  // Add a special rewrite for SPA routing
-  {
-    source: "/pdfspark/:path*",
-    destination: "/pdfspark/index.html"
-  }
-];
-
-// Write updated vercel.json
-fs.writeFileSync(vercelJsonPath, JSON.stringify(vercelJson, null, 2));
 
 // Create an index.html in the root that redirects to /pdfspark
 console.log('Creating root index.html with redirect...');

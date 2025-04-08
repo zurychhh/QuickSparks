@@ -2,11 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
+import cookieParser from 'cookie-parser';
 import env from './config/env';
 import connectDatabase from './config/database';
 import { initializeWorker } from './config/queue';
 import routes from './routes';
 import logger from './utils/logger';
+import errorHandler from './middleware/errorHandler';
+import metrics from './middleware/monitoring/metrics';
 
 // Declare global modules
 declare global {
@@ -25,9 +28,64 @@ declare global {
 const app = express();
 
 // Apply middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Configure CORS for specific origins
+const corsOptions = {
+  origin: function(origin, callback) {
+    // Lista dozwolonych domen
+    const allowedOrigins = [
+      'https://pdfspark.vercel.app',            // Main production domain
+      'https://www.pdfspark.vercel.app',        // www subdomain
+      'https://pdfspark-git-main.vercel.app',   // Branch deployment
+      'https://quicksparks.dev',                // Main custom domain
+      'https://www.quicksparks.dev',            // www custom domain
+      'http://localhost:3000',                  // Local dev with React
+      'http://localhost:5173',                  // Local dev with Vite
+      env.FRONTEND_URL                          // From env variables
+    ].filter(Boolean); // Remove any undefined/empty values
+    
+    // In development, allow any origin
+    if (env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    console.log(`CORS request from origin: ${origin}`);
+    
+    // Allow requests with no origin (like mobile apps, curl, etc)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // Check if origin is in the allowed list
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Check if origin ends with allowed domain (subdomains)
+    for (const allowed of allowedOrigins) {
+      if (origin.endsWith(allowed.replace(/^https?:\/\//, ''))) {
+        return callback(null, true);
+      }
+    }
+    
+    console.error(`Origin blocked by CORS: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Content-Disposition', 'X-CSRF-Token'],
+  exposedHeaders: ['Content-Disposition'], // Expose headers for file downloads
+  credentials: true,
+  maxAge: 86400,  // 24 hours
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(cookieParser(env.COOKIE_SECRET || 'pdfspark-default-cookie-secret-replace-in-production'));
+
+// Add metrics middleware for all requests
+app.use(metrics.httpMetricsMiddleware);
 
 // Create required directories if they don't exist
 const uploadsDir = path.join(process.cwd(), env.UPLOADS_DIR);
@@ -43,19 +101,46 @@ if (!fs.existsSync(outputsDir)) {
   logger.info(`Created outputs directory at ${outputsDir}`);
 }
 
-// Apply routes
+// Metrics endpoint for Prometheus scraping - no authentication required
+// but should be protected by network policies in production
+app.get('/metrics', metrics.metricsHandler);
+
+// Apply API routes
 app.use('/api', routes);
 
-// Global error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error('Unhandled error', err);
-  
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-    error: env.NODE_ENV === 'development' ? err.message : undefined
-  });
+// Add request ID middleware
+app.use((req, res, next) => {
+  const requestId = req.headers['x-request-id'] || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  req.headers['x-request-id'] = requestId as string;
+  res.setHeader('X-Request-ID', requestId as string);
+  next();
 });
+
+// Add security headers to all responses
+app.use((req, res, next) => {
+  // Prevent MIME type sniffing
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
+  // Enable XSS filter in browsers
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+
+  // Prevent clickjacking
+  res.setHeader('X-Frame-Options', 'DENY');
+  
+  // Set strict content security policy
+  res.setHeader('Content-Security-Policy', "default-src 'self'; frame-ancestors 'none';");
+  
+  // Set referrer policy
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  next();
+});
+
+// Apply not found handler for undefined routes - must come after all valid routes
+app.use(errorHandler.notFoundHandler);
+
+// Global error handler - must be the last middleware
+app.use(errorHandler.errorHandler);
 
 // Initialize worker
 let worker: any;
