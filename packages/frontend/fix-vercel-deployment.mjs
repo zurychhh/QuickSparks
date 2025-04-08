@@ -100,15 +100,6 @@ async function fixDeployment() {
     // Remove any existing base tag since we're using HashRouter now
     indexHtml = indexHtml.replace(/<base href="[^"]*"[^>]*>/g, '');
     
-    // Ensure Google verification meta tag is present
-    if (!indexHtml.includes('google-site-verification')) {
-      console.log('Adding Google verification meta tag...');
-      indexHtml = indexHtml.replace(
-        /<meta name="viewport".*?>/,
-        '$&\n    <meta name="google-site-verification" content="WIKscPK-LpMMM63OZiE66Gsg1K0LXmXSt5z6wP4AqwQ" />'
-      );
-    }
-    
     // Update paths to be relative
     indexHtml = indexHtml.replace(/href="\/pdfspark\//g, 'href="./');
     indexHtml = indexHtml.replace(/src="\/pdfspark\//g, 'src="./');
@@ -181,14 +172,6 @@ window.addEventListener('DOMContentLoaded', function() {
       JSON.stringify(packageJson, null, 2)
     );
     console.log('✅ Created package.json in dist-fix');
-    
-    // Create Google verification file
-    console.log('\nStep 6.1: Creating Google verification file...');
-    fs.writeFileSync(
-      path.join(distFixDir, 'googlefaa9d441c86b843b.html'),
-      'google-site-verification: googlefaa9d441c86b843b.html'
-    );
-    console.log('✅ Created Google verification file');
 
     // Deploy to Vercel
     console.log('\nStep 7: Deploying to Vercel...');
