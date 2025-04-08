@@ -3,12 +3,14 @@
   "buildCommand": "cd packages/frontend && cp index.html index.html.bak && echo '<!DOCTYPE html><html><head><meta name=\"google-site-verification\" content=\"WIKscPK-LpMMM63OZiE66Gsg1K0LXmXSt5z6wP4AqwQ\" /></head><body></body></html>' > googlefaa9d441c86b843b.html && pnpm run build:vercel && cd dist && echo '<!DOCTYPE html><html><head><meta name=\"google-site-verification\" content=\"WIKscPK-LpMMM63OZiE66Gsg1K0LXmXSt5z6wP4AqwQ\" /></head><body></body></html>' > google-verification.html",
   "outputDirectory": "packages/frontend/dist",
   "framework": "vite",
+  "routes": [
+    { "src": "/googlefaa9d441c86b843b.html", "dest": "/googlefaa9d441c86b843b.html" },
+    { "src": "/pdfspark/googlefaa9d441c86b843b.html", "dest": "/googlefaa9d441c86b843b.html" },
+    { "src": "/google-verification.html", "dest": "/google-verification.html" },
+    { "src": "/privacy-policy", "dest": "/documents/privacy-policy.html" },
+    { "src": "/paintmate-privacy", "dest": "/documents/privacy-policy.html" }
+  ],
   "rewrites": [
-    { "source": "/privacy-policy", "destination": "/legal/paintmate-privacy.html" },
-    { "source": "/paintmate-privacy", "destination": "/legal/paintmate-privacy.html" },
-    { "source": "/googlefaa9d441c86b843b.html", "destination": "/googlefaa9d441c86b843b.html" },
-    { "source": "/pdfspark/googlefaa9d441c86b843b.html", "destination": "/googlefaa9d441c86b843b.html" },
-    { "source": "/google-verification.html", "destination": "/google-verification.html" },
     {
       "source": "/api/:path*",
       "destination": "https://pdfspark-api.onrender.com/api/:path*"
